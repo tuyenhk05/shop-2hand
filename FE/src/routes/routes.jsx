@@ -1,13 +1,9 @@
 //import Layoutt from "../components/Layout";
 import Home from "../pages/home/index.home";
 import Register from "../pages/register/Register";
-//import Login from "../components/Login/index";
-//import Register from "../components/Sigup/index";
-//import Courses from "../components/DsCourses/index";
-//import AllCourses from "../components/DsCourses/allCourses";
-//import CourseDetail from "../components/DsCourses/CoursesDetail";
-//import Profile from "../components/Profile";
-//import FavoritesPage from "../components/CoursesLike/index";
+import Login from "../pages/login/Login";
+import Layout from "../components/layout/layout";
+
 
 
 export const routes = [
@@ -51,5 +47,9 @@ export const routes = [
     {
         path: "/register", 
         element: <Register />
+    },
+    {
+        path: "/login",
+        element: <Login />
     }
 ]

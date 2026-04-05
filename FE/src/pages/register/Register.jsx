@@ -2,8 +2,11 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { postRegister } from "../../services/register"; 
+import useScrollToTop from "../../hooks/useScrollToTop";
+import AnimateWhenVisible from "../../helpers/animationScroll";
 
 const Register = () => {
+    useScrollToTop();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -21,8 +24,7 @@ const Register = () => {
   const [submitError, setSubmitError] = useState('');
   const [passwordVisibility, setPasswordVisibility] = useState({
     password: false,
-    confirmPassword: false
-  });
+    confirmPassword: false});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -140,24 +142,13 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-surface glass-header border-b border-outline-variant/10">
-        <div className="flex justify-between items-center px-6 md:px-8 py-4 w-full max-w-7xl mx-auto">
-          <a className="text-2xl font-bold tracking-tighter text-primary font-headline" href="/">
-            Atelier
-          </a>
-          <div className="hidden md:flex items-center gap-8">
-            <span className="text-xs uppercase tracking-[0.2em] text-on-surface-variant font-label">
-              Eco-Conscious Luxury
-            </span>
-          </div>
-        </div>
-      </header>
+      <div className="min-h-screen bg-surface flex flex-col">
+          {/* Visual Side */}              <AnimateWhenVisible direction="fadeInUp" className="w-full">
 
-      <main className="flex-grow flex items-center justify-center pt-24 pb-12 px-4 md:px-6">
+          <main className="flex-grow flex items-center justify-center pt-24 pb-12 px-4 md:px-6">
+
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-2xl bg-surface-container-low shadow-lg">
-          {/* Visual Side */}
+
           <div className="hidden lg:flex lg:col-span-5 relative overflow-hidden bg-gradient-to-br from-primary-container to-primary">
             <div className="absolute inset-0 opacity-30">
               <img
@@ -179,7 +170,6 @@ const Register = () => {
               </div>
             </div>
           </div>
-
           {/* Form Side */}
           <div className="lg:col-span-7 bg-surface-container-lowest p-6 md:p-12 lg:p-16 flex flex-col justify-center">
             <div className="max-w-md mx-auto w-full space-y-6">
@@ -472,26 +462,13 @@ const Register = () => {
               </div>
             </div>
           </div>
-        </div>
-      </main>
+                  </div>
 
-      {/* Footer */}
-      <footer className="w-full mt-auto bg-surface-container-low border-t border-outline-variant/10">
-        <div className="flex flex-col md:flex-row justify-between items-center px-6 md:px-12 py-8 w-full max-w-7xl mx-auto gap-4">
-          <span className="text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant/70">
-            © 2024 Atelier Digital. Conscious Luxury.
-          </span>
-          <div className="flex gap-8">
-            <a className="text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant/70 hover:text-primary transition-colors" href="#">
-              Privacy Policy
-            </a>
-            <a className="text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant/70 hover:text-primary transition-colors" href="#">
-              Sustainability
-            </a>
-          </div>
-        </div>
-      </footer>
-    </div>
+          </main>
+        </AnimateWhenVisible>
+
+      </div >
+     
   );
 };
 
