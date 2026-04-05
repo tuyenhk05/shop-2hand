@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Lịch sử mua hàng | Atelier</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;0,900;1,400;1,900&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-background": "#1c1c19",
+                        "tertiary-fixed": "#d3e8d5",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c8b8",
+                        "surface-dim": "#dcdad5",
+                        "surface-container": "#f0ede8",
+                        "surface-variant": "#e5e2dd",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#514532",
+                        "secondary-container": "#f0ddc3",
+                        "inverse-on-surface": "#f3f0eb",
+                        "tertiary-container": "#849887",
+                        "outline": "#76786b",
+                        "background": "#fcf9f4",
+                        "surface-container-highest": "#e5e2dd",
+                        "surface-tint": "#4c6545",
+                        "secondary-fixed": "#f3e0c6",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#506354",
+                        "on-primary-fixed": "#0a2007",
+                        "inverse-primary": "#b3cea7",
+                        "surface-container-high": "#ebe8e3",
+                        "inverse-surface": "#31302d",
+                        "primary-container": "#809b77",
+                        "on-surface": "#1c1c19",
+                        "on-primary-container": "#1b3116",
+                        "primary": "#4c6545",
+                        "on-secondary-fixed": "#231a0a",
+                        "error": "#ba1a1a",
+                        "surface": "#fcf9f4",
+                        "on-tertiary-container": "#1e3023",
+                        "secondary": "#6a5c48",
+                        "on-surface-variant": "#46483c",
+                        "on-secondary-container": "#6e614c",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#ceebc2",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#b3cea7",
+                        "surface-container-low": "#f6f3ee",
+                        "surface-bright": "#fcf9f4"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #fcf9f4; color: #1c1c19; }
+        .font-notoSerif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fcf9f4]/80 backdrop-blur-md">
+<nav class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-12">
+<a class="font-notoSerif italic font-black text-2xl text-[#4c6545]" href="#">Atelier</a>
+<div class="hidden md:flex gap-8">
+<a class="text-[#46483c] hover:text-[#4c6545] transition-colors font-medium" href="#">Cửa hàng</a>
+<a class="text-[#46483c] hover:text-[#4c6545] transition-colors font-medium" href="#">Bền vững</a>
+<a class="text-[#46483c] hover:text-[#4c6545] transition-colors font-medium" href="#">Kho lưu trữ</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="p-2 hover:bg-stone-200/50 rounded-lg transition-all active:scale-95 text-[#4c6545]">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+<button class="p-2 hover:bg-stone-200/50 rounded-lg transition-all active:scale-95 text-[#4c6545]">
+<span class="material-symbols-outlined">shopping_bag</span>
+</button>
+<button class="p-2 hover:bg-stone-200/50 rounded-lg transition-all active:scale-95 text-[#4c6545] border-b-2 border-[#4c6545] pb-1">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+</nav>
+</header>
+<main class="pt-32 pb-20 max-w-7xl mx-auto px-6">
+<!-- Hero Section / Editorial Header -->
+<section class="mb-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+<div class="md:col-span-7">
+<h1 class="font-notoSerif text-5xl md:text-7xl font-black text-on-surface tracking-tight mb-6">
+                    Lịch sử <span class="italic text-primary">sở hữu.</span>
+</h1>
+<p class="text-on-surface-variant max-w-lg text-lg font-light leading-relaxed">
+                    Mỗi món đồ bạn chọn tại Atelier không chỉ là một giao dịch, mà là một bước đi hướng tới lối sống bền vững hơn. Cảm ơn bạn đã đồng hành cùng chúng tôi.
+                </p>
+</div>
+<!-- CO2 Impact Card -->
+<div class="md:col-span-5 bg-primary-container/20 p-8 rounded-xl border border-primary/10 relative overflow-hidden">
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-bold tracking-widest text-xs text-primary uppercase">TÁC ĐỘNG MÔI TRƯỜNG</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-notoSerif text-5xl font-black text-primary">124.5</span>
+<span class="font-headline text-xl text-primary/80">kg CO2</span>
+</div>
+<p class="text-on-primary-container text-sm mt-2 opacity-80">Tổng lượng phát thải đã giảm thiểu từ các đơn hàng của bạn.</p>
+</div>
+<!-- Abstract decorative element -->
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+</div>
+</section>
+<!-- Order List Section -->
+<section class="space-y-12">
+<!-- Filter Bar (Soft Minimalism) -->
+<div class="flex flex-wrap items-center justify-between gap-4 py-6 border-b border-outline-variant/30">
+<div class="flex gap-4">
+<span class="px-6 py-2 bg-primary text-on-primary rounded-full text-sm font-medium">Tất cả đơn hàng</span>
+<span class="px-6 py-2 bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer rounded-full text-sm font-medium text-on-surface-variant">Đang xử lý</span>
+<span class="px-6 py-2 bg-surface-container hover:bg-surface-container-high transition-colors cursor-pointer rounded-full text-sm font-medium text-on-surface-variant">Đã hoàn thành</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-xl">sort</span>
+<span class="text-sm font-medium">Sắp xếp: Mới nhất</span>
+</div>
+</div>
+<!-- Orders Bento/Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Order Card 1: Delivered -->
+<div class="lg:col-span-2 group">
+<div class="bg-surface-container-lowest p-8 rounded-xl transition-all duration-300 hover:shadow-[0_24px_40px_-15px_rgba(28,28,25,0.04)] border border-transparent hover:border-outline-variant/20">
+<div class="flex flex-wrap justify-between items-start mb-8 gap-4">
+<div>
+<span class="block text-[10px] tracking-[0.2em] uppercase font-bold text-outline mb-1">MÃ ĐƠN HÀNG</span>
+<h3 class="font-headline font-bold text-xl text-on-surface">#ATL-882910</h3>
+</div>
+<div class="text-right">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-[11px] font-bold uppercase tracking-wider rounded-full">Đã giao hàng</span>
+<p class="text-xs text-on-surface-variant mt-2">Ngày mua: 14 Th03, 2024</p>
+</div>
+</div>
+<div class="flex items-center gap-6 mb-8 overflow-hidden">
+<img class="w-24 h-32 object-cover rounded-lg bg-surface-container" data-alt="Premium vintage wool coat in earthy brown tone hanging on a minimalist wooden rack against a beige background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC__MhZ-48PmZJ74JOAI29pLMnLHdQPzHlYzBO6O-MBcAfaaPjAU3rLTZk4yy_j3Fgmc_UtQsL5eNyhjSoHEYfFfYbktcvKqg4LzdcU-zt-A5_Im8hOt-wREW3FqLJymc9QMPCouZRZWeWAFV3zoeJOu1g6CoH5KB719iKb-fcXji8PBYaxtX24FVs4XXRK8PLrv3c6iRHLNKzvAAMTSaKld-UZmTC_rvFhGxsiupvQm9Xz8FxSCWfMFTooMmbNA6AAioioHAncIfV-"/>
+<div class="flex-1">
+<h4 class="font-headline text-lg text-on-surface">Áo khoác dạ Vintage - Nâu đất</h4>
+<p class="text-sm text-on-surface-variant mb-4">Size: M | Tình trạng: 9/10</p>
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-sm">eco</span>
+<span class="text-xs font-semibold">Tiết kiệm 18.2kg CO2</span>
+</div>
+</div>
+<div class="text-right">
+<p class="font-headline font-bold text-xl text-on-surface">4.250.000đ</p>
+</div>
+</div>
+<div class="flex justify-end gap-4 border-t border-outline-variant/10 pt-6">
+<button class="text-primary text-sm font-bold tracking-tight hover:underline underline-offset-8 transition-all px-4 py-2">Hỗ trợ</button>
+<button class="bg-primary text-on-primary px-8 py-2 rounded-lg text-sm font-bold active:scale-95 transition-all shadow-sm">Xem chi tiết</button>
+</div>
+</div>
+</div>
+<!-- Featured Impact/Small Card -->
+<div class="bg-surface-container-low p-8 rounded-xl flex flex-col justify-between border border-outline-variant/10">
+<div>
+<div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-6 shadow-sm">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-4">Giao hàng xanh</h3>
+<p class="text-on-surface-variant font-light leading-relaxed mb-6">Đơn hàng này được vận chuyển bằng phương tiện chạy điện để giảm thiểu dấu chân carbon của bạn.</p>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">Trạng thái vận chuyển</span>
+<span class="font-bold text-primary">Hoàn tất</span>
+</div>
+<div class="w-full bg-outline-variant/20 h-1 rounded-full">
+<div class="bg-primary h-full w-full rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Order Card 2: Shipping -->
+<div class="lg:col-span-3">
+<div class="bg-surface-container-lowest p-8 rounded-xl transition-all duration-300 hover:shadow-[0_24px_40px_-15px_rgba(28,28,25,0.04)] border border-transparent hover:border-outline-variant/20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 items-center">
+<div class="md:col-span-1">
+<span class="block text-[10px] tracking-[0.2em] uppercase font-bold text-outline mb-1">MÃ ĐƠN HÀNG</span>
+<h3 class="font-headline font-bold text-xl text-on-surface mb-2">#ATL-902144</h3>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[11px] font-bold uppercase tracking-wider rounded-full">Đang vận chuyển</span>
+</div>
+<div class="md:col-span-2 flex items-center gap-8">
+<div class="flex -space-x-4">
+<img class="w-16 h-16 object-cover rounded-full border-2 border-white shadow-sm bg-surface-container" data-alt="Pair of designer leather boots with elegant stitching on a neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_siTbyF1q4DU_gEEBvlLQ5Xbo1dHskTeJX_aK2zr6jN15GbOFbRXD1Ikot4jCFKJ9MIwbwKvZn-wRksP4ukHLVhT2OJ9GzCdhNA9eGxaev-nsUFAIR_PwlOOta_7F3ISevg7cVr_p6IZz7EITFfl7YL3NrijoycttgzFAzugjam8YqUc7ksZUcs5veaSvOVKH7ciIVynKTfwsQYIHx1X5mcpW2HMR4Hb1xCRImxaJ1hszWXKI7tUvdgIMlrKn1q1ygf5gE61s8XKs"/>
+<img class="w-16 h-16 object-cover rounded-full border-2 border-white shadow-sm bg-surface-container" data-alt="Luxury handcrafted leather handbag in olive green with gold hardware accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDotR3S5Lk0PG5pZuOxaYXRM03I8rtc2gRfbtyAKB3sXA9ukCVJD-AGPAKZT4NlKtnNKT9wN8rZ_2R0iOrg_10lfgaUZ1LLOL_ePg3cVQQg8tW_f1c0r-y9h-2wRuKO8QK-1dSMBVeZCyDFyY3m40yoYLx2PcvCQtaUFYI21Dp3kidvSBdHqty2hDwW2X9kGNcAPfliEXdZnrku-_8_UedcvxQ8HOhqN-01uuGD5nbsOjs4P1RwBqwrzoGOCddV0WcWfjxdlV9o7tS7"/>
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center border-2 border-white text-xs font-bold text-on-surface-variant">+1</div>
+</div>
+<div>
+<p class="text-on-surface font-semibold">Gói đồ phụ kiện Xuân Hè</p>
+<p class="text-sm text-on-surface-variant">Dự kiến giao: 22 Th03</p>
+</div>
+</div>
+<div class="md:col-span-1 flex flex-col items-end gap-4">
+<p class="font-headline font-bold text-2xl text-on-surface">8.120.000đ</p>
+<button class="bg-primary text-on-primary px-8 py-2 rounded-lg text-sm font-bold active:scale-95 transition-all shadow-sm">Theo dõi đơn</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Card 3: Completed -->
+<div class="lg:col-span-2">
+<div class="bg-surface-container-lowest p-8 rounded-xl transition-all duration-300 hover:shadow-[0_24px_40px_-15px_rgba(28,28,25,0.04)] border border-transparent hover:border-outline-variant/20">
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline-variant">inventory_2</span>
+<div>
+<h3 class="font-headline font-bold text-lg text-on-surface">#ATL-775102</h3>
+<p class="text-xs text-on-surface-variant">Ngày mua: 28 Th01, 2024</p>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden sm:block text-right">
+<p class="text-xs text-outline font-bold uppercase tracking-widest mb-1">TỔNG CỘNG</p>
+<p class="font-headline font-bold text-lg text-on-surface">1.890.000đ</p>
+</div>
+<button class="text-primary hover:bg-primary/5 px-6 py-2 rounded-lg text-sm font-bold transition-all border border-primary/20">Xem chi tiết</button>
+</div>
+</div>
+<div class="flex items-center gap-2 text-primary/70">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="text-xs font-medium italic">Đơn hàng này đã đóng góp 8.4kg vào tổng lượng CO2 tiết kiệm được.</span>
+</div>
+</div>
+</div>
+<!-- Secondary Info Card -->
+<div class="bg-secondary-container/30 p-8 rounded-xl border border-secondary-container/50">
+<h3 class="font-headline text-xl font-bold text-on-secondary-container mb-4">Chăm sóc &amp; Bảo quản</h3>
+<p class="text-on-secondary-container/80 text-sm font-light leading-relaxed mb-6">Kéo dài tuổi thọ của các món đồ là cách tốt nhất để bảo vệ môi trường. Hãy xem hướng dẫn chăm sóc riêng cho từng chất liệu.</p>
+<a class="text-on-secondary-container font-bold text-sm inline-flex items-center gap-2 group" href="#">
+                        Khám phá hướng dẫn
+                        <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">north_east</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Pagination (Soft Minimalism) -->
+<div class="mt-20 flex justify-center items-center gap-4">
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<span class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-on-primary font-bold text-sm shadow-sm">1</span>
+<span class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all text-sm cursor-pointer">2</span>
+<span class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-all text-sm cursor-pointer">3</span>
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t-0 mt-20 bg-[#f6f3ee] py-12 px-8 flex flex-col items-center border-t border-[#c6c8b8]/20">
+<div class="max-w-7xl w-full grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+<div class="md:col-span-2">
+<h2 class="font-notoSerif font-bold text-2xl text-[#4c6545] mb-4">Atelier</h2>
+<p class="font-manrope text-sm tracking-wide text-[#46483c] max-w-sm">Chế tác thủ công cho tương lai bền vững. Chúng tôi tuyển chọn những món đồ vượt thời gian để giảm thiểu rác thải thời trang.</p>
+</div>
+<div>
+<h4 class="font-bold text-[#4c6545] mb-4 uppercase text-xs tracking-[0.2em]">Khám phá</h4>
+<ul class="space-y-3">
+<li><a class="font-manrope text-sm text-[#46483c] hover:text-[#4c6545] hover:underline transition-all underline-offset-4" href="#">Về chúng tôi</a></li>
+<li><a class="font-manrope text-sm text-[#46483c] hover:text-[#4c6545] hover:underline transition-all underline-offset-4" href="#">Chính sách bảo mật</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-[#4c6545] mb-4 uppercase text-xs tracking-[0.2em]">Hỗ trợ</h4>
+<ul class="space-y-3">
+<li><a class="font-manrope text-sm text-[#46483c] hover:text-[#4c6545] hover:underline transition-all underline-offset-4" href="#">Điều khoản sử dụng</a></li>
+<li><a class="font-manrope text-sm text-[#46483c] hover:text-[#4c6545] hover:underline transition-all underline-offset-4" href="#">Liên hệ</a></li>
+</ul>
+</div>
+</div>
+<p class="font-manrope text-xs tracking-wide text-[#46483c] opacity-60">© 2024 Atelier. Chế tác thủ công cho tương lai bền vững.</p>
+</footer>
+</body></html>

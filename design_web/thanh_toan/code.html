@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;0,900;1,400;1,900&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-background": "#1c1c19",
+              "tertiary-fixed": "#d3e8d5",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c8b8",
+              "surface-dim": "#dcdad5",
+              "surface-container": "#f0ede8",
+              "surface-variant": "#e5e2dd",
+              "tertiary-fixed-dim": "#b7ccb9",
+              "on-tertiary-fixed": "#0e1f13",
+              "on-tertiary-fixed-variant": "#394b3d",
+              "on-primary-fixed-variant": "#354d2f",
+              "on-error-container": "#93000a",
+              "on-secondary-fixed-variant": "#514532",
+              "secondary-container": "#f0ddc3",
+              "inverse-on-surface": "#f3f0eb",
+              "tertiary-container": "#849887",
+              "outline": "#76786b",
+              "background": "#fcf9f4",
+              "surface-container-highest": "#e5e2dd",
+              "surface-tint": "#4c6545",
+              "secondary-fixed": "#f3e0c6",
+              "on-error": "#ffffff",
+              "secondary-fixed-dim": "#d6c4ab",
+              "on-secondary": "#ffffff",
+              "tertiary": "#506354",
+              "on-primary-fixed": "#0a2007",
+              "inverse-primary": "#b3cea7",
+              "surface-container-high": "#ebe8e3",
+              "inverse-surface": "#31302d",
+              "primary-container": "#809b77",
+              "on-surface": "#1c1c19",
+              "on-primary-container": "#1b3116",
+              "primary": "#4c6545",
+              "on-secondary-fixed": "#231a0a",
+              "error": "#ba1a1a",
+              "surface": "#fcf9f4",
+              "on-tertiary-container": "#1e3023",
+              "secondary": "#6a5c48",
+              "on-surface-variant": "#46483c",
+              "on-secondary-container": "#6e614c",
+              "error-container": "#ffdad6",
+              "primary-fixed": "#ceebc2",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#b3cea7",
+              "surface-container-low": "#f6f3ee",
+              "surface-bright": "#fcf9f4"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #fcf9f4; color: #1c1c19; }
+        .font-notoSerif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-[#fcf9f4]/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-12">
+<a class="font-notoSerif italic font-black text-2xl text-[#4c6545]" href="#">Atelier</a>
+<div class="hidden md:flex space-x-8">
+<a class="text-[#46483c] hover:text-[#4c6545] font-medium transition-colors" href="#">Cửa hàng</a>
+<a class="text-[#46483c] hover:text-[#4c6545] font-medium transition-colors" href="#">Bền vững</a>
+<a class="text-[#46483c] hover:text-[#4c6545] font-medium transition-colors" href="#">Kho lưu trữ</a>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<button class="material-symbols-outlined text-[#4c6545] hover:bg-stone-200/50 p-2 rounded-lg transition-all" data-icon="favorite">favorite</button>
+<button class="material-symbols-outlined text-[#4c6545] hover:bg-stone-200/50 p-2 rounded-lg transition-all" data-icon="shopping_bag">shopping_bag</button>
+<button class="material-symbols-outlined text-[#4c6545] hover:bg-stone-200/50 p-2 rounded-lg transition-all" data-icon="person">person</button>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 pt-32 pb-20">
+<!-- Header Section -->
+<div class="mb-12">
+<h1 class="font-headline font-black text-4xl text-on-background tracking-tight mb-2">Thanh toán</h1>
+<p class="font-body text-on-surface-variant text-sm tracking-wide">Hoàn tất đơn hàng của bạn và đóng góp vào tương lai bền vững.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Left Column: Checkout Forms -->
+<div class="lg:col-span-7 space-y-12">
+<!-- Delivery Information -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="local_shipping">local_shipping</span>
+<h2 class="font-headline font-bold text-xl">Thông tin giao hàng</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Họ và tên</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="Nguyễn Văn A" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Số điện thoại</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="090 123 4567" type="tel"/>
+</div>
+<div class="md:col-span-2 space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Địa chỉ nhận hàng</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="Số nhà, tên đường, phường/xã..." type="text"/>
+</div>
+</div>
+</section>
+<!-- Shipping Method -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="package_2">package_2</span>
+<h2 class="font-headline font-bold text-xl">Phương thức vận chuyển</h2>
+</div>
+<div class="space-y-3">
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant/20 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<input checked="" class="text-primary focus:ring-primary" name="shipping" type="radio"/>
+<div>
+<p class="font-bold text-sm">Giao hàng tiêu chuẩn</p>
+<p class="text-xs text-on-surface-variant">3-5 ngày làm việc</p>
+</div>
+</div>
+<span class="font-bold text-sm">30.000đ</span>
+</label>
+<label class="flex items-center justify-between p-4 bg-surface-container-low border border-outline-variant/10 rounded-xl cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<input class="text-primary focus:ring-primary" name="shipping" type="radio"/>
+<div>
+<p class="font-bold text-sm">Giao hàng hỏa tốc</p>
+<p class="text-xs text-on-surface-variant">24 giờ trong nội thành</p>
+</div>
+</div>
+<span class="font-bold text-sm">55.000đ</span>
+</label>
+</div>
+</section>
+<!-- Payment Method -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+<h2 class="font-headline font-bold text-xl">Phương thức thanh toán</h2>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<button class="flex flex-col items-center justify-center p-6 bg-surface-container-lowest border-2 border-primary rounded-xl gap-2">
+<span class="material-symbols-outlined" data-icon="credit_card">credit_card</span>
+<span class="text-xs font-bold uppercase tracking-widest">Thẻ tín dụng</span>
+</button>
+<button class="flex flex-col items-center justify-center p-6 bg-surface-container-low border border-outline-variant/20 rounded-xl gap-2 hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+<span class="text-xs font-bold uppercase tracking-widest">Ví điện tử</span>
+</button>
+</div>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Số thẻ</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="0000 0000 0000 0000" type="text"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
+<div class="w-8 h-5 bg-stone-300 rounded-sm"></div>
+<div class="w-8 h-5 bg-stone-400 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">Ngày hết hạn</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="MM/YY" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1">CVC / CVV</label>
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all" placeholder="***" type="text"/>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Order Summary & Eco Impact -->
+<div class="lg:col-span-5">
+<div class="sticky top-32 space-y-6">
+<!-- Order Summary Card -->
+<div class="bg-surface-container-low rounded-2xl p-8">
+<h3 class="font-headline font-bold text-xl mb-6">Tóm tắt đơn hàng</h3>
+<div class="space-y-6 mb-8">
+<!-- Item 1 -->
+<div class="flex gap-4">
+<div class="w-20 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Vintage Wool Coat" class="w-full h-full object-cover" data-alt="high-end vintage wool beige overcoat hanging on a minimalist wooden hanger against a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgHeumS0h4AXuVxQf7UnOreSxb0ZXMTaS1p7o72pYVsnOW2J4TR5pQ3ik6Kbdew5bdlG4P3E9-D1XTD_5HTlpGVJlakjszkHysDAkfhz1XhUuz0HH6Uc7alv0E5aXkwfWsKQFsx5Wo5XwSci3YwnAvKYkdjiq2IIXjMXP1cPsSQ4a4_F30MKlr4oy6kagREvKUQnyZmT1kQgK95aKA-1TqAWj82srAYIh1YbbgpEUhK1dlQfrFakOhuAEBCuHevepMRmupcC7yQ-4E"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-sm uppercase tracking-tight">Áo khoác dạ Vintage</h4>
+<span class="font-bold text-sm">2.450.000đ</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Size: M | Màu: Beige</p>
+<div class="mt-2 inline-block bg-tertiary-container/20 text-on-tertiary-container text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">
+                                        Verified Pre-owned
+                                    </div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex gap-4">
+<div class="w-20 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Leather Loafers" class="w-full h-full object-cover" data-alt="luxury designer leather loafers with gold hardware on a marble pedestal, editorial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpAqaktdW8BNkmsAgflgbQjD429ng922clXEiz4tOmPptcrQoLMJkY0SUB2HpVX73SlTjyIhf6-WbeDDLaiv4zEmkT7_fTXy57aV7MFSea0zQxrvNqea0evvA4t4u-0E9w4k2MZl6AN-hI0cDCOifTmDYeHXB89n0FkkuIbM2xefJNLSoxLfYdjoUxZOUh_YfingGOl7oUdKC_6fOe8S33dr7QiKuWoxcT-H_CFy0iVdqdfnV-ZHyOWVjsIVTzcYBKEG8wvclCm7nc"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-sm uppercase tracking-tight">Giày Loafer Da Thuần</h4>
+<span class="font-bold text-sm">1.800.000đ</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1">Size: 40 | Màu: Nâu Cafe</p>
+<div class="mt-2 inline-block bg-tertiary-container/20 text-on-tertiary-container text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">
+                                        Verified Pre-owned
+                                    </div>
+</div>
+</div>
+</div>
+<div class="space-y-3 pt-6 border-t border-outline-variant/20">
+<div class="flex justify-between text-sm text-on-surface-variant">
+<span>Tạm tính</span>
+<span>4.250.000đ</span>
+</div>
+<div class="flex justify-between text-sm text-on-surface-variant">
+<span>Phí vận chuyển</span>
+<span>30.000đ</span>
+</div>
+<div class="flex justify-between font-headline font-bold text-lg pt-2">
+<span>Tổng cộng</span>
+<span class="text-primary">4.280.000đ</span>
+</div>
+</div>
+<button class="w-full mt-8 bg-primary text-on-primary font-bold py-4 rounded-xl hover:bg-primary-container transition-all scale-active-95">
+                            Xác nhận thanh toán
+                        </button>
+</div>
+<!-- Eco Impact Card -->
+<div class="bg-tertiary-container/10 border border-tertiary-container/20 rounded-2xl p-6">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="eco">eco</span>
+<h4 class="font-headline font-bold text-sm uppercase tracking-widest">Tác động môi trường</h4>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed mb-6">
+                            Bằng cách chọn mua đồ cũ cao cấp, bạn đã trực tiếp giúp giảm thiểu rác thải thời trang và tiết kiệm tài nguyên thiên nhiên.
+                        </p>
+<!-- Eco Slider -->
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<span class="text-[10px] font-bold uppercase tracking-tighter text-on-surface-variant">Lượng CO2 tiết kiệm</span>
+<span class="text-xl font-notoSerif font-black text-primary">12.5 kg</span>
+</div>
+<div class="relative h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-[75%] bg-primary rounded-full"></div>
+</div>
+<p class="text-[10px] italic text-on-surface-variant text-center">Tương đương với 50 ngày lọc không khí của một cây xanh trưởng thành.</p>
+</div>
+</div>
+<!-- Provenance Badge Section -->
+<div class="flex items-center justify-center gap-2 py-4">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="verified_user">verified_user</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Mọi sản phẩm đều được giám định thủ công</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-[#f6f3ee] py-12 px-8 border-t border-[#c6c8b8]/20 mt-20">
+<div class="max-w-7xl mx-auto flex flex-col items-center">
+<a class="font-notoSerif font-bold text-2xl text-[#4c6545] mb-6" href="#">Atelier</a>
+<div class="flex flex-wrap justify-center gap-8 mb-8">
+<a class="font-manrope text-sm tracking-wide text-[#46483c] hover:text-[#4c6545] hover:underline underline-offset-4 transition-all" href="#">Về chúng tôi</a>
+<a class="font-manrope text-sm tracking-wide text-[#46483c] hover:text-[#4c6545] hover:underline underline-offset-4 transition-all" href="#">Chính sách bảo mật</a>
+<a class="font-manrope text-sm tracking-wide text-[#46483c] hover:text-[#4c6545] hover:underline underline-offset-4 transition-all" href="#">Điều khoản sử dụng</a>
+<a class="font-manrope text-sm tracking-wide text-[#46483c] hover:text-[#4c6545] hover:underline underline-offset-4 transition-all" href="#">Liên hệ</a>
+</div>
+<p class="font-manrope text-xs tracking-wide text-[#46483c]/60">© 2024 Atelier. Chế tác thủ công cho tương lai bền vững.</p>
+</div>
+</footer>
+</body></html>

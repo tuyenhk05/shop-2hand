@@ -1,4 +1,6 @@
-const API = "api";
+
+
+const API = `http://localhost:3001/api`;
 export const get = async (path) => {
     try {
         const response = await fetch(`${API + path}`);

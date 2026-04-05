@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Atelier | Kho lưu trữ Tuyển chọn</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f6f3ee",
+              "surface-container-high": "#ebe8e3",
+              "tertiary-fixed-dim": "#b7ccb9",
+              "primary-container": "#809b77",
+              "on-primary-fixed-variant": "#354d2f",
+              "on-surface-variant": "#46483c",
+              "surface-variant": "#e5e2dd",
+              "inverse-on-surface": "#f3f0eb",
+              "tertiary-container": "#849887",
+              "primary-fixed": "#ceebc2",
+              "secondary": "#6a5c48",
+              "surface-container": "#f0ede8",
+              "primary": "#4c6545",
+              "inverse-surface": "#31302d",
+              "surface-tint": "#4c6545",
+              "tertiary-fixed": "#d3e8d5",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#1e3023",
+              "secondary-fixed": "#f3e0c6",
+              "surface-container-highest": "#e5e2dd",
+              "surface-bright": "#fcf9f4",
+              "on-background": "#1c1c19",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed": "#231a0a",
+              "on-primary-fixed": "#0a2007",
+              "inverse-primary": "#b3cea7",
+              "surface-dim": "#dcdad5",
+              "error": "#ba1a1a",
+              "surface": "#fcf9f4",
+              "on-secondary-fixed-variant": "#514532",
+              "outline-variant": "#c6c8b8",
+              "secondary-container": "#f0ddc3",
+              "primary-fixed-dim": "#b3cea7",
+              "on-tertiary-fixed-variant": "#394b3d",
+              "outline": "#76786b",
+              "on-primary": "#ffffff",
+              "secondary-fixed-dim": "#d6c4ab",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#1b3116",
+              "error-container": "#ffdad6",
+              "background": "#fcf9f4",
+              "on-secondary-container": "#6e614c",
+              "on-error-container": "#93000a",
+              "on-surface": "#1c1c19",
+              "on-tertiary-fixed": "#0e1f13",
+              "tertiary": "#506354"
+            },
+            fontFamily: {
+              "notoSerif": ["Noto Serif", "serif"],
+              "manrope": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface font-manrope text-on-surface antialiased">
+<!-- Top Navigation -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 bg-[#fcf9f4]/80 dark:bg-stone-900/80 backdrop-blur-md z-50 shadow-sm dark:shadow-none">
+<div class="text-2xl font-bold font-notoSerif text-[#4c6545] dark:text-[#ceebc2] tracking-tighter">Atelier</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#46483c] dark:text-stone-400 font-notoSerif tracking-tighter hover:text-[#4c6545] transition-colors duration-300" href="#">Cửa hàng</a>
+<a class="text-[#46483c] dark:text-stone-400 font-notoSerif tracking-tighter hover:text-[#4c6545] transition-colors duration-300" href="#">Bền vững</a>
+<a class="text-[#4c6545] dark:text-[#ceebc2] border-b border-[#4c6545] font-notoSerif tracking-tighter hover:text-[#4c6545] transition-colors duration-300" href="#">Kho lưu trữ</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#4c6545] cursor-pointer" data-icon="camera_alt">camera_alt</span>
+<span class="material-symbols-outlined text-[#4c6545] cursor-pointer" data-icon="shopping_bag">shopping_bag</span>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant">
+<img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHrCKthtFP_1TQoxiMz4K2aI7Je5ehpMAXKhcbtb1uNZ3ciTGyWgdi65nYfpYaufugZH3fqOeh6hya4jzSO6yVPoKzezvQ20-1Fzsl2EgleZgFYWAVu84pTIAAHYeAimaVR4bL2NC2LSXY6uo_U8BL0cxPy_YjTH4mRhYgwIlLrTa55CK5BTSVyUFuckj85Z4Cg1eI2q_tCMKNmF1VKsYJOh4da3h6dHHOI_WlkW9cnUyAtS4zMhRzIzg73ydEqYdurpvrgQKQZyFY"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-7xl mx-auto">
+<!-- Search & Editorial Header -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
+<div class="max-w-2xl">
+<h1 class="text-5xl md:text-7xl font-notoSerif font-bold tracking-tighter text-on-surface mb-4">Kho lưu trữ</h1>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-lg">Tuyển chọn các tạo tác đồ cũ, được nâng niu với sự tôn trọng dành cho thiết kế cao cấp. Sự sang trọng bền vững cho nhà sưu tập có ý thức.</p>
+</div>
+<div class="w-full md:w-96">
+<div class="relative flex items-center bg-surface-container-highest rounded-xl p-1">
+<input class="w-full bg-transparent border-none focus:ring-0 px-4 py-3 text-on-surface placeholder-on-surface-variant/60" placeholder="Tìm kiếm sản phẩm tuyển chọn..." type="text"/>
+<button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2.5 rounded-lg text-sm font-medium transition-transform active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-sm" data-icon="camera_alt">camera_alt</span> Ảnh
+                        </button>
+</div>
+</div>
+</div>
+<!-- Featured Curations Banner -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+<div class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer">
+<img alt="Minimalism 90s" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoQTlbN-mL98H2V54xROtytSXZO5tet6h4ymtsRto8ivYiejntM5sHO_aPmiqJfw0bTlE0Nc6SEJJiXFEIgc5d1DVEB3plmWw44pW6QeJAPz9FUPMcEX6dq7_X4LlRjQgZw9aSgjTAbrilO3PFx0pSa_kBEgqD-tX3FKlgpvrK-odQAF6pwARTvJfOJu8gZ60ZxNAxdD2T2vyrSAYcgeT1uAdMNRFQ-uX-1owQR_NuB0nF_PqYFGPhVLlDNS8OqRTxG-lu4yTr7gjn"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-end p-4">
+<span class="text-white font-notoSerif font-bold text-lg leading-tight">Minimalism 90s</span>
+</div>
+</div>
+<div class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer">
+<img alt="Archive Outerwear" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTHkTsxnFJx7fSAmxFDexBZ47Hs8J6dDd4ySBg3GP4XPo215HUiagIJUoTsEcCY7P5b1Tp3oBvRdBXUShggZtVZfgpLxSr9LyCeoH0j9CAOES8k4LJvBPD5I3zKTv6rB9zXc3y_yf24Qc1twuk1yIHoYC4fWFkq1eI6Jb7jSWGO3XSXTBrXHkfHZ4664VjIpnLd-M6g775a8muGFcmz0JF5cEuVNeN4LcY9FRTXCtG7t1765uaAJxzPmsLSOE3DmfzSZgG-TXHBw7F"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-end p-4">
+<span class="text-white font-notoSerif font-bold text-lg leading-tight">Archive Outerwear</span>
+</div>
+</div>
+<div class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer">
+<img alt="Sustainable Denim" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEj8FT4dCEtBOaP1H7lvJ_mSn1wYpxGj2S3URQ5AHnWoV60BwAWxfWQKsaxi0Zad9Qih9ShMFDpe0qXdUOfTEfeBqQNIe3pEAeclCdB6OPXf0vHconbXXqWHJeAqOsPSxhFaywEbsVop_qjq-c0aYkdQRgsCbXhNfhCPCB6BVdZKUHPcyA2Wtw-vEmkDvNd1sf_V7Xz5aWs1py_F8ylJJQRKzYZU80WrC4YqZiI4yJe-CalfaPSVLjKkmMwnyL7Iz096d1w91SrH4d"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-end p-4">
+<span class="text-white font-notoSerif font-bold text-lg leading-tight">Sustainable Denim</span>
+</div>
+</div>
+<div class="group relative aspect-[4/3] rounded-2xl overflow-hidden cursor-pointer">
+<img alt="Watch Gallery" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbFo1c0X5EzL0VCuVYmhY1ti6jV-j9DBG7bWTSXcwJ13auTxZ7ixKVzoAoQ6_Oc27k6tgv5mWbIIxTNuYbrbY9FG3fho3qrjLKROnyMTp5X93F0bU4mLqqC4YRoBOj8Sp_OYq4Qz_NhLgdcohMJ94i3JTJ4a602Jad5_vMwsXoCEhmv39fJV3LnOEFPJh2anPXCYlOgn3wx9IXVTX6FUoljnb5J-08KXvebNwBUWHc2B4kg8LEAtmgluOG6G4dt548D2FrU5fhULBV"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-end p-4">
+<span class="text-white font-notoSerif font-bold text-lg leading-tight">Vintage Watches</span>
+</div>
+</div>
+</div>
+<!-- Smart Filters -->
+<div class="flex flex-col gap-6">
+<div class="flex flex-wrap items-center gap-4 overflow-x-auto hide-scrollbar pb-2">
+<div class="flex items-center gap-2 pr-4 border-r border-outline-variant/30">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Kỷ nguyên</span>
+<div class="flex gap-2">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap">Thập niên 90</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap hover:bg-surface-container-highest">Y2K</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap hover:bg-surface-container-highest">Tối giản</span>
+</div>
+</div>
+<div class="flex items-center gap-2 pr-4 border-r border-outline-variant/30">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Tình trạng</span>
+<div class="flex gap-2">
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap hover:bg-surface-container-highest">Như mới</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap hover:bg-surface-container-highest">Tốt</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Độ hiếm</span>
+<div class="flex gap-2">
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap hover:bg-surface-container-highest">Lưu trữ</span>
+<span class="bg-tertiary-container text-on-tertiary-container px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap">Cổ điển</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between py-4 border-t border-outline-variant/10">
+<span class="text-sm font-manrope text-on-surface-variant italic">Đang hiển thị 48 tác phẩm tuyển chọn</span>
+<button class="flex items-center gap-2 text-primary font-bold text-sm">
+<span class="material-symbols-outlined text-lg" data-icon="tune">tune</span> Bộ lọc Nâng cao
+                    </button>
+</div>
+</div>
+</section>
+<!-- Product Grid (Breathing Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-12">
+<!-- Large Hero Card -->
+<div class="md:col-span-8 group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-6 aspect-[16/9]">
+<img alt="Vintage wool coat" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx2rHRJruoDABKO7pEHHCz3XxQqDX681e6la_v0pxaqF02NP8nNzNbIVYFkBVtq3gGudE_7B2VT4NMt6oNTmYiU-hg-1jZ16qsN_KRhW9zD8zkWTxJsurRqz7fPsJhTjOXeUf1kxtyVFbtn2slKqf0QFc0TsLyIZWYYPXIktCtktG0cbkkhVK7VmpKqjePWcPeSpgf5sSTCtWqq60p8CNDVtbUlOB41DiSp6NF5ZZIr-PesSwO6h35-GHDPFRI7r9kTK4BLuaCnRQf"/>
+<div class="absolute top-4 right-4 flex flex-col gap-2">
+<button class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+<div class="bg-tertiary-container text-on-tertiary-container text-[10px] font-bold uppercase tracking-tighter px-3 py-1 rounded-full text-center">Tác phẩm Lưu trữ</div>
+</div>
+</div>
+<div class="flex justify-between items-start px-2">
+<div>
+<h3 class="text-2xl font-notoSerif font-bold text-on-surface">Áo khoác len Oversized Lemaire '98</h3>
+<p class="text-on-surface-variant text-sm mt-1">Kỷ nguyên: Thập niên 90 Tối giản • Tình trạng: Như mới</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-manrope font-semibold text-primary">$840</span>
+<div class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-tertiary uppercase tracking-widest"><span class="material-symbols-outlined text-sm" data-icon="eco">eco</span> Đã tiết kiệm 12kg CO2</div>
+</div>
+</div>
+</div>
+<!-- Small Side Card 1 -->
+<div class="md:col-span-4 group cursor-pointer md:mt-24">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-6 aspect-[4/5]">
+<img alt="Designer shoes" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSTJwtD2f5ttCw3IDnTPYMSb5r1oF0htqgmlw2EWjkbRqBtsTAEBtybZ_c9v5L_Xt4MJmi1mqTCytb9mkxZ6tcbMOs68S_9bPd7SerQtL39SE0I2sY3gwxYKxQwIxfm0b9e9sP_ARdp7PbDFWYkTk4InEjZOplr8VWm-6AlEbk6dsz6WtBwVLH8hMttUvbS06f5CQPA187ZFUh9SeROJGSC0xG8NJ28SsetevSeP_DS6je7Hc4i-hUFmKTn03gdnhfsO_gW4w5YTBg"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+</div>
+</div>
+<div class="px-2">
+<h3 class="text-xl font-notoSerif font-bold text-on-surface">Giày cao gót Margiela Tabi</h3>
+<p class="text-on-surface-variant text-sm mt-1">Kỷ nguyên: Thập niên 2010 • Tình trạng: Tốt</p>
+<div class="flex justify-between items-center mt-3">
+<span class="text-lg font-manrope font-semibold text-primary">$520</span>
+<span class="text-[10px] font-bold text-tertiary uppercase tracking-widest">Nguồn gốc đã xác minh</span>
+</div>
+</div>
+</div>
+<!-- Interstitial Content Card (Occupies 4 columns) -->
+<div class="md:col-span-4 flex items-center">
+<div class="bg-primary-container/10 border border-primary/20 p-8 rounded-3xl relative overflow-hidden group">
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors"></div>
+<span class="material-symbols-outlined text-primary text-4xl mb-6" data-icon="auto_awesome">auto_awesome</span>
+<h4 class="text-xl font-notoSerif font-bold text-primary mb-3">Sự thật về Bền vững</h4>
+<p class="text-on-primary-fixed-variant/80 text-sm leading-relaxed mb-6 italic">"Kéo dài vòng đời của một sản phẩm may mặc chỉ thêm 9 tháng sẽ giảm lượng khí thải carbon, nước và chất thải khoảng 20-30%."</p>
+<a class="text-xs font-bold uppercase tracking-widest text-primary border-b border-primary/30 pb-1" href="#">Tìm hiểu thêm</a>
+</div>
+</div>
+<!-- Small Side Card 2 -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-6 aspect-[4/5]">
+<img alt="Leather Bag" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdK_CR4KfmrDoHLiqv1gmlLHfdh6toP_US4rP0sJD6IdXESCopw9tokDm_kzY4J3VqL4WblQBbCbT8f-X14NbMAb6IaH3xcLx_-4A-ssOdk2LpwUVMtXy89mEdD8TINfqwVUAoVewSXvfkFv1LhrALGbzqDFoV34KAGNknQCvEkkw8lfiBdivTbcSs1svL8IFevWxOUBFfOA53VfVi-eDfmqfQS6Qp18bhKKfW_JYyOem56QVE7r-JOkJZW-mSKHEvU86fHONwYvvN"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+</div>
+</div>
+<div class="px-2">
+<h3 class="text-xl font-notoSerif font-bold text-on-surface">Túi Hermès Kelly 32 Cổ điển</h3>
+<p class="text-on-surface-variant text-sm mt-1">Kỷ nguyên: Thập niên 80 • Tình trạng: Dấu ấn thời gian</p>
+<div class="flex justify-between items-center mt-3">
+<span class="text-lg font-manrope font-semibold text-primary">$4,200</span>
+<div class="bg-primary-fixed text-on-primary-fixed-variant text-[9px] font-extrabold uppercase px-2 py-0.5 rounded">Chất lượng Bảo tàng</div>
+</div>
+</div>
+</div>
+<!-- Added Product Card 3 -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-6 aspect-[4/5]">
+<img alt="Vintage Jeans" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqpyp4gCbp1VzRxcCnBYfmoodCtw3EA42TeRCDhxdE_dvnCTRXBmEUhiROMeTwfZtbiiLteEGHxv2bv_XYYcH780q0JBot3rcx983DrDOtS48KJC5NVbeqdlKro6M5DMJfIfUN9Vh0JgoD9MSjdAxzBbZP_XU2unG0E0F05tyCOLr0kHDn5ixwXqEK3Ck2ypsKrK3s6XikWJbmye0-dvWnPXeIfo1KYx3KP07cl_naCpauq5o3wAP8Kf3DQ9UD_wRkGPbh9F9cx60I"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+</div>
+</div>
+<div class="px-2">
+<h3 class="text-xl font-notoSerif font-bold text-on-surface">Quần Denim Levi's 501 Big E</h3>
+<p class="text-on-surface-variant text-sm mt-1">Kỷ nguyên: Thập niên 70 • Tình trạng: Cổ điển</p>
+<div class="flex justify-between items-center mt-3">
+<span class="text-lg font-manrope font-semibold text-primary">$350</span>
+<span class="text-[10px] font-bold text-tertiary uppercase tracking-widest">Sản phẩm hiếm</span>
+</div>
+</div>
+</div>
+<!-- Medium Wide Card -->
+<div class="md:col-span-8 group cursor-pointer md:-mt-12">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-6 aspect-[16/10]">
+<img alt="Streetwear Archive" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtttQlHjtqY0BellUemrhSToqkjbq4_PAYbJm6AQz-o69tqOl7hHXsFC58v4cB6MX-qNd37-L1N0txedNILM8sd56Eyn2iKtbyXt4TyWSlqqmuRwyszdzgOOPtDCvHHJbOEFh-WtFKpAqsO2-jzVQatg7-VZo0hxnwD1LIXwQcSZwD0FUxs8ogGZb_Ul9gYqQzzUDi6-cZ9eetnemb1FYu9mLeBppRS6K2-BqiAxhxJ3GwRQF5ybXTHS5ZzVgPEDP5Qjs2k5IvWl0S"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+</div>
+</div>
+<div class="flex justify-between items-start px-2">
+<div>
+<h3 class="text-2xl font-notoSerif font-bold text-on-surface">Áo Hoodie Raf Simons 'Riot'</h3>
+<p class="text-on-surface-variant text-sm mt-1">Kỷ nguyên: Thập niên 2000 Y2K • Tình trạng: Tốt</p>
+</div>
+<div class="text-right">
+<span class="text-xl font-manrope font-semibold text-primary">$1,100</span>
+<div class="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-tertiary uppercase tracking-widest justify-end"><span class="material-symbols-outlined text-sm" data-icon="eco">eco</span> Tiết kiệm Tác động cao</div>
+</div>
+</div>
+</div>
+<!-- Added Product Card 4 -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-6 aspect-[4/5]">
+<img alt="Vintage Sneakers" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz1ZuKv9kajqx5VHV-u-uoGNmvAQ289A_NLoXRQ1jV4msS-5gb2lwO6lMxLSqvLP_VS7kq6GYHMHVlJvuokc78Y8DKKuVUTI01lSEA8ihqUp7fI-HjkwFwiKE2uZtbYRLg6JwU186yuyDTv2LIdHSbckgX_laJQTjAVPMGGLbMSMfx8_dypXghpylx291rZhnMP_57j2d1aYIl6ZBXlnGduT7nt6n1XpjPvLhduSPC-sXAULGDjPB2vN-vMp5w68u5Hw94pZTDExF0"/>
+<div class="absolute top-4 right-4">
+<button class="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+</div>
+</div>
+<div class="px-2">
+<h3 class="text-xl font-notoSerif font-bold text-on-surface">Nike Dunk High '85 Original</h3>
+<p class="text-on-surface-variant text-sm mt-1">Kỷ nguyên: Thập niên 80 • Tình trạng: Lưu trữ</p>
+<div class="flex justify-between items-center mt-3">
+<span class="text-lg font-manrope font-semibold text-primary">$1,850</span>
+<div class="bg-secondary-container text-on-secondary-container text-[9px] font-extrabold uppercase px-2 py-0.5 rounded">Xác minh Giày</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recently Viewed Section -->
+<section class="mt-32">
+<h2 class="text-2xl font-notoSerif font-bold mb-8">Xem gần đây</h2>
+<div class="flex gap-6 overflow-x-auto hide-scrollbar pb-4 -mx-2 px-2">
+<div class="flex-none w-48 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-3">
+<img alt="Item" class="w-full h-full object-cover group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCDC6JU4DkKG3i9U1uSAl0_H6MnuV-5r4HjulcAB82exQMxHrXXrbJzh5diCQrsRBvQYaIBjXrNqym9sfuY3yR5OeX84QNMz_zV_yrzfl1-WS7VOTlCManqzAKhC5sWIDJso5knCTXJNiI5OR4gvdK00FvZQ2eFjjc1e6gYHxNokNG3jKugpBQt-G7A_J2k_YkSpFDfFoFZeO-0TNysm8H_cNlbu0kcsIqieENjUOisDnlNTAGM63fpSadL26PCuKG8zCeOJH77k0eA"/>
+</div>
+<p class="text-xs font-bold truncate">Túi Mini Prada Nylon</p>
+<p class="text-xs text-primary font-semibold mt-1">$450</p>
+</div>
+<div class="flex-none w-48 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-3">
+<img alt="Item" class="w-full h-full object-cover group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvXjNaQPHCuYJCjWeuWF6RjJ8oTHDZV9VodWLgg8t4IYx8XH6kNi0tvxrjvQEkTgMvnsNDVMbxXMefljTO_2-QrQhAvdoYNY4Qd9_lTDW4O-E0wIFpfj1s8kYT7Mvn3ExesNSqr2a2B52xfyKfLbEz9oXoDkk_Z3Ahfna5kUbcKnGBIKBYNGjcW-nfkdwODViXD7pZ0JnWm7KZpEX2N0r0kU9jOh5kfax9uadTLnDMgpUPc8MNhU0S1gDGIK3-r5tskCYRxc7Ozl4G"/>
+</div>
+<p class="text-xs font-bold truncate">Blazer Nhung Jil Sander</p>
+<p class="text-xs text-primary font-semibold mt-1">$680</p>
+</div>
+<div class="flex-none w-48 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-3">
+<img alt="Item" class="w-full h-full object-cover group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArUwTFll6LMYBw4_CsZlNA0tqpv2g17EYuwhF-EMm1hXnxsDVrxaD92F1Tfej64KbDNTXR0AykieL6aoGVZVC7UJLaiKAO3KmIViQiyrGkiSQJflF89YBq9BT2wTniwc9w33hqsCVhtIBhHKOuGa-6Ny9oE7OJbh0NQ2hjrn28ZAf4WfEiivT4WtK7ihjbAMHAMaok2uSnWZ_-cb_H0AKHaR53vQixyp7hJNeGEW1qGRXlo1tIUnM_FdKGVlI-9_Rc4_Ku-i01lTn2"/>
+</div>
+<p class="text-xs font-bold truncate">Giày Loafer Gucci Cổ điển</p>
+<p class="text-xs text-primary font-semibold mt-1">$420</p>
+</div>
+<div class="flex-none w-48 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-3">
+<img alt="Item" class="w-full h-full object-cover group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNV7fThSivM8xbpZnleN62nOvBlofCaZwgnMv9hnEuuDG0zszsxxMncz2ijwc4MRswLsvrFGq6-nfakdvFjecxJr2p4dvgcypep-10uEwTusbeh2R-5CVeQQCpPC-0ZuYtKOJnMhuhJduzj_7a3o2tfUmM9Dj9srm9GkYsr_uAb-9O_hxoC7vEMHGzWtJy67zrybjxeoGFFNeh_Hgqvc201Ozj3NKMzmiY4g5PxFBixqLlPgrkUovFJzXbPfrF5rG7hvE7V4J7T3Z8"/>
+</div>
+<p class="text-xs font-bold truncate">Chân váy xếp ly Issey Miyake</p>
+<p class="text-xs text-primary font-semibold mt-1">$590</p>
+</div>
+<div class="flex-none w-48 group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-3">
+<img alt="Item" class="w-full h-full object-cover group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfFugRV2A2rZ1Vd_Qhs9a2_XIHDS8lz86yi94Yv67B57x9m-7qnHxtYXphnlFGaef6QuReD1M1qLNVakMLv2L1uFAx-NvibS_pLbRdm5sanVOWrT5bubKnVz8cw8nnfnJJOVj3cnt09p9gpz51yIt0G4X8ULiVAvvIcocIbBsmkCU3fxCOtck4Uthf8u8YtLNb1KscIKokLi8jTmARH8TY6Po92wuWLdQl3Ee3tHtS5ODZTIwcnBKvX8njGe2qDlp1QiDvaWqnJhFe"/>
+</div>
+<p class="text-xs font-bold truncate">Kính râm Cartier '90s</p>
+<p class="text-xs text-primary font-semibold mt-1">$310</p>
+</div>
+</div>
+</section>
+<!-- Eco Impact Section -->
+<section class="mt-32 p-12 bg-surface-container-low rounded-3xl flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1">
+<h2 class="text-4xl font-notoSerif font-bold mb-6">Tác động Ý thức của bạn</h2>
+<p class="text-on-surface-variant mb-8 leading-relaxed">Bằng cách chọn các tác phẩm lưu trữ thay vì sản xuất mới, bạn đang tham gia vào sứ mệnh của Digital Atelier nhằm bảo tồn nghề thủ công đồng thời bảo vệ trái đất của chúng ta.</p>
+<div class="space-y-6">
+<label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant">Giả lập Bù đắp Carbon</label>
+<div class="relative h-2 w-full bg-surface-container-highest rounded-full">
+<div class="absolute top-0 left-0 h-full w-[65%] bg-primary rounded-full"></div>
+<div class="absolute top-1/2 left-[65%] -translate-y-1/2 w-6 h-6 bg-surface-container-lowest rounded-full shadow-lg border-4 border-primary cursor-pointer"></div>
+</div>
+<div class="flex justify-between items-center text-sm font-bold text-primary">
+<span>3 Sản phẩm Tuyển chọn</span>
+<span>42kg CO2 đã tiết kiệm</span>
+</div>
+</div>
+</div>
+<div class="w-full md:w-1/3 aspect-square bg-surface-container-highest rounded-2xl overflow-hidden">
+<img alt="Eco growth" class="w-full h-full object-cover mix-blend-multiply opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUfQTireXUFoCsP--FGUTaxd4DqPG8FVZsuhtZtgG1WfZ8bGfG5-E6Xerl-JkH54vvNNrGNqSxfTeJbWZqoOtMryuKRIW3n3LzUHr-21pBUMbmCqehnMAd4PLy6cc264SSnV1lHmKm0S9EYgu38kDKBhCYmGJSPChHMMYPtnKVeY9KlgrZjXWkoRSuGodk56Xk2tb5CvuFU9dsv4NpzxYKdiX5-k2hsTJ4k8mq6XGnONk_8BfMGqVtwERDRaPDDJPOLxqgvLioYw14"/>
+</div>
+</section>
+<!-- Enhanced SEO/Archive Info Section -->
+<section class="mt-32 border-t border-outline-variant/20 pt-16">
+<div class="max-w-4xl">
+<h2 class="text-3xl font-notoSerif font-bold mb-8">Về Kho lưu trữ Atelier</h2>
+<div class="grid md:grid-cols-2 gap-12 text-on-surface-variant leading-relaxed">
+<div class="space-y-4">
+<p class="text-sm">Digital Atelier không chỉ là một cửa hàng; đó là một nỗ lực nhằm định nghĩa lại giá trị của thời gian trong thời trang. Kho lưu trữ của chúng tôi được xây dựng dựa trên niềm tin rằng thiết kế thực sự không bao giờ lỗi thời. Chúng tôi tìm kiếm những tạo tác từ các nhà mốt danh tiếng như Maison Margiela, Hermès, và Raf Simons, tập trung vào những kỷ nguyên đã định hình nên thẩm mỹ hiện đại.</p>
+<p class="text-sm">Quy trình giám tuyển của chúng tôi bao gồm việc xác minh nguồn gốc nghiêm ngặt và đánh giá tình trạng chi tiết. Mỗi tác phẩm được gán một "Chỉ số Bền vững" dựa trên vòng đời dự kiến và tác động bù đắp so với việc sản xuất mới.</p>
+</div>
+<div class="space-y-4">
+<p class="text-sm">Sự sang trọng có ý thức có nghĩa là hiểu được câu chuyện đằng sau mỗi đường may. Từ phong cách tối giản của thập niên 90 đến tinh thần nổi loạn của văn hóa Y2K, kho lưu trữ của chúng tôi mang đến cơ hội sở hữu một phần lịch sử văn hóa. Chúng tôi tự hào được thúc đẩy nền kinh tế tuần hoàn, nơi mỗi sản phẩm là một khoản đầu tư cho cả phong cách cá nhân và hành tinh.</p>
+<div class="flex items-center gap-4 pt-4">
+<div class="text-center p-4 bg-surface-container-low rounded-xl flex-1">
+<span class="block text-2xl font-bold text-primary">100%</span>
+<span class="text-[10px] uppercase font-bold tracking-widest">Xác minh</span>
+</div>
+<div class="text-center p-4 bg-surface-container-low rounded-xl flex-1">
+<span class="block text-2xl font-bold text-primary">5k+</span>
+<span class="text-[10px] uppercase font-bold tracking-widest">Tác phẩm</span>
+</div>
+<div class="text-center p-4 bg-surface-container-low rounded-xl flex-1">
+<span class="block text-2xl font-bold text-primary">12</span>
+<span class="text-[10px] uppercase font-bold tracking-widest">Kỷ nguyên</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 px-8 flex flex-col items-center gap-8 md:flex-row md:justify-between bg-[#f6f3ee] dark:bg-stone-950 font-manrope text-sm tracking-tight text-[#4c6545] dark:text-[#ceebc2]">
+<div class="font-notoSerif italic text-xl">Digital Atelier</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Quy trình QC</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Tính bền vững</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Báo cáo Tác động</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Liên hệ</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Điều khoản</a>
+</div>
+<div class="text-[#46483c] dark:text-stone-500">© 2024 Digital Atelier. Conscious Curation.</div>
+</footer>
+<!-- Bottom Nav Bar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fcf9f4] dark:bg-stone-900 rounded-t-3xl no-border shadow-[0_-1px_10px_rgba(0,0,0,0.02)]">
+<div class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-4 py-2 hover:bg-[#f6f3ee] dark:hover:bg-stone-800 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="home_max">home_max</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Trang chủ</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-[#4c6545] text-white rounded-full px-5 py-2 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Tìm kiếm</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-4 py-2 hover:bg-[#f6f3ee] dark:hover:bg-stone-800 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Bán</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-4 py-2 hover:bg-[#f6f3ee] dark:hover:bg-stone-800 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="person_outline">person_outline</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Hồ sơ</span>
+</div>
+</nav>
+</body></html>

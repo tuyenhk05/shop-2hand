@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;700&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#fcf9f4",
+                        "primary-container": "#809b77",
+                        "surface-bright": "#fcf9f4",
+                        "secondary-fixed": "#f3e0c6",
+                        "on-tertiary-container": "#1e3023",
+                        "tertiary-fixed": "#d3e8d5",
+                        "on-secondary-container": "#6e614c",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-primary-fixed": "#0a2007",
+                        "secondary": "#6a5c48",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0ede8",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "inverse-primary": "#b3cea7",
+                        "outline": "#76786b",
+                        "surface-tint": "#4c6545",
+                        "primary-fixed": "#ceebc2",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "secondary-container": "#f0ddc3",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-surface": "#1c1c19",
+                        "surface-dim": "#dcdad5",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f3f0eb",
+                        "surface-variant": "#e5e2dd",
+                        "on-secondary-fixed-variant": "#514532",
+                        "error": "#ba1a1a",
+                        "on-background": "#1c1c19",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "tertiary-container": "#849887",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f6f3ee",
+                        "inverse-surface": "#31302d",
+                        "primary-fixed-dim": "#b3cea7",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "primary": "#4c6545",
+                        "on-secondary-fixed": "#231a0a",
+                        "outline-variant": "#c6c8b8",
+                        "tertiary": "#506354",
+                        "surface-container-high": "#ebe8e3",
+                        "on-surface-variant": "#46483c",
+                        "background": "#fcf9f4",
+                        "on-primary-container": "#1b3116"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fcf9f4;
+            color: #1c1c19;
+        }
+        h1, h2, h3 {
+            font-family: 'Noto Serif', serif;
+        }
+        .glass-header {
+            background: rgba(252, 249, 244, 0.7);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<!-- Top Navigation Bar (Simplified for Auth Flow) -->
+<nav class="fixed top-0 w-full z-50 glass-header">
+<div class="flex justify-between items-center px-8 py-6 w-full max-w-7xl mx-auto">
+<a class="text-2xl font-bold tracking-tighter text-[#4c6545] font-headline" href="/">Atelier</a>
+<div class="hidden md:flex items-center gap-8">
+<span class="text-xs uppercase tracking-[0.2em] text-on-surface-variant font-label">Eco-Conscious Luxury</span>
+</div>
+</div>
+</nav>
+<main class="flex-grow flex items-center justify-center pt-24 pb-12 px-6">
+<div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-xl bg-surface-container-low">
+<!-- Visual Side (Asymmetric Layout) -->
+<div class="hidden lg:flex lg:col-span-5 relative overflow-hidden bg-primary-container">
+<div class="absolute inset-0">
+<img class="w-full h-full object-cover mix-blend-multiply opacity-60" data-alt="Close-up of high-quality linen fabric textures and neutral tones in a sunlit atelier setting, editorial photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCHfgKkjFz2K3maWH8mG7IZkIdDbtahgZKoCzsw5LrkIYGy61s8iIKeuxK8ywqcRNMU7wIfAOKHDmBGgBbzsq5ZJMlRKWDwiwd08M4NFQLg9k20DBIjQvq74GLLTaeuh9Nr6wzOeZtQWTLnsx_Uu4pQKVjgb9RMFEFhqLEumEpYYe_DdnkQd9BGO8Plve1E8c359GtiyzMr-ZvD4DQY5LoPmi-zTzHwTVWX0pO72q6loODFvTrOt9uLs64AfHmnR95cub5yjQr3RU"/>
+</div>
+<div class="relative z-10 p-12 flex flex-col justify-end h-full text-white">
+<div class="space-y-6">
+<div class="w-12 h-[1px] bg-white/50"></div>
+<p class="font-headline text-3xl leading-snug tracking-tight">
+                            "Thời trang bền vững không chỉ là một lựa chọn, đó là một di sản."
+                        </p>
+<p class="text-sm font-label uppercase tracking-widest text-white/80">
+                            The Conscious Collection
+                        </p>
+</div>
+</div>
+</div>
+<!-- Form Side -->
+<div class="lg:col-span-7 bg-surface-container-lowest p-8 md:p-16 flex flex-col justify-center">
+<div class="max-w-md mx-auto w-full">
+<header class="mb-10">
+<h1 class="text-4xl font-bold text-on-surface mb-4 tracking-tight">Gia nhập Cộng đồng Atelier.</h1>
+<p class="text-on-surface-variant leading-relaxed font-body">
+                            Bắt đầu hành trình tiêu dùng bền vững và khám phá những món đồ di sản được tuyển chọn.
+                        </p>
+</header>
+<form class="space-y-5" onsubmit="return false;">
+<div class="grid grid-cols-1 gap-5">
+<div>
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2 ml-1">Họ và tên</label>
+<input class="w-full bg-surface-container-highest border-none rounded-md px-4 py-3 text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300" placeholder="Nguyễn Văn A" type="text"/>
+</div>
+<div>
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2 ml-1">Ngày sinh</label>
+<input class="w-full bg-surface-container-highest border-none rounded-md px-4 py-3 text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300" type="date"/>
+</div>
+<div>
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2 ml-1">Số điện thoại</label>
+<input class="w-full bg-surface-container-highest border-none rounded-md px-4 py-3 text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300" placeholder="0901 234 567" type="tel"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2 ml-1">Email</label>
+<input class="w-full bg-surface-container-highest border-none rounded-md px-4 py-3 text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300" placeholder="example@atelier.com" type="email"/>
+</div>
+<div>
+<label class="block text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-2 ml-1">Mật khẩu</label>
+<input class="w-full bg-surface-container-highest border-none rounded-md px-4 py-3 text-on-surface placeholder:text-outline-variant focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300" placeholder="••••••••" type="password"/>
+</div>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full bg-primary text-on-primary py-4 rounded-md font-bold text-sm uppercase tracking-widest hover:bg-on-primary-container transition-all duration-300 transform active:scale-[0.98]">
+                                Đăng ký ngay
+                            </button>
+</div>
+</form>
+<!-- Divider -->
+<div class="relative my-10">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant/20"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase tracking-widest">
+<span class="bg-surface-container-lowest px-4 text-outline">Hoặc tiếp tục với</span>
+</div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-3 py-3 border border-outline-variant/30 rounded-md hover:bg-surface-container transition-colors duration-200">
+<img class="w-5 h-5 grayscale opacity-70" data-alt="Google colorful G logo icon small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpBXyTFZwosYROBxqLdbsvoq6iGBaGNj9gevPbqKtZUWU1FHSWatlDdwtQkc7jkkCloQ-J6kN80agH7uVO9QFvShQZZwWnR5-NFjoS-kWq7qESxkV6IAGSh8DqZg3CV8tU1AQpkXhc2CGizIH_0hvjoC-f9RQugAadz6ynISl3kQLNNR05CsaOgqZYYR7zqZJscacSaiujqHq1PctjkEB9mCWx287DujIfqmQvVK9kw4owlbZ0HzvOA2y8WQKVBmEHq1bCdkU1WCs"/>
+<span class="text-xs font-bold uppercase tracking-widest">Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 py-3 border border-outline-variant/30 rounded-md hover:bg-surface-container transition-colors duration-200">
+<span class="material-symbols-outlined text-xl">ios</span>
+<span class="text-xs font-bold uppercase tracking-widest">Apple</span>
+</button>
+</div>
+<!-- Value Proposition -->
+<div class="mt-12 p-6 bg-tertiary-container/10 rounded-lg flex gap-4 items-start border-l-2 border-primary/20">
+<span class="material-symbols-outlined text-primary mt-0.5" data-weight="fill">eco</span>
+<p class="text-xs text-on-tertiary-fixed-variant leading-relaxed font-body">
+                            Bằng cách tham gia, bạn đã góp phần kéo dài vòng đời cho các sản phẩm thời trang cao cấp. Mỗi món đồ được tái sử dụng giúp giảm 82% lượng khí thải carbon.
+                        </p>
+</div>
+<!-- Footer Link -->
+<p class="mt-10 text-center text-sm text-on-surface-variant font-body">
+                        Bạn đã có tài khoản? 
+                        <a class="text-primary font-bold underline decoration-primary/30 underline-offset-4 hover:decoration-primary transition-all" href="#">Đăng nhập</a>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="w-full mt-auto bg-surface-container-low border-t border-outline-variant/10">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-8 w-full max-w-7xl mx-auto">
+<span class="text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant/70">
+                © 2024 Atelier Digital. Conscious Luxury.
+            </span>
+<div class="flex gap-8 mt-4 md:mt-0">
+<a class="text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant/70 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant/70 hover:text-primary transition-colors" href="#">Sustainability</a>
+</div>
+</div>
+</footer>
+</body></html>

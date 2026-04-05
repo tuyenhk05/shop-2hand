@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f6f3ee",
+              "surface-container-high": "#ebe8e3",
+              "tertiary-fixed-dim": "#b7ccb9",
+              "primary-container": "#809b77",
+              "on-primary-fixed-variant": "#354d2f",
+              "on-surface-variant": "#46483c",
+              "surface-variant": "#e5e2dd",
+              "inverse-on-surface": "#f3f0eb",
+              "tertiary-container": "#849887",
+              "primary-fixed": "#ceebc2",
+              "secondary": "#6a5c48",
+              "surface-container": "#f0ede8",
+              "primary": "#4c6545",
+              "inverse-surface": "#31302d",
+              "surface-tint": "#4c6545",
+              "tertiary-fixed": "#d3e8d5",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#1e3023",
+              "secondary-fixed": "#f3e0c6",
+              "surface-container-highest": "#e5e2dd",
+              "surface-bright": "#fcf9f4",
+              "on-background": "#1c1c19",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed": "#231a0a",
+              "on-primary-fixed": "#0a2007",
+              "inverse-primary": "#b3cea7",
+              "surface-dim": "#dcdad5",
+              "error": "#ba1a1a",
+              "surface": "#fcf9f4",
+              "on-secondary-fixed-variant": "#514532",
+              "outline-variant": "#c6c8b8",
+              "secondary-container": "#f0ddc3",
+              "primary-fixed-dim": "#b3cea7",
+              "on-tertiary-fixed-variant": "#394b3d",
+              "outline": "#76786b",
+              "on-primary": "#ffffff",
+              "secondary-fixed-dim": "#d6c4ab",
+              "on-secondary": "#ffffff",
+              "on-primary-container": "#1b3116",
+              "error-container": "#ffdad6",
+              "background": "#fcf9f4",
+              "on-secondary-container": "#6e614c",
+              "on-error-container": "#93000a",
+              "on-surface": "#1c1c19",
+              "on-tertiary-fixed": "#0e1f13",
+              "tertiary": "#506354"
+            },
+            fontFamily: {
+              "notoSerif": ["Noto Serif"],
+              "manrope": ["Manrope"],
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-manrope selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 bg-[#fcf9f4]/80 dark:bg-stone-900/80 backdrop-blur-md z-50 shadow-sm dark:shadow-none">
+<div class="text-2xl font-bold font-notoSerif text-[#4c6545] dark:text-[#ceebc2] tracking-tighter">Atelier</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#4c6545] dark:text-[#ceebc2] border-b border-[#4c6545] font-manrope font-medium uppercase tracking-widest text-[11px] py-1" href="#">Shop</a>
+<a class="text-[#46483c] dark:text-stone-400 font-manrope font-medium uppercase tracking-widest text-[11px] py-1 hover:text-[#4c6545] transition-colors duration-300" href="#">Sustain</a>
+<a class="text-[#46483c] dark:text-stone-400 font-manrope font-medium uppercase tracking-widest text-[11px] py-1 hover:text-[#4c6545] transition-colors duration-300" href="#">Archive</a>
+</div>
+<div class="flex items-center gap-5">
+<button class="text-[#4c6545] active:opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="camera_alt">camera_alt</span>
+</button>
+<button class="text-[#4c6545] active:opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-container-high ring-1 ring-outline-variant/20">
+<img alt="User profile" data-alt="professional portrait of a young woman with a neutral expression in soft natural daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVXYaaEdkbQD7wm7h9LWyHq2RquvUx2rFWuxv_CSED9KAVtOexdNJBhzRygpeJOG3RZUFqG7vV4Y2CStg-N3mZYc1LCONnYmWLc7WenHUxAsH7-Smeu9tOmqm8nlO5bnXyzhX_VOOeZlBCkunOMfqzah6zlZSwta2FUUFHa9z-Vft-rgdXRuhpG_PSq_emFhql_XwBvMm0VwRcwO_O0c1lhWlmkIhf9M7oEUM6qhaGAHDvFzJ9YGciGAMQYVQF6i1dr3QgLdmP6Js_"/>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-32 max-w-7xl mx-auto px-6">
+<!-- Hero Section: Immersive PDP Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-24">
+<!-- Gallery Grid (Asymmetrical Editorial Style) -->
+<div class="lg:col-span-7 grid grid-cols-2 gap-4">
+<div class="col-span-2 aspect-[4/5] rounded-xl overflow-hidden bg-surface-container-low group relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="high-end vintage camel hair overcoat hanging on a minimalist wooden hanger against a soft beige plaster wall" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADTbkiRvIplSpcO-oU0SK4JVrw16br7tOwghF09TTOktfObb8tDcSOsYpj9B34IT0doDr8p9q4Za83uPssyR4Qf4YgRk_LHs9n4bi4HTGmToPd9i6MNTHVKiziDQdoThNkyjOTjC6fp6oLkvirFYkBIyeEcWmYlRcMv-BLGfozz0EtLdWU7i4U6m0DPydrPf0so-x-JhOQEolxHxbSTBEgeWcKEWv0xLhyftmoNCjF4YQmWL-etEVai5_s7pkcZdXnUOb8b4K3vE9f"/>
+<div class="absolute top-6 left-6">
+<span class="bg-tertiary-container/90 backdrop-blur text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Verified Provenance</span>
+</div>
+</div>
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="detailed close-up of the fine texture and weave of a camel hair fabric with soft shadows and warm highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmc8mtF4SQgR7oYBmDWwdYjAnhnyRGXBlG_TIW3InDuzXfBxccHqpQXfWAkYGopNj4Q0vmCWBKxYl7oqZH6rW-aQ-WOOvIZ2RRNPgjaqMT1tGxzebRYqzIiAjbeLAIpeoBA3PnEv_Y8YpXiRyNdCsVIE8EyIJbMeFW7A5J5tjSixtJe53JJhK6yQKDL-B0_XzngRWj-BubbE4POAiK7pLjCS0MLWLQSh7lOctttnKv4XUbETuVhIsh-qXE8INTQDMcm5OkSzp6hM29"/>
+</div>
+<div class="aspect-square rounded-xl overflow-hidden bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="macro photograph showing the internal silk lining and artisanal stitching of a luxury vintage coat" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvngdkNAUAGWSSpPfLDFElcJNX0SnUeGLBI8Co58OKL7v9DEFMj0LaG05Bw_h0w-lswKTrjYZCX5KkBhy3UbetSefojYDf1yT78nDyeQCPb7vxEFiWkPimzmWX_yYIMYBjGC4yJemfysk8_lrINc0lV40KDiUKaXWDJI6qCUk3V1jVAb3VzWYcFJS6TkdC627Iwalm0tjEzgDT7lC9wuKgEMRFfYxcIg5y29CO5vJa0PnG94P_5vDIlTG8bxMTgzh2spybu8gtRPxt"/>
+</div>
+</div>
+<!-- Product Info -->
+<div class="lg:col-span-5 sticky top-32 h-fit">
+<div class="flex items-center gap-2 mb-4">
+<span class="text-primary font-manrope text-[11px] uppercase tracking-[0.2em] font-bold">Lemaire Archive</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-on-surface-variant font-manrope text-[11px] uppercase tracking-[0.2em]">Circa 2018</span>
+</div>
+<h1 class="font-notoSerif text-5xl md:text-6xl text-on-background leading-tight mb-6 tracking-tighter italic">
+                    Wool-Cashmere Overcoat
+                </h1>
+<div class="flex items-baseline gap-4 mb-8">
+<p class="text-3xl font-manrope font-light text-on-background">€1,240</p>
+<p class="text-on-surface-variant line-through font-manrope text-sm">RRP €2,850</p>
+<span class="text-primary text-xs font-bold bg-primary-fixed px-2 py-0.5 rounded">SAVE 56%</span>
+</div>
+<div class="space-y-8 mb-12">
+<div class="p-6 bg-surface-container-lowest rounded-xl border border-outline-variant/10 shadow-sm">
+<h3 class="font-manrope text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">Condition Report</h3>
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-medium">Excellent (Grade A)</span>
+<span class="text-xs text-primary font-bold">9.2/10</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-[92%] h-full bg-primary"></div>
+</div>
+<p class="text-xs text-on-surface-variant mt-4 leading-relaxed">
+                            Minor pilling near the cuffs consistent with minimal wear. Structural integrity is perfect. Professionally eco-cleaned and steamed.
+                        </p>
+</div>
+<div class="flex gap-4">
+<button class="flex-1 bg-primary text-on-primary py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all active:scale-95">
+                            Acquire Piece
+                        </button>
+<button class="px-5 border border-outline-variant rounded-xl flex items-center justify-center hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="favorite_border">favorite_border</span>
+</button>
+</div>
+</div>
+<!-- Transparency Details -->
+<div class="grid grid-cols-2 gap-6 border-t border-outline-variant/10 pt-8">
+<div class="flex flex-col gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="eco">eco</span>
+<h4 class="text-[11px] font-bold uppercase tracking-widest">CO2 Saved</h4>
+<p class="text-sm font-light">14.2kg avoided</p>
+</div>
+<div class="flex flex-col gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="verified_user">verified_user</span>
+<h4 class="text-[11px] font-bold uppercase tracking-widest">Auth. Check</h4>
+<p class="text-sm font-light">12-point inspection</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Wear & Tear Detailed Analysis -->
+<section class="mb-24">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div class="max-w-xl">
+<h2 class="font-notoSerif text-3xl mb-4 italic">Honest Provenance</h2>
+<p class="text-on-surface-variant font-light leading-relaxed">
+                        We believe in total transparency. Every vintage piece carries a story. Here we document the exact points of wear, ensuring no surprises upon arrival.
+                    </p>
+</div>
+<div class="flex gap-2">
+<span class="px-4 py-2 bg-surface-container-low rounded-full text-[10px] uppercase font-bold tracking-widest">Left Cuff</span>
+<span class="px-4 py-2 bg-surface-container-low rounded-full text-[10px] uppercase font-bold tracking-widest">Collar Line</span>
+<span class="px-4 py-2 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[10px] uppercase font-bold tracking-widest">Inner Pocket</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Wear Point 1 -->
+<div class="group">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container-high mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="extreme close-up of a coat sleeve cuff showing slight friction wear on the wool fibers" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQWHNj-tqbXFLS7MjeQgpQuT7jtKBatP6fxyOR6JuNwqE_u3XIRL_v1Dn5PmATwdaZ23A_qWSJkjw3eDiM9uqTC1LQLb0OrYRPkscDRydZg6g2kLq9gq_SfjkJbM3581gS7gZNL21pZ6fcPxZwxarMgmIQlXXDHtIV_nUD0zkdR58fiylWXrSnPS34lR0_3ukeIV3PhBkOvZFpFNdil2mlC5XktMGUwI8c3C74ovMovF8jn5e8AtodlZoZYImU3eiiUkvO2A231K64"/>
+</div>
+<h4 class="text-xs font-bold uppercase tracking-widest mb-2">01. Friction on Cuffs</h4>
+<p class="text-sm text-on-surface-variant font-light">Micro-pilling noted on the inner wrist area. Barely visible during regular wear.</p>
+</div>
+<!-- Wear Point 2 -->
+<div class="group">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container-high mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="close-up of the interior silk tag and neck lining of a luxury coat showing pristine condition" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmbvU5HpKtjmYTe3xjA-D-TJh1MX_-A6dnuLx6pQdpq-gJXmJgxP9hQtArya2i8ltz_pXoR1uvs7I2KF0Kipxa-pUePlBywb0taMHfsEpv-lwmLnHZHWeHuoTPYDcAU5bFxJt4qTL-JsTdPM5Vyds7FyvXlqyhyGPSCOlVYl8m2yiBGvILhfpn7IMrAgrG1PJaPv8DKMNJUBieVmAqkiOvokS_YkS08Z7RId4XKPHb07RVTOxjobuixtVsNxCVSwWpVyk-4v1HQVZX"/>
+</div>
+<h4 class="text-xs font-bold uppercase tracking-widest mb-2">02. Lining Integrity</h4>
+<p class="text-sm text-on-surface-variant font-light">Silk lining remains intact. No pulls or staining present. Label is fully legible.</p>
+</div>
+<!-- Wear Point 3 -->
+<div class="group">
+<div class="aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container-high mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" data-alt="macro shot of a horn button on a wool coat showing subtle natural variations and secure stitching" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAVT875bKB8w-ANXvVOyqM515Q8cEa4V-ESLaBws3y0-qcLiprS2sMIjDoHlyzGcETwLztMzVNQzfYp8D-Y3mfK-WOrquV3ALtLjkrv1BmbD3YEKSxYbtb6862UVbfHK5f9LH0wZDHzsM9pUCYUhOlvEroOfKQxAUZFECOS9iuMKeROJnsyq8GvMDRZNwFjPkmHvb9ey_ufiJTkh76DEI3tEWOuETgTbqapQTfL_EhifPnA9_BjjgmWuiXoVTR9y0qbBm0uSC-f20W"/>
+</div>
+<h4 class="text-xs font-bold uppercase tracking-widest mb-2">03. Hardware Check</h4>
+<p class="text-sm text-on-surface-variant font-light">Original horn buttons are all present and secure. No chips or scratches detected.</p>
+</div>
+</div>
+</section>
+<!-- Section: Resale Value & Price History -->
+<section class="bg-surface-container-low rounded-[2rem] p-8 md:p-16 mb-24 flex flex-col lg:flex-row gap-16">
+<div class="lg:w-1/3">
+<h2 class="font-notoSerif text-3xl mb-6 italic">Market Dynamics</h2>
+<p class="text-on-surface-variant text-sm font-light leading-relaxed mb-8">
+                    Luxury investment pieces often retain or increase in value. We track over 500 similar sales to provide you with real-time liquidity insights.
+                </p>
+<div class="space-y-4">
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-2">
+<span class="text-xs font-bold uppercase tracking-widest">Retention Rate</span>
+<span class="text-primary font-bold">78%</span>
+</div>
+<div class="flex justify-between items-end border-b border-outline-variant/20 pb-2">
+<span class="text-xs font-bold uppercase tracking-widest">Resale Trend</span>
+<span class="text-primary flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                            +4.2%
+                        </span>
+</div>
+</div>
+</div>
+<!-- Price Chart Mockup -->
+<div class="lg:w-2/3 h-64 md:h-80 flex items-end gap-2 md:gap-4 px-4 border-l border-b border-outline-variant/20 relative">
+<!-- Vertical Grid lines -->
+<div class="absolute inset-0 flex justify-between pointer-events-none opacity-5">
+<div class="border-r border-on-surface h-full"></div>
+<div class="border-r border-on-surface h-full"></div>
+<div class="border-r border-on-surface h-full"></div>
+<div class="border-r border-on-surface h-full"></div>
+</div>
+<!-- Bars representing price fluctuation -->
+<div class="flex-1 bg-primary/20 rounded-t-lg h-[40%] relative group">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">€980</div>
+<div class="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant">2021</div>
+</div>
+<div class="flex-1 bg-primary/30 rounded-t-lg h-[55%] relative group">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">€1,050</div>
+<div class="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant">2022</div>
+</div>
+<div class="flex-1 bg-primary/50 rounded-t-lg h-[70%] relative group">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">€1,180</div>
+<div class="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant">2023</div>
+</div>
+<div class="flex-1 bg-primary rounded-t-lg h-[85%] relative group ring-4 ring-primary/10">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-2 py-1 rounded">€1,240</div>
+<div class="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter font-bold text-primary">Now</div>
+</div>
+<div class="flex-1 bg-surface-container-high border-t border-dashed border-primary-container h-[90%] relative group">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Est. €1,310</div>
+<div class="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant italic">2025</div>
+</div>
+</div>
+</section>
+<!-- Eco Impact Slider Component -->
+<section class="mb-24 max-w-2xl mx-auto text-center px-6">
+<h3 class="font-notoSerif text-2xl mb-8 italic">Your Conscious Impact</h3>
+<div class="relative py-12 px-8 bg-surface-container-lowest rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-outline-variant/10">
+<div class="flex justify-between items-center mb-8">
+<div class="text-left">
+<p class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1">Water Saved</p>
+<p class="text-2xl font-manrope font-light text-primary">2,400 Liters</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-1">CO2 Offset</p>
+<p class="text-2xl font-manrope font-light text-primary">14.2 KG</p>
+</div>
+</div>
+<!-- Range Slider Mockup -->
+<div class="relative h-2 w-full bg-surface-container-high rounded-full overflow-hidden mb-6">
+<div class="absolute top-0 left-0 h-full w-[65%] bg-primary"></div>
+</div>
+<p class="text-xs text-on-surface-variant font-light">
+                    By choosing 2nd-hand, you've bypassed the environmental cost of new textile production for this item.
+                </p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile) -->
+<div class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fcf9f4] dark:bg-stone-900 rounded-t-3xl shadow-[0_-1px_10px_rgba(0,0,0,0.02)]">
+<button class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="home_max">home_max</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-[#4c6545] text-white rounded-full px-5 py-2">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Search</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Sell</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-4 py-2">
+<span class="material-symbols-outlined" data-icon="person_outline">person_outline</span>
+<span class="text-[11px] font-manrope font-medium uppercase tracking-widest mt-1">Profile</span>
+</button>
+</div>
+<!-- Footer -->
+<footer class="w-full py-16 px-8 flex flex-col items-center gap-8 md:flex-row md:justify-between bg-[#f6f3ee] dark:bg-stone-950 font-manrope text-sm tracking-tight text-[#4c6545] dark:text-[#ceebc2]">
+<div class="font-notoSerif italic text-xl">Atelier</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">QC Process</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Sustainability</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Impact Report</a>
+<a class="text-[#46483c] dark:text-stone-500 hover:text-[#4c6545] dark:hover:text-white transition-all" href="#">Contact</a>
+</div>
+<div class="text-[#46483c] dark:text-stone-500 text-xs">
+            © 2024 Digital Atelier. Conscious Curation.
+        </div>
+</footer>
+</body></html>

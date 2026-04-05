@@ -1,0 +1,323 @@
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Atelier | Bảng điều khiển Tin cậy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#f6f3ee",
+                "surface-container-high": "#ebe8e3",
+                "tertiary-fixed-dim": "#b7ccb9",
+                "primary-container": "#809b77",
+                "on-primary-fixed-variant": "#354d2f",
+                "on-surface-variant": "#46483c",
+                "surface-variant": "#e5e2dd",
+                "inverse-on-surface": "#f3f0eb",
+                "tertiary-container": "#849887",
+                "primary-fixed": "#ceebc2",
+                "secondary": "#6a5c48",
+                "surface-container": "#f0ede8",
+                "primary": "#4c6545",
+                "inverse-surface": "#31302d",
+                "surface-tint": "#4c6545",
+                "tertiary-fixed": "#d3e8d5",
+                "on-error": "#ffffff",
+                "on-tertiary-container": "#1e3023",
+                "secondary-fixed": "#f3e0c6",
+                "surface-container-highest": "#e5e2dd",
+                "surface-bright": "#fcf9f4",
+                "on-background": "#1c1c19",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed": "#231a0a",
+                "on-primary-fixed": "#0a2007",
+                "inverse-primary": "#b3cea7",
+                "surface-dim": "#dcdad5",
+                "error": "#ba1a1a",
+                "surface": "#fcf9f4",
+                "on-secondary-fixed-variant": "#514532",
+                "outline-variant": "#c6c8b8",
+                "secondary-container": "#f0ddc3",
+                "primary-fixed-dim": "#b3cea7",
+                "on-tertiary-fixed-variant": "#394b3d",
+                "outline": "#76786b",
+                "on-primary": "#ffffff",
+                "secondary-fixed-dim": "#d6c4ab",
+                "on-secondary": "#ffffff",
+                "on-primary-container": "#1b3116",
+                "error-container": "#ffdad6",
+                "background": "#fcf9f4",
+                "on-secondary-container": "#6e614c",
+                "on-error-container": "#93000a",
+                "on-surface": "#1c1c19",
+                "on-tertiary-fixed": "#0e1f13",
+                "tertiary": "#506354"
+              },
+              fontFamily: {
+                "headline": ["Noto Serif", "serif"],
+                "body": ["Manrope", "sans-serif"],
+                "label": ["Manrope", "sans-serif"],
+                "notoSerif": ["Noto Serif", "serif"],
+                "manrope": ["Manrope", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-pill {
+            view-transition-name: active-pill;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fcf9f4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e5e2dd;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-5 bg-[#fcf9f4]/80 dark:bg-stone-900/80 backdrop-blur-md z-50 shadow-sm dark:shadow-none border-b border-outline-variant/10">
+<div class="text-2xl font-bold font-notoSerif text-[#4c6545] dark:text-[#ceebc2] tracking-tight" style="">Atelier</div>
+<div class="hidden md:flex items-center gap-12">
+<a class="font-manrope text-[11px] font-bold uppercase tracking-[0.15em] text-[#46483c] hover:text-[#4c6545] transition-colors duration-300" href="#" style="">Cửa hàng</a>
+<a class="font-manrope text-[11px] font-bold uppercase tracking-[0.15em] text-[#46483c] hover:text-[#4c6545] transition-colors duration-300" href="#" style="">Bền vững</a>
+<a class="font-manrope text-[11px] font-bold uppercase tracking-[0.15em] text-[#46483c] hover:text-[#4c6545] transition-colors duration-300" href="#" style="">Lưu trữ</a>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-[#4c6545] cursor-pointer" data-icon="camera_alt" style="">camera_alt</span>
+<span class="material-symbols-outlined text-[#4c6545] cursor-pointer" data-icon="shopping_bag" style="">shopping_bag</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5l784VevywhAwerVvV3tayZ5IQ1v2CJvGfjFpaUMZ4lVMZqUQWhtBqkBkeFi5U7ReROzoizdiUOk5qnGA1ngJ1-EgKg14Lnk9z-CZGSpFWHaZPFJhqbcVYTXYDyLTP2UnqCD2xfCPOrsMMwfD2B2N2N4M0NXbIx687aui8acbgFIa3FnbY8KKHeQgGonxdarF3aXR9pY1CtqOI57ZxY9WieGD6WrjLdjsJj5FBglHEA1odYgcdYnodRfs-MqwHXueEj3iWUwtmBFb" class="" style="">
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-32 pb-32 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Header Section -->
+<header class="mb-14">
+<h1 class="font-headline text-5xl md:text-6xl font-bold text-on-background tracking-tight mb-5 leading-[1.1]" style="">Chào mừng, Julian</h1>
+<p class="font-body text-on-surface-variant max-w-2xl text-lg leading-relaxed font-light" style="">Tổng quan được tuyển chọn của bạn về tiêu dùng có ý thức và quyền sở hữu vòng tròn. Quản lý các giao dịch mua của bạn và theo dõi hành trình của các món đồ đã ký gửi.</p>
+</header>
+<!-- View Toggle -->
+<div class="flex p-1.5 bg-surface-container-low w-fit rounded-xl mb-14">
+<button class="px-8 py-3 bg-surface-container-lowest text-primary font-bold text-sm rounded-lg shadow-sm transition-all duration-300 flex items-center gap-2.5 font-manrope" style="">
+<span class="material-symbols-outlined text-[18px]" data-icon="shopping_basket" style="">shopping_basket</span> 
+                Trung tâm Người mua
+            </button>
+<button class="px-8 py-3 text-on-surface-variant hover:text-primary font-semibold text-sm rounded-lg transition-all duration-300 flex items-center gap-2.5 font-manrope" style="">
+<span class="material-symbols-outlined text-[18px]" data-icon="storefront" style="">storefront</span> 
+                Bảng điều khiển Người ký gửi
+            </button>
+</div>
+<!-- Dashboard Content: Dual View Layout (Grid) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+<!-- Left Column: Buyer Stats & Activity -->
+<div class="lg:col-span-8 space-y-14">
+<!-- Bento Stat Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-lowest p-7 rounded-2xl flex flex-col justify-between h-44 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+<span class="text-on-surface-variant font-manrope text-[10px] font-bold uppercase tracking-[0.15em]" style="">Bù đắp Carbon</span>
+<div class="mt-4">
+<span class="text-4xl font-headline font-bold text-primary tracking-tight" style="">2.4kg</span>
+<p class="text-[11px] font-medium text-on-surface-variant mt-2 uppercase tracking-wide" style="">Tiết kiệm trong tháng này</p>
+</div>
+</div>
+<div class="bg-primary p-7 rounded-2xl flex flex-col justify-between h-44 text-white shadow-lg shadow-primary/10">
+<span class="text-white/70 font-manrope text-[10px] font-bold uppercase tracking-[0.15em]" style="">Đơn hàng Đang xử lý</span>
+<div class="mt-4">
+<span class="text-4xl font-headline font-bold tracking-tight" style="">02</span>
+<p class="text-[11px] font-medium text-white/70 mt-2 uppercase tracking-wide" style="">Giao hàng tiếp theo vào Thứ Ba</p>
+</div>
+</div>
+<div class="bg-tertiary-container p-7 rounded-2xl flex flex-col justify-between h-44 text-on-tertiary-container">
+<span class="text-on-tertiary-container/70 font-manrope text-[10px] font-bold uppercase tracking-[0.15em]" style="">Đánh giá Tin cậy</span>
+<div class="mt-4">
+<div class="flex items-center gap-0.5 mb-2">
+<span class="material-symbols-outlined text-sm" data-icon="star" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-sm" data-icon="star_half" style="font-variation-settings: &quot;FILL&quot; 1;">star_half</span>
+</div>
+<span class="text-2xl font-headline font-bold" style="">Hạng Vàng</span>
+</div>
+</div>
+</div>
+<!-- Recent Orders (Buyer View) -->
+<section>
+<div class="flex justify-between items-end mb-8">
+<h2 class="font-headline text-3xl font-bold tracking-tight" style="">Sản phẩm mới mua</h2>
+<a class="text-xs font-bold text-primary uppercase tracking-widest border-b-2 border-primary/20 hover:border-primary transition-all pb-1" href="#" style="">Xem tất cả</a>
+</div>
+<div class="space-y-6">
+<!-- Order Item -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl flex items-center gap-7 group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 border border-outline-variant/5">
+<div class="w-24 h-28 rounded-xl overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjVfta7iNwUZAzvQ2yo1vDLxfnLMFgMNh7OSrA9kG3RGk3ynEgI2MOxLywKm4RpWTlHdtKcY6xpxx5RmACIEoumqaJM6hACj6Tm4ZvGKdWGAhev_xM7c5qqidgPY_Xn6NvPJnbmIrZUJZRbLkGQtuPbnLM0Qe55ZqhSfoYRTW7R63ruujT_8fE1pWwwyLwTu0C7tkaHE8xCO2JZtu9bNvg7nHJ9Z8fqi2WWWOT4BvbLKe98WZ79FNlyARLFASxAF35XK8XEgw4p95d" style="">
+</div>
+<div class="flex-grow">
+<div class="flex justify-between mb-1.5">
+<h3 class="font-manrope font-bold text-lg text-on-surface tracking-tight" style="">Lemaire Wool Overshirt</h3>
+<span class="text-primary font-extrabold font-manrope text-lg" style="">$320</span>
+</div>
+<p class="text-sm font-medium text-on-surface-variant/80 mb-4 font-manrope" style="">Đơn hàng #AT-8829 • Đã giao 12 thg 10</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[9px] uppercase font-extrabold tracking-wider rounded-md" style="">Đã xác minh</span>
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[9px] uppercase font-extrabold tracking-wider rounded-md" style="">Đóng gói sinh thái</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline/40 group-hover:text-primary transition-colors" data-icon="chevron_right" style="">chevron_right</span>
+</div>
+<!-- Order Item -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl flex items-center gap-7 group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 border border-outline-variant/5">
+<div class="w-24 h-28 rounded-xl overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGD9m2PQ-vZjHB8JlIZXcO4if-8Vjy7AdaTGGTuc7i9_Y5vxM4NQLlZ4LdsMWMws4sIBgJkzrOIF9sFfFkHSK_cDzlUKAgUiWz0fxh792bqoCs2OK4ipx1QRoxaRAY-MtMVkXYCz7EEqhJJzayg2rGx-E9TygEeIo2HBO7JqaT8dntrXivnDOgTYDlCCTOUoBe9Y9jh4BGJiTQejMmbaTpg0JrL4fcL8f3hdw1bX-zcoSNKvu3-nE9XbIVYaLoA3CK3NcP1XQ-a0sK" style="">
+</div>
+<div class="flex-grow">
+<div class="flex justify-between mb-1.5">
+<h3 class="font-manrope font-bold text-lg text-on-surface tracking-tight" style="">Margaret Howell Linen Trousers</h3>
+<span class="text-primary font-extrabold font-manrope text-lg" style="">$185</span>
+</div>
+<p class="text-sm font-medium text-on-surface-variant/80 mb-4 font-manrope" style="">Đơn hàng #AT-8714 • Đang vận chuyển</p>
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-secondary-fixed text-on-secondary-fixed-variant text-[9px] uppercase font-extrabold tracking-wider rounded-md" style="">Đang giao</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline/40 group-hover:text-primary transition-colors" data-icon="chevron_right" style="">chevron_right</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Consignor Overview (Data Viz & Status) -->
+<div class="lg:col-span-4 space-y-10">
+<!-- Consignor Sales Analytics -->
+<div class="bg-surface-container-low p-8 rounded-3xl border border-outline-variant/10">
+<h3 class="font-headline text-2xl font-bold mb-7 tracking-tight" style="">Hoạt động Ký gửi</h3>
+<div class="space-y-8">
+<div>
+<div class="flex justify-between items-center text-[10px] font-bold font-manrope uppercase tracking-[0.2em] text-on-surface-variant mb-3">
+<span class="" style="">Tổng doanh thu</span>
+<span class="text-primary font-extrabold text-sm" style="">$2,450.00</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant/50 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[75%]"></div>
+</div>
+</div>
+<div class="space-y-5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3.5">
+<div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+<span class="text-sm font-semibold font-manrope text-on-surface-variant" style="">Đang kiểm định</span>
+</div>
+<span class="font-extrabold font-manrope" style="">02</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3.5">
+<div class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+<span class="text-sm font-semibold font-manrope text-on-surface-variant" style="">Đã đăng bán</span>
+</div>
+<span class="font-extrabold font-manrope" style="">05</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3.5">
+<div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>
+<span class="text-sm font-semibold font-manrope text-on-surface-variant" style="">Đã bán</span>
+</div>
+<span class="font-extrabold font-manrope" style="">12</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-outline-variant/20">
+<div class="bg-surface-container-lowest p-5 rounded-2xl shadow-sm border border-outline-variant/10">
+<p class="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-2" style="">Sẵn sàng thanh toán</p>
+<div class="flex justify-between items-center">
+<span class="text-2xl font-headline font-bold text-on-background tracking-tight" style="">$840.00</span>
+<button class="px-5 py-2.5 bg-primary text-white text-[11px] font-extrabold uppercase tracking-widest rounded-lg hover:shadow-lg hover:shadow-primary/20 transition-all font-manrope" style="">tHANH TOÁN</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Eco Impact Visualization -->
+<div class="bg-[#4c6545] text-white p-9 rounded-3xl relative overflow-hidden shadow-xl shadow-primary/10">
+<div class="relative z-10">
+<h3 class="font-headline text-2xl font-bold mb-3 tracking-tight" style="">Tác động Vòng đời</h3>
+<p class="text-sm text-white/80 leading-relaxed mb-7 font-light font-manrope" style="">Bằng cách ký gửi 14 món đồ, bạn đã tiết kiệm được 120.000 lít nước so với sản xuất mới.</p>
+<div class="flex items-baseline gap-2">
+<span class="text-5xl font-headline font-bold tracking-tighter" style="">14</span>
+<span class="text-white/60 text-xs font-bold uppercase tracking-widest font-manrope" style="">Sản phẩm đã có chủ mới</span>
+</div>
+</div>
+<div class="absolute -right-12 -bottom-12 opacity-10">
+<span class="material-symbols-outlined text-[180px]" data-icon="eco" style="">eco</span>
+</div>
+</div>
+<!-- Favorites/Watchlist -->
+<div class="bg-surface-container-lowest p-7 rounded-3xl border border-outline-variant/10">
+<h3 class="font-headline text-xl font-bold mb-5 tracking-tight" style="">Sản phẩm đã lưu</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-[3/4] rounded-xl overflow-hidden bg-surface-container-low group relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpEx5OXSdpZl3jcJCx-kpLWBahGQid6zXg08U4wHcjQjPElsuDM-hqw-KhuSapo1qfg7yUBFTPtHJ4h-7wB19pbXMVCyenVs1LmDhZ6b81-4ReJ1WEmCNT07MdyQZaEQpNo0S6fQouYtY9NonAs-yawQeRz0q7Qc42h0uKv9Cirbe57WvyDUBdktp0G1bof7yx4XMQgski5fqHxf_REGLqBfgptAgmJpH-YkYTsmtkFrz9yuDaOc4KeGKGRVXqUGhLGej3nrCvlQBh" style="">
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite" style="font-variation-settings: &quot;FILL&quot; 1;">favorite</span>
+</div>
+</div>
+<div class="aspect-[3/4] rounded-xl overflow-hidden bg-surface-container-low group relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATOJKa0L-sAQ9hJ4peaSe1vNJnpj2vdzfvs39JQIeyecsiomiqbX2OC88Ejsk3UZRx1vM_5hcCUqVa2gmna_MsTX8sZETG03R74TSIc0YmyaSDriBrwPlyYllgkTX3mTnowW33I9teWFVuHf6S5pxtjFi8EVUQ9hymkwiCzlqqvRw6hExAVyQd-8ZLBivWLI0Vg9QSJOuULQlEPR5gio2F4gmLiQ8vaXxPFIBz1xFiqfRNMQPLz0M9ugmC-khIu9IleHfp_TzmoQVX" style="">
+<div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite" style="font-variation-settings: &quot;FILL&quot; 1;">favorite</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-7 py-3.5 border border-primary/20 text-primary font-bold text-[10px] uppercase tracking-[0.2em] rounded-xl hover:bg-primary/5 transition-all font-manrope" style="">Đi đến Danh sách mong muốn</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-20 px-12 flex flex-col items-center gap-10 md:flex-row md:justify-between bg-[#f6f3ee] border-t border-outline-variant/10 dark:bg-stone-950">
+<div class="font-notoSerif italic text-2xl text-[#4c6545] dark:text-[#ceebc2] tracking-tight" style="">Digital Atelier.</div>
+<div class="flex flex-wrap justify-center gap-10 font-manrope text-[11px] font-bold uppercase tracking-[0.15em] text-[#46483c] dark:text-stone-500">
+<a class="hover:text-[#4c6545] dark:hover:text-white transition-all" href="#" style="">Quy trình QC</a>
+<a class="hover:text-[#4c6545] dark:hover:text-white transition-all" href="#" style="">Bền vững</a>
+<a class="hover:text-[#4c6545] dark:hover:text-white transition-all" href="#" style="">Báo cáo tác động</a>
+<a class="hover:text-[#4c6545] dark:hover:text-white transition-all" href="#" style="">Liên hệ</a>
+<a class="hover:text-[#4c6545] dark:hover:text-white transition-all" href="#" style="">Điều khoản</a>
+</div>
+<div class="font-manrope text-[11px] font-medium tracking-wide text-[#46483c]/60 dark:text-stone-600 uppercase" style="">© 2024 Digital Atelier. Tuyển chọn có ý thức.</div>
+</footer>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-[#fcf9f4]/95 backdrop-blur-lg dark:bg-stone-900 border-t border-outline-variant/10">
+<a class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-3" href="#" style="">
+<span class="material-symbols-outlined text-[22px]" data-icon="home_max" style="">home_max</span>
+<span class="text-[9px] font-bold font-manrope uppercase tracking-widest mt-1.5" style="">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-3" href="#" style="">
+<span class="material-symbols-outlined text-[22px]" data-icon="search" style="">search</span>
+<span class="text-[9px] font-bold font-manrope uppercase tracking-widest mt-1.5" style="">Tìm kiếm</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#46483c] dark:text-stone-400 px-3" href="#" style="">
+<span class="material-symbols-outlined text-[22px]" data-icon="add_circle" style="">add_circle</span>
+<span class="text-[9px] font-bold font-manrope uppercase tracking-widest mt-1.5" style="">Bán</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#4c6545] text-white rounded-2xl px-5 py-2.5 shadow-lg shadow-primary/20" href="#" style="">
+<span class="material-symbols-outlined text-[20px]" data-icon="person_outline" style="">person_outline</span>
+<span class="text-[9px] font-bold font-manrope uppercase tracking-widest mt-1" style="">Hồ sơ</span>
+</a>
+</nav>
+</body></html>

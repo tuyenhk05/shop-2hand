@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,600&amp;family=Manrope:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface": "#fcf9f4",
+                        "on-secondary-container": "#6e614c",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#231a0a",
+                        "on-primary-fixed": "#0a2007",
+                        "surface-tint": "#4c6545",
+                        "surface-dim": "#dcdad5",
+                        "secondary": "#6a5c48",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "on-surface-variant": "#46483c",
+                        "surface-container-low": "#f6f3ee",
+                        "secondary-container": "#f0ddc3",
+                        "primary": "#4c6545",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#809b77",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#31302d",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "primary-fixed": "#ceebc2",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "tertiary": "#506354",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-tertiary-container": "#1e3023",
+                        "on-surface": "#1c1c19",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#f3e0c6",
+                        "inverse-primary": "#b3cea7",
+                        "surface-variant": "#e5e2dd",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#f0ede8",
+                        "outline": "#76786b",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "surface-container-high": "#ebe8e3",
+                        "on-primary-container": "#1b3116",
+                        "background": "#fcf9f4",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#d3e8d5",
+                        "primary-fixed-dim": "#b3cea7",
+                        "surface-bright": "#fcf9f4",
+                        "inverse-on-surface": "#f3f0eb",
+                        "on-background": "#1c1c19",
+                        "tertiary-container": "#849887",
+                        "on-secondary-fixed-variant": "#514532",
+                        "outline-variant": "#c6c8b8"
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-title {
+            letter-spacing: -0.02em;
+        }
+        .glass-header {
+            background: rgba(252, 249, 244, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(198, 200, 184, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen">
+<!-- Top Navigation (Shell suppressed due to Transactional Page Rule, but brand presence maintained) -->
+<header class="fixed top-0 w-full z-50 glass-header flex justify-between items-center px-6 py-4">
+<div class="text-2xl font-headline font-semibold italic text-primary">The Digital Atelier</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer" data-icon="help_outline">help_outline</span>
+</div>
+</header>
+<main class="min-h-screen grid lg:grid-cols-2">
+<!-- Visual Column (Asymmetric Editorial Style) -->
+<div class="hidden lg:flex flex-col justify-center bg-surface-container-low p-12 relative overflow-hidden">
+<div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-container to-transparent"></div>
+<div class="relative z-10 space-y-8 max-w-md">
+<div class="aspect-[3/4] rounded-xl overflow-hidden shadow-2xl rotate-[-2deg]">
+<img alt="Interior Atelier" class="w-full h-full object-cover" data-alt="Sophisticated minimalist interior with olive green linen curtains, textured beige walls, and a single sculptural designer chair in soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0EJbLvthqwTjBxd13L78TCPJW0RHskdtpQYg4VU0xhyRxNQCScTXOWU47aqPkuxXww_NeLoEsmJUjMLl4VxK-d_ZVbM1PIr6puthN5mQEv_4HIl94abz9EIZPu0z4D5KRPn8NgsxspdvPDe-NToAkiiJ0nUohAizJbm8nUKkarIzVt61q5i1GurwYmpkLN1dMCoDxj-_YJMHcxi78LOk4lsE_epyt5cxLKRrzz43Rqc2wWiByNlvZbdWbUN81G7eaw0dZNA1G9SI"/>
+</div>
+<div class="pl-8">
+<h2 class="font-headline text-4xl text-primary-fixed-variant leading-tight italic">
+                        Di sản được tái tạo.
+                    </h2>
+<p class="mt-4 text-on-surface-variant font-body leading-relaxed max-w-xs">
+                        Nơi những món đồ cũ tìm thấy câu chuyện mới qua lăng kính của sự tinh tế và bền vững.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Form Column -->
+<div class="flex items-center justify-center p-6 md:p-12 lg:p-24 bg-surface">
+<div class="w-full max-w-[420px] space-y-10">
+<!-- Branding/Heading -->
+<div class="space-y-3">
+<h1 class="font-headline text-4xl font-bold text-on-background editorial-title">Chào mừng trở lại.</h1>
+<p class="text-on-surface-variant font-body">Đăng nhập vào tài khoản Atelier của bạn.</p>
+</div>
+<!-- Form -->
+<form class="space-y-6">
+<div class="space-y-5">
+<!-- Phone Input -->
+<div class="space-y-2">
+<label class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant" for="phone">Số điện thoại</label>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-5 py-4 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline/50" id="phone" placeholder="0901 234 567" type="tel"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant" for="password">Mật khẩu</label>
+</div>
+<div class="relative">
+<input class="w-full bg-surface-container-highest border-none rounded-xl px-5 py-4 focus:ring-1 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Options -->
+<div class="flex items-center justify-between">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary transition-all cursor-pointer" type="checkbox"/>
+<span class="text-sm text-on-surface-variant group-hover:text-on-surface">Ghi nhớ tôi</span>
+</label>
+<a class="text-sm font-semibold text-primary hover:underline transition-all" href="#">Quên mật khẩu?</a>
+</div>
+<!-- Main Action -->
+<button class="w-full py-4 bg-primary text-on-primary rounded-xl font-bold tracking-widest text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/10" type="submit">
+                        ĐĂNG NHẬP
+                    </button>
+</form>
+<!-- Divider -->
+<div class="relative flex items-center py-4">
+<div class="flex-grow border-t border-outline-variant/30"></div>
+<span class="flex-shrink mx-4 text-xs font-bold text-outline uppercase tracking-[0.2em]">Hoặc</span>
+<div class="flex-grow border-t border-outline-variant/30"></div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-1 gap-4">
+<button class="flex items-center justify-center gap-3 w-full py-4 bg-surface-container-lowest ghost-border rounded-xl font-semibold text-on-surface hover:bg-surface-container-low transition-colors duration-200">
+<img alt="Google" class="w-5 h-5" data-alt="Google colorful G logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBhikkYzruv6SPCbkzHbu84qcBQDGDXKjWwqFRxz1jwBw5E6VJiIRRpmcQy4ZZNne6IjiKEE4F6zeS5pjXW3oKXKQy4L9s8zIAX2aYbIyZvNftXPh5b2m4s6sIb7ZKtmb6EtGl2LO1h_t7TShCi1xP0LlQDJts3e2YqHnWO59pMpefrh_shTt9IrY1MBxc8hb4Am5Jhtze3wnEq7uHIMbIQJ8HfC6lOUCsRdF5x0OIM3Y8IoYP5DT6AIwGx35Gz4SLE3AuItoJPhI"/>
+<span>Tiếp tục với Google</span>
+</button>
+<button class="flex items-center justify-center gap-3 w-full py-4 bg-on-background text-white rounded-xl font-semibold hover:opacity-90 transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="apple" style="font-variation-settings: 'FILL' 1;">ios</span>
+<span>Tiếp tục với Apple</span>
+</button>
+</div>
+<!-- Footer Link -->
+<div class="text-center pt-4">
+<p class="text-on-surface-variant text-sm">
+                        Bạn chưa có tài khoản? 
+                        <a class="text-primary font-bold hover:underline ml-1" href="#">Đăng ký ngay</a>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Eco-Impact Slider (Specialized Component) -->
+<div class="fixed bottom-8 right-8 hidden md:block">
+<div class="bg-surface-container-lowest p-6 rounded-2xl shadow-xl shadow-on-surface/5 ghost-border max-w-[280px]">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-primary" data-icon="eco" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="text-xs font-bold uppercase tracking-tighter text-on-surface-variant">Tác động bền vững</span>
+</div>
+<div class="space-y-4">
+<input class="w-full h-1.5 bg-primary-fixed rounded-lg appearance-none cursor-pointer accent-primary" max="10" min="1" type="range" value="7"/>
+<div class="flex justify-between items-end">
+<div>
+<span class="block text-2xl font-headline font-bold text-primary">12.5kg</span>
+<span class="text-[10px] text-on-surface-variant uppercase font-medium">CO2 Tiết kiệm mỗi lần trao đổi</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

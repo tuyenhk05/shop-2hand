@@ -1,5 +1,6 @@
 //import Layoutt from "../components/Layout";
 import Home from "../pages/home/index.home";
+import Register from "../pages/register/Register";
 //import Login from "../components/Login/index";
 //import Register from "../components/Sigup/index";
 //import Courses from "../components/DsCourses/index";
@@ -12,7 +13,8 @@ import Home from "../pages/home/index.home";
 export const routes = [
     {
         path: "/",
-        element: <Home />
+        element: <Home />,
+        
         //path: "/",
         //element: <Layoutt />,
         //children: [{
@@ -45,5 +47,9 @@ export const routes = [
         //    element: <FavoritesPage />
         //}
         //]
+    },
+    {
+        path: "/register", 
+        element: <Register />
     }
 ]
