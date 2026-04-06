@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
 }, { collection: 'users' });
 
 // Hash password trước khi save
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
     if (!this.isModified('password')) return;
 
     try {
@@ -57,7 +57,7 @@ userSchema.pre('save', async function() {
 });
 
 // Method so sánh password
-userSchema.methods.matchPassword = async function(enteredPassword) {
+userSchema.methods.matchPassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password);
 };
 

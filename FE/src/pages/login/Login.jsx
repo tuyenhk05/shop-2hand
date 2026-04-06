@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { message } from 'antd';
 import { postLogin } from "../../services/login";
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import useScrollToTop from "../../hooks/useScrollToTop";
@@ -90,17 +91,23 @@ const Login = () => {
         if (rememberMe) {
           localStorage.setItem('rememberMe', formData.email);
           }
-          if (data.data.role === 'admin') {
-              navigate('/admin/dashboard');
-          } else {
-        navigate('/home');
-
-          }
+          
+          // Hiển thị thông báo thành công
+          const destinationPath = data.data.role === 'admin' ? '/admin/dashboard' : '/home';
+          message.success({
+            content: `Đăng nhập thành công! Chuyển hướng sang ${data.data.role === 'admin' ? 'bảng điều khiển' : 'trang chủ'}...`,
+            duration: 2,
+            onClose: () => {
+              navigate(destinationPath);
+            }
+          });
       } else {
+        message.error(data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
         setSubmitError(data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
       }
     } catch (error) {
       console.error('Login error:', error);
+      message.error('Có lỗi xảy ra. Vui lòng thử lại.');
       setSubmitError('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setLoading(false);

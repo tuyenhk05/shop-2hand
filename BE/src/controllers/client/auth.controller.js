@@ -1,8 +1,7 @@
-﻿const User = require('../models/users.model.js');
-const { generateToken } = require('../utils/jwt.utils');
+﻿const User = require('../../models/users.model.js');
+const { generateToken } = require('../../utils/jwt.utils');
 
-
-    // ✅ ĐĂNG KÝ
+// ✅ ĐĂNG KÝ
 exports.register = async (req, res) => {
     try {
         const { fullName, email, password, confirmPassword, phone } = req.body;
@@ -116,7 +115,6 @@ exports.login = async (req, res) => {
                 email: user.email,
                 phone: user.phone,
                 role: user.role,
-                avatar: user.avatar,
                 token
             }
         });
@@ -149,8 +147,8 @@ exports.getCurrentUser = async (req, res) => {
                 fullName: user.fullName,
                 email: user.email,
                 phone: user.phone,
-                avatar: user.avatar,
-                role: user.role
+                role: user.role,
+                status: user.status
             }
         });
     } catch (error) {

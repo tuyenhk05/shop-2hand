@@ -1,6 +1,7 @@
-﻿import React, { useState } from 'react';
+﻿    import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { message } from 'antd';
 import { postRegister } from "../../services/register"; 
 import useScrollToTop from "../../hooks/useScrollToTop";
 import AnimateWhenVisible from "../../helpers/animationScroll";
@@ -117,12 +118,22 @@ const Register = () => {
 
       if (data?.success) {
         localStorage.setItem('token', data.data.token);
-        navigate('/login');
+        
+        // Hiển thị thông báo thành công
+        message.success({
+          content: 'Đăng ký thành công!',
+          duration: 2,
+          onClose: () => {
+            navigate('/login');
+          }
+        });
       } else {
+        message.error(data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
         setSubmitError(data?.message || 'Đăng ký thất bại. Vui lòng thử lại.');
       }
     } catch (error) {
       console.error('Registration error:', error);
+      message.error('Có lỗi xảy ra. Vui lòng thử lại.');
       setSubmitError('Có lỗi xảy ra. Vui lòng thử lại.');
     } finally {
       setLoading(false);
