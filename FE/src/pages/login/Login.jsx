@@ -5,7 +5,9 @@ import { message } from 'antd';
 import { postLogin } from "../../services/login";
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import useScrollToTop from "../../hooks/useScrollToTop";
-
+import imageLogin from "../../assets/images/image_login.png";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { socialLogin, handleGoogleLogin } from '../../services/social';
 
 const Login = () => {
     useScrollToTop();
@@ -59,7 +61,50 @@ const Login = () => {
     }
 
     return newErrors;
-  };
+    };
+    // ✅ Handle Google Login
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            setLoading(true);
+
+            // 1. Dùng helper để lấy ra object { token, provider }
+            const authData = handleGoogleLogin(credentialResponse);
+
+            if (!authData) {
+                message.error('Không nhận được dữ liệu xác thực từ Google');
+                return;
+            }
+
+            // 2. Gửi cục data đó xuống Backend thông qua hàm socialLogin
+            const data = await socialLogin(authData.provider, authData.token);
+
+            // 3. Xử lý kết quả Backend trả về
+            if (data?.success) {
+                localStorage.setItem('token', data.data.token);
+
+                if (data.data.isNewUser) {
+                    message.info('Vui lòng hoàn tất thông tin cá nhân');
+                    sessionStorage.setItem('pendingUserData', JSON.stringify(data.data));
+                    navigate('/complete-profile');
+                } else {
+                    message.success('Đăng nhập thành công!');
+                    navigate('/');
+                }
+            } else {
+                message.error(data?.message || 'Đăng nhập Google thất bại');
+            }
+        } catch (error) {
+            console.error('Google login error:', error);
+            message.error('Có lỗi xảy ra. Vui lòng thử lại.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleError = () => {
+        message.error('Đăng nhập Google thất bại. Vui lòng thử lại.');
+    };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -118,16 +163,25 @@ const Login = () => {
     setPasswordVisibility(!passwordVisibility);
   };
 
-  const handleSocialLogin = (provider) => {
-    console.log(`Login with ${provider}`);
-    alert(`Chức năng đăng nhập qua ${provider} sẽ được kích hoạt sớm`);
-  };
 
-  return (
+
+    return (
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+
       <div className="min-h-screen bg-surface flex flex-col">
-
+          <div className="min-h-screen w-full bg-[#fef9f7] relative">
+              {/* Warm Soft Coral & Cream */}
+              <div
+                  className="absolute inset-0 z-0 pointer-events-none"
+                  style={{
+                      backgroundImage: `
+        radial-gradient(circle at 20% 80%, rgba(255, 160, 146, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 244, 228, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 160, 146, 0.15) 0%, transparent 50%)`,
+                  }}
+              />
           <AnimateWhenVisible direction="slideFromRight">
-              <div className="fixed bottom-8 right-8 hidden md:block">
+              <div className=" fixed bottom-8 right-8 hidden md:block">
                   <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-xl shadow-on-surface/5 ghost-border max-w-[280px]">
                       <div className="flex items-center gap-3 mb-4">
                           <svg
@@ -173,9 +227,9 @@ const Login = () => {
                 <AnimateWhenVisible direction="fadeInUp" transition={{ duration: 0.8, ease: "easeInOut" }}>
                   <div className="aspect-[3/4] rounded-xl overflow-hidden shadow-2xl transform -rotate-1">
                     <img
-                      alt="Interior Atelier"
-                      className="w-full h-full object-cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0EJbLvthqwTjBxd13L78TCPJW0RHskdtpQYg4VU0xhyRxNQCScTXOWU47aqPkuxXww_NeLoEsmJUjMLl4VxK-d_ZVbM1PIr6puthN5mQEv_4HIl94abz9EIZPu0z4D5KRPn8NgsxspdvPDe-NToAkiiJ0nUohAizJbm8nUKkarIzVt61q5i1GurwYmpkLN1dMCoDxj-_YJMHcxi78LOk4lsE_epyt5cxLKRrzz43Rqc2wWiByNlvZbdWbUN81G7eaw0dZNA1G9SI"
+                                              alt="Interior Atelier"
+                                              className="w-full h-full object-cover"
+                                              src={imageLogin}
                     />
                   </div>
                 </AnimateWhenVisible>
@@ -267,47 +321,47 @@ const Login = () => {
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••"
-                            className={`w-full bg-surface-container-highest border rounded-xl px-5 py-4 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline/50 ${
+                            className={`w-full bg-surface-container-highest border rounded-xl px-5 py-4  focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline/50 ${
                               errors.password
                                 ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                 : 'border-outline-variant/30 hover:border-outline-variant/50'
                             }`}
                           />
-                          <button
-                            type="button"
-                            onClick={togglePasswordVisibility}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
-                          >
-                            {passwordVisibility ? (
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                                />
-                              </svg>
-                            ) : (
-                              <svg
-                                className="w-5 h-5"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                                />
-                              </svg>
-                            )}
-                          </button>
+                          {/*<button*/}
+                          {/*  type="button"*/}
+                          {/*  onClick={togglePasswordVisibility}*/}
+                          {/*  className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"*/}
+                          {/*>*/}
+                          {/*  {passwordVisibility ? (*/}
+                          {/*    <svg*/}
+                          {/*      className="w-5 h-5"*/}
+                          {/*      fill="none"*/}
+                          {/*      stroke="currentColor"*/}
+                          {/*      viewBox="0 0 24 24"*/}
+                          {/*    >*/}
+                          {/*      <path*/}
+                          {/*        strokeLinecap="round"*/}
+                          {/*        strokeLinejoin="round"*/}
+                          {/*        strokeWidth={2}*/}
+                          {/*        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"*/}
+                          {/*      />*/}
+                          {/*    </svg>*/}
+                          {/*  ) : (*/}
+                          {/*    <svg*/}
+                          {/*      className="w-5 h-5"*/}
+                          {/*      fill="none"*/}
+                          {/*      stroke="currentColor"*/}
+                          {/*      viewBox="0 0 24 24"*/}
+                          {/*    >*/}
+                          {/*      <path*/}
+                          {/*        strokeLinecap="round"*/}
+                          {/*        strokeLinejoin="round"*/}
+                          {/*        strokeWidth={2}*/}
+                          {/*        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"*/}
+                          {/*      />*/}
+                          {/*    </svg>*/}
+                          {/*  )}*/}
+                          {/*</button>*/}
                         </div>
                         {errors.password && (
                           <p className="text-xs text-error font-medium">{errors.password}</p>
@@ -360,30 +414,29 @@ const Login = () => {
 
                 {/* Social Logins */}
                 <AnimateWhenVisible direction="fadeInUp" transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}>
-                  <div className="grid grid-cols-1 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => handleSocialLogin('google')}
-                      className="flex items-center justify-center gap-2 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-lg font-semibold text-on-surface hover:bg-surface-container-low transition-all duration-300"
-                    >
-                      <img
-                        className="w-5 h-5"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpBXyTFZwosYROBxqLdbsvoq6iGBaGNj9gevPbqKtZUWU1FHSWatlDdwtQkc7jkkCloQ-J6kN80agH7uVO9QFvShQZZwWnR5-NFjoS-kWq7qESxkV6IAGSh8DqZg3CV8tU1AQpkXhc2CGizIH_0hvjoC-f9RQugAadz6ynISl3kQLNNR05CsaOgqZYYR7zqZJscacSaiujqHq1PctjkEB9mCWx287DujIfqmQvVK9kw4owlbZ0HzvOA2y8WQKVBmEHq1bCdkU1WCs"
-                        alt="Google"
-                      />
-                      <span className="text-xs uppercase tracking-wider">Google</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSocialLogin('facebook')}
-                      className="flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300"
-                    >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                      </svg>
-                      <span className="text-xs uppercase tracking-wider">Facebook</span>
-                    </button>
-                  </div>
+                                      <div className="grid grid-cols-1 gap-4">
+                                          <GoogleLogin
+                                              onSuccess={handleGoogleSuccess}
+                                              onError={handleGoogleError}
+                                              render={(renderProps) => (
+                                                  <button
+                                                      type="button"
+                                                      onClick={renderProps.onClick}
+                                                      disabled={renderProps.disabled || loading}
+                                                      className="flex items-center justify-center gap-2 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-lg font-semibold text-on-surface hover:bg-surface-container-low transition-all duration-300"
+                                                  >
+                                                      <img
+                                                          className="w-5 h-5"
+                                                          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpBXyTFZwosYROBxqLdbsvoq6iGBaGNj9gevPbqKtZUWU1FHSWatlDdwtQkc7jkkCloQ-J6kN80agH7uVO9QFvShQZZwWnR5-NFjoS-kWq7qESxkV6IAGSh8DqZg3CV8tU1AQpkXhc2CGizIH_0hvjoC-f9RQugAadz6ynISl3kQLNNR05CsaOgqZYYR7zqZJscacSaiujqHq1PctjkEB9mCWx287DujIfqmQvVK9kw4owlbZ0HzvOA2y8WQKVBmEHq1bCdkU1WCs"
+                                                          alt="Google"
+                                                      />
+                                                      <span className="text-xs uppercase tracking-wider">Google</span>
+                                                  </button>
+                                              )}
+                                          />
+
+
+                                      </div>
                 </AnimateWhenVisible>
 
                 {/* Footer Link */}
@@ -407,8 +460,9 @@ const Login = () => {
       </main>
 
       {/* Eco-Impact Slider */}
-     
-    </div>
+          </div>
+            </div>
+        </GoogleOAuthProvider>
   );
 };
 

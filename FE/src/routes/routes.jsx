@@ -2,8 +2,9 @@
 import Home from "../pages/home/index.home";
 import Register from "../pages/register/Register";
 import Login from "../pages/login/Login";
+import CompleteProfile from "../pages/complete_profile/complete_profile.jsx";
+import ForgotPassword from "../pages/forget_password/forgetPassword";
 import Layout from "../components/layout/layout";
-
 
 
 export const routes = [
@@ -51,5 +52,13 @@ export const routes = [
     {
         path: "/login",
         element: <Login />
+    },
+    {
+        path: "/complete-profile",
+        element: <CompleteProfile />
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPassword />
     }
 ]
