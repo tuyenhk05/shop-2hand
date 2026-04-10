@@ -1,9 +1,8 @@
-const express = require('express');
+﻿const express = require('express');
 const productsController = require('../../controllers/client/products.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 
 const router = express.Router();
-
 // Public routes
 router.get('/', productsController.getAllProducts);
 router.get('/:id', productsController.getProductById);
