@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethos Archive | Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-primary-fixed": "#0a2007",
+                        "surface-container-low": "#f6f3ee",
+                        "primary-fixed": "#ceebc2",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "surface-container": "#f0ede8",
+                        "on-surface": "#1c1c19",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#f3e0c6",
+                        "tertiary-fixed": "#d3e8d5",
+                        "primary-container": "#809b77",
+                        "surface-container-highest": "#e5e2dd",
+                        "tertiary": "#506354",
+                        "on-primary-container": "#1b3116",
+                        "on-secondary-container": "#6e614c",
+                        "on-secondary-fixed": "#231a0a",
+                        "inverse-primary": "#b3cea7",
+                        "tertiary-container": "#849887",
+                        "surface": "#fcf9f4",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "inverse-surface": "#31302d",
+                        "surface-variant": "#e5e2dd",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "secondary-container": "#f0ddc3",
+                        "on-primary": "#ffffff",
+                        "primary": "#4c6545",
+                        "inverse-on-surface": "#f3f0eb",
+                        "secondary": "#6a5c48",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dcdad5",
+                        "on-secondary-fixed-variant": "#514532",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "background": "#fcf9f4",
+                        "surface-bright": "#fcf9f4",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#ebe8e3",
+                        "primary-fixed-dim": "#b3cea7",
+                        "outline-variant": "#c6c8b8",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "outline": "#76786b",
+                        "surface-tint": "#4c6545",
+                        "on-surface-variant": "#46483c",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#1e3023"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #fcf9f4; color: #1c1c19; }
+        .serif-font { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- Predicted Component: SideNavBar -->
+<aside class="bg-[#f6f3ee] text-[#4c6545] font-['Manrope'] text-sm font-medium tracking-wide h-screen w-64 fixed left-0 top-0 z-40 flex flex-col py-8 px-4 gap-y-6">
+<div class="px-2 mb-4">
+<h2 class="text-[#4c6545] font-['Noto_Serif'] italic text-2xl">Ethos Archive</h2>
+<div class="mt-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Admin User Avatar" data-alt="close-up portrait of a professional man in a beige linen shirt against a soft neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJ5qsv_cZgfxfj3b1rMcc5EC8PQuJ413QDVYaGyeqY7BXYL3I9HLou87_4h9s-tFiO0RKpI4LlUns2iJ9omsgjk5wpS9XklI8yaJ1BlS420zJX4sGmCXJrJSZgtL8EDLIQqu99mbc3uBbA8Wldynya1Lec9Bem_U36pnj_f5psd8rFtegEDlKh2iT3WjcKOCxTgQrJpiILMIODTN4a6w4DwQooXjCHOi4bEeIFHP2HeSVK0lI5YqRERe8Ieb6MTE-SJeCGilBMaHRR"/>
+</div>
+<div>
+<p class="font-bold text-on-surface">Admin Portal</p>
+<p class="text-xs text-on-surface-variant">Management Tier</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out text-[#4c6545] font-bold border-r-2 border-[#4c6545]" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545]" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545]" href="#">
+<span class="material-symbols-outlined">group</span>
+                Users
+            </a>
+<a class="flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545]" href="#">
+<span class="material-symbols-outlined">handshake</span>
+                Consignments
+            </a>
+<a class="flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545]" href="#">
+<span class="material-symbols-outlined">category</span>
+                Categories
+            </a>
+</nav>
+<div class="mt-auto pt-6 space-y-4">
+<button class="w-full py-3 bg-primary text-on-primary rounded-xl font-semibold transition-all hover:opacity-90 active:scale-[0.98]">
+                New Consignment
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 py-2 px-4 text-[#46483c] hover:text-[#4c6545] transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+<a class="flex items-center gap-3 py-2 px-4 text-[#46483c] hover:text-[#4c6545] transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+                    Support
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-64 p-8 bg-surface min-h-screen">
+<!-- Predicted Component: TopNavBar (Simulated for Dashboard Header) -->
+<header class="flex justify-between items-center w-full mb-12 sticky top-0 bg-surface/80 backdrop-blur-md z-30 py-4">
+<div>
+<h1 class="serif-font text-4xl font-semibold tracking-tight text-primary">Overview</h1>
+<p class="text-on-surface-variant mt-1">Welcome back. Here is the atelier's performance today.</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<div class="flex items-center gap-2 cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">account_circle</span>
+</div>
+</div>
+</header>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<!-- Metric Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border-outline-variant/10 flex flex-col justify-between h-40">
+<div class="flex justify-between items-start">
+<span class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Total Revenue</span>
+<span class="material-symbols-outlined text-primary">payments</span>
+</div>
+<div>
+<h3 class="serif-font text-3xl font-bold text-on-surface">$24,500</h3>
+<p class="text-xs text-primary mt-1 font-medium">+12.5% from last month</p>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface-container-low p-6 rounded-xl flex flex-col justify-between h-40">
+<div class="flex justify-between items-start">
+<span class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Active Consignments</span>
+<span class="material-symbols-outlined text-primary">inventory</span>
+</div>
+<div>
+<h3 class="serif-font text-3xl font-bold text-on-surface">12</h3>
+<p class="text-xs text-on-surface-variant mt-1 font-medium">4 pending review</p>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl flex flex-col justify-between h-40">
+<div class="flex justify-between items-start">
+<span class="text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Total Items Sold</span>
+<span class="material-symbols-outlined text-primary">sell</span>
+</div>
+<div>
+<h3 class="serif-font text-3xl font-bold text-on-surface">84</h3>
+<p class="text-xs text-primary mt-1 font-medium">Top category: Outerwear</p>
+</div>
+</div>
+<!-- Metric Card 4: Impact -->
+<div class="bg-primary text-on-primary p-6 rounded-xl flex flex-col justify-between h-40">
+<div class="flex justify-between items-start">
+<span class="text-sm font-semibold opacity-80 uppercase tracking-wider">Carbon Saved</span>
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div>
+<h3 class="serif-font text-3xl font-bold">120kg</h3>
+<p class="text-xs opacity-80 mt-1 font-medium">Equivalent to 45 trees planted</p>
+</div>
+</div>
+</div>
+<!-- Charts & Activity Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+<!-- Monthly Sales Chart Area -->
+<div class="lg:col-span-2 bg-surface-container-low rounded-xl p-8">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h2 class="serif-font text-2xl font-semibold text-on-surface">Sales Performance</h2>
+<p class="text-sm text-on-surface-variant">Annual trend analysis</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-surface-container-lowest text-on-surface-variant hover:text-primary transition-colors">Daily</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-semibold bg-primary text-on-primary">Monthly</button>
+</div>
+</div>
+<!-- Visualizing a Line Chart with SVG -->
+<div class="relative h-64 w-full">
+<svg class="w-full h-full" viewbox="0 0 1000 300">
+<!-- Horizontal Grid Lines -->
+<line stroke="#c6c8b8" stroke-dasharray="4" stroke-width="0.5" x1="0" x2="1000" y1="50" y2="50"></line>
+<line stroke="#c6c8b8" stroke-dasharray="4" stroke-width="0.5" x1="0" x2="1000" y1="150" y2="150"></line>
+<line stroke="#c6c8b8" stroke-dasharray="4" stroke-width="0.5" x1="0" x2="1000" y1="250" y2="250"></line>
+<!-- Main Path -->
+<path d="M0,250 C100,240 150,280 250,200 S400,50 500,100 S700,220 850,140 S1000,80 1000,80" fill="none" stroke="#4c6545" stroke-linecap="round" stroke-width="4"></path>
+<!-- Area Fill -->
+<path d="M0,250 C100,240 150,280 250,200 S400,50 500,100 S700,220 850,140 S1000,80 1000,80 V300 H0 Z" fill="url(#chartGradient)" opacity="0.1"></path>
+<defs>
+<lineargradient id="chartGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#4c6545;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#4c6545;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+<!-- Points -->
+<circle cx="250" cy="200" fill="#4c6545" r="5"></circle>
+<circle cx="500" cy="100" fill="#4c6545" r="5"></circle>
+<circle cx="850" cy="140" fill="#4c6545" r="5"></circle>
+</svg>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest px-2">
+<span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
+</div>
+</div>
+</div>
+<!-- Recent Activity List -->
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col h-full border border-outline-variant/10">
+<div class="flex justify-between items-center mb-8">
+<h2 class="serif-font text-2xl font-semibold text-on-surface">Recent Activity</h2>
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</div>
+<div class="flex-1 space-y-6 overflow-y-auto no-scrollbar">
+<div class="flex gap-4">
+<div class="w-2 h-2 mt-2 rounded-full bg-primary-container shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-on-surface">New Consignment: "Linen Overshirt"</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Assigned to: Marcus Aurelio • 2h ago</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-2 h-2 mt-2 rounded-full bg-tertiary-container shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Item Sold: "1970s Trench Coat"</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Sold for $450.00 • 5h ago</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-2 h-2 mt-2 rounded-full bg-secondary-fixed-dim shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Price Adjusted: "Wool Trousers"</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Marked down to $120 • 8h ago</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-2 h-2 mt-2 rounded-full bg-primary-container shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Sustainability Badge Earned</p>
+<p class="text-xs text-on-surface-variant mt-0.5">Threshold 100kg CO2 reached • 1d ago</p>
+</div>
+</div>
+</div>
+<button class="mt-8 text-center text-sm font-bold text-primary hover:underline transition-all">View All Activity</button>
+</div>
+</div>
+<!-- Impact Snapshot Section -->
+<div class="bg-surface-container-low rounded-2xl p-10 flex flex-col md:flex-row items-center gap-12 relative overflow-hidden">
+<div class="md:w-1/2 relative z-10">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/20 text-tertiary rounded-full mb-6">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Sustainability Milestone</span>
+</div>
+<h2 class="serif-font text-4xl font-bold text-on-surface mb-6 leading-tight">Your Atelier is leading the <span class="italic text-primary">circular movement.</span></h2>
+<p class="text-on-surface-variant text-lg max-w-md mb-8">This month, your curated archive has diverted 120kg of textile waste from landfills, saving approximately 15,000 liters of water.</p>
+<!-- Eco Impact Slider (Custom Mockup) -->
+<div class="space-y-4">
+<div class="flex justify-between items-end mb-2">
+<span class="text-xs font-bold text-on-surface uppercase tracking-wider">Circular Progress</span>
+<span class="serif-font text-xl font-bold text-primary">82%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[82%]"></div>
+</div>
+<p class="text-xs text-on-surface-variant italic">Next milestone: Climate Positive Certification (150kg)</p>
+</div>
+</div>
+<div class="md:w-1/2 grid grid-cols-2 gap-4">
+<div class="aspect-square rounded-xl overflow-hidden shadow-sm rotate-[-2deg]">
+<img alt="Sustainable Fashion" data-alt="minimalist fashion shot of high-quality vintage linen garments hanging on a sculptural wooden rail in a sun-drenched studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSlGL9P6ewTI_vgJtoLks1go1QsFdlKIV2yJVNvmByIQx4AWk3sPkjvqwK0nsMFeN7VJtlVNkqfJP2u8P1AbjKmy7IlQt7RGvSNl01aQX_5cLYo_lvbjf4p6-N8WFCJTf4jaBd1R2cOKz9DR34SlANe_52aBW69PniBhkSFkI7K_IhqaZ8ppiE-P1pHCh7JdMhXO7ouzpcM5hf5EtY50qrME4mXWuM39qLdrB285Y6JRK0RlsdWLsFfOaVx7OrZSTeK0DeA_aGYvMQ"/>
+</div>
+<div class="aspect-square rounded-xl overflow-hidden shadow-sm translate-y-8 rotate-[3deg]">
+<img alt="Eco Material" data-alt="close-up texture of organic hemp fabric and recycled cotton fibers showing natural weave and earth-toned threads" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxgImEAtKumBscYqSdoJMVJPExwMdIoZsueG3yafESMmXIDKjuqqLziwCdY5EnNnQWQOoW9grB4gXbpwkUYgx82WwXcQ4N8sk4A17-M2E4VVOJDXLHbD_Mj5t8PxvhszgOm76WkPLE51PLesOtl1qT3_N6MzuxAsNSWKDzBRzDK4lAWSjgVqbzQkXvkoMybD9l4fhofxbL5hYiFDiXiyTq-m3IiqC5Timdejof1mW36fZ1tPbiHLdGsezlWqH7bNF3r2MYD55dGDIM"/>
+</div>
+</div>
+<!-- Background Decorative Element -->
+<div class="absolute bottom-[-100px] right-[-100px] w-80 h-80 bg-primary/5 rounded-full blur-[100px]"></div>
+</div>
+</main>
+</body></html>

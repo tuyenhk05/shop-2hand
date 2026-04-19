@@ -6,9 +6,10 @@ module.exports.getAllProducts = async (req, res) => {
     try {
         // 1. Lấy sản phẩm và nối (populate) thông tin Brand
         // Dùng .lean() để biến Mongoose Document thành Plain JavaScript Object (để gán thêm field images)
-        const products = await Product.find()
-            .populate('brandId', 'name logoUrl') // Chỉ lấy name và logoUrl của Brand cho nhẹ
-            .populate('categoryId', 'name') // Lấy tên danh mục để dễ hiển thị, không cần lấy hết thông tin
+        // 1. Chỉ lấy các sản phẩm đang hiển thị (active) và còn hàng
+        const products = await Product.find({ status: 'active' })
+            .populate('brandId', 'name logoUrl')
+            .populate('categoryId', 'name')
             .lean();
 
         // 2. Lấy ra danh sách tất cả ID của các sản phẩm vừa tìm được

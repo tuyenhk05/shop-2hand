@@ -7,16 +7,19 @@ import { addToWishlistApi, getWishlistApi, removeFromWishlistApi } from '../../s
 import { getCookie } from '../../helpers/cookie';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import useScrollToTop from "../../hooks/useScrollToTop";
+import { useSelector } from 'react-redux';
 
 const Store = () => {
     useScrollToTop();
     const navigate = useNavigate();
+    const isLoggedIn = useSelector((state) => state.auth.isLogin);
+    console.log(isLoggedIn);
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
     const [wishlistIds, setWishlistIds] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const userId = getCookie('userId') || localStorage.getItem('userId') || '66bb1f9d506a73c1d51ab4cd';
+    const userId = useSelector((state) => state.auth.userId);
 
     // Filtering states
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -70,6 +73,10 @@ const Store = () => {
         };
 
         const fetchWishlist = async () => {
+            if (!userId) {
+                setWishlistIds([]);
+                return;
+            }
             try {
                 const res = await getWishlistApi(userId);
                 if (res && res.data) {
@@ -90,12 +97,17 @@ const Store = () => {
 
     const handleAddToCart = async (e, productId) => {
         e.stopPropagation();
+        if (!userId) {
+            message.warning('Vui lòng đăng nhập để thêm vào giỏ hàng!');
+            navigate('/login');
+            return;
+        }
         try {
             const res = await addToCartApi(userId, productId, 1);
             if (res && res.success) {
-                message.success('Đã đưa sản phẩm vào Giỏ hàng!');
+                message.success('Đã thêm vào giỏ hàng!');
             } else {
-                message.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại!');
+                message.warning(res.message || 'Không thể thêm vào giỏ hàng. Vui lòng thử lại!');
             }
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
@@ -105,9 +117,14 @@ const Store = () => {
 
     const handleAddToWishlist = async (e, productId) => {
         e.stopPropagation();
+        if (!userId) {
+            message.warning('Vui lòng đăng nhập để lưu sản phẩm yêu thích!');
+            navigate('/login');
+            return;
+        }
         const pid = String(productId);
         const isFavorite = wishlistIds.includes(pid);
-        
+
         try {
             if (isFavorite) {
                 const res = await removeFromWishlistApi(userId, pid);
@@ -379,21 +396,20 @@ const Store = () => {
                                                 onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500/eeeeee/aaaaaa?text=Image+Loading+Failed' }}
                                             />
                                             <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
-                                                <button 
+                                                <button
                                                     onClick={(e) => handleAddToWishlist(e, item._id || item.slug)}
-                                                    className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all ${
-                                                        isWishlisted(item) 
-                                                            ? 'bg-primary text-white' 
+                                                    className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all ${isWishlisted(item)
+                                                            ? 'bg-primary text-white'
                                                             : 'bg-white/90 text-primary hover:bg-primary hover:text-white'
-                                                    }`}
+                                                        }`}
                                                     title={isWishlisted(item) ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
                                                 >
-                                                    <span 
-                                                        className="material-symbols-outlined" 
+                                                    <span
+                                                        className="material-symbols-outlined"
                                                         style={{ fontVariationSettings: isWishlisted(item) ? "'FILL' 1" : "'FILL' 0" }}
                                                     >favorite</span>
                                                 </button>
-                                                <button 
+                                                <button
                                                     onClick={(e) => handleAddToCart(e, item._id || item.slug)}
                                                     className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all hover:bg-primary hover:text-white"
                                                     title="Thêm vào bộ sưu tập"

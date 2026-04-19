@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import useScrollToTop from "../../hooks/useScrollToTop";
 import AnimateWhenVisible from "../../helpers/animationScroll";
-
+import { useSelector } from 'react-redux';
 const CompleteProfile = () => {
     useScrollToTop();
     const navigate = useNavigate();
-
+    const user = useSelector((state) => state.auth.user);
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -24,6 +24,10 @@ const CompleteProfile = () => {
         if (!pendingData || !token) {
             message.warning('Vui lòng đăng nhập để tiếp tục');
             navigate('/login');
+            return;
+        }
+        if (user) {
+            navigate('/');
             return;
         }
 

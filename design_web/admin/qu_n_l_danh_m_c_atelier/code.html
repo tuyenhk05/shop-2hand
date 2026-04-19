@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#354d2f",
+                    "on-primary-fixed": "#0a2007",
+                    "surface-container-low": "#f6f3ee",
+                    "primary-fixed": "#ceebc2",
+                    "tertiary-fixed-dim": "#b7ccb9",
+                    "surface-container": "#f0ede8",
+                    "on-surface": "#1c1c19",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#f3e0c6",
+                    "tertiary-fixed": "#d3e8d5",
+                    "primary-container": "#809b77",
+                    "surface-container-highest": "#e5e2dd",
+                    "tertiary": "#506354",
+                    "on-primary-container": "#1b3116",
+                    "on-secondary-container": "#6e614c",
+                    "on-secondary-fixed": "#231a0a",
+                    "inverse-primary": "#b3cea7",
+                    "tertiary-container": "#849887",
+                    "surface": "#fcf9f4",
+                    "secondary-fixed-dim": "#d6c4ab",
+                    "inverse-surface": "#31302d",
+                    "surface-variant": "#e5e2dd",
+                    "on-tertiary-fixed-variant": "#394b3d",
+                    "secondary-container": "#f0ddc3",
+                    "on-primary": "#ffffff",
+                    "primary": "#4c6545",
+                    "inverse-on-surface": "#f3f0eb",
+                    "secondary": "#6a5c48",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dcdad5",
+                    "on-secondary-fixed-variant": "#514532",
+                    "surface-container-lowest": "#ffffff",
+                    "on-background": "#1c1c19",
+                    "background": "#fcf9f4",
+                    "surface-bright": "#fcf9f4",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#ebe8e3",
+                    "primary-fixed-dim": "#b3cea7",
+                    "outline-variant": "#c6c8b8",
+                    "on-tertiary-fixed": "#0e1f13",
+                    "outline": "#76786b",
+                    "surface-tint": "#4c6545",
+                    "on-surface-variant": "#46483c",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-container": "#1e3023"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Manrope', sans-serif; background-color: #fcf9f4; color: #1c1c19; }
+        h1, h2, h3 { font-family: 'Noto Serif', serif; }
+        .glass-header {
+            background: rgba(252, 249, 244, 0.8);
+            backdrop-filter: blur(15px);
+        }
+    </style>
+</head>
+<body class="bg-surface selection:bg-primary-fixed">
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-[#f6f3ee] flex flex-col py-8 px-4 gap-y-6">
+<div class="px-4 mb-4">
+<h2 class="text-xl font-headline italic text-primary">Atelier Admin</h2>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant opacity-60">Management Tier</p>
+</div>
+<nav class="flex flex-col gap-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-medium text-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-medium text-sm" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-medium text-sm" href="#">
+<span class="material-symbols-outlined">group</span>
+                Users
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-medium text-sm" href="#">
+<span class="material-symbols-outlined">handshake</span>
+                Consignments
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#4c6545] font-bold border-r-2 border-[#4c6545] bg-[#fcf9f4] transition-all duration-200 ease-in-out font-medium text-sm" href="#">
+<span class="material-symbols-outlined">category</span>
+                Categories
+            </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-4 py-3 text-[#46483c] hover:text-[#4c6545] transition-colors text-sm" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#46483c] hover:text-[#4c6545] transition-colors text-sm" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+<div class="mt-4 flex items-center gap-3 px-4">
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a professional male administrator with a warm and focused expression in a bright minimalist office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX_iSjxEE7YHRqtMxrhU2ri_w9CgZDAePUiIZb2HPoaWknXGRd03KvWg-tyiUs0CuzmLwByanzTPG2UgVLZuRyuZJxcGgrDcEJnd2TklT7JVXgTnfFKqaGL-KeVyeXvEHtKGrDzFRVv1fzItlOJubQomVxEWxwJXyr2J5pf7ILfVYj4Srf95mf5jzZ9p75fzVEQe3nZRQkd54IJdXqZZQHoh8xFHQM36Z67q5_PsIcGblJWLL_bZgvjqhZ-VzjhRfNLJ5n3OBobznS"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-on-surface">Admin User</span>
+<span class="text-[10px] text-on-surface-variant">Management Tier</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="ml-64 min-h-screen">
+<header class="sticky top-0 z-30 glass-header flex justify-between items-center w-full px-12 h-20">
+<div class="flex items-center gap-8">
+<h1 class="text-2xl font-headline font-semibold tracking-tight text-primary">Ethos Archive</h1>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+<input class="bg-surface-container-highest/50 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary/30 w-64 transition-all" placeholder="Search categories..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
+                    Create Category
+                </button>
+</div>
+</header>
+<section class="px-12 py-10">
+<div class="flex items-end justify-between mb-12">
+<div class="max-w-xl">
+<span class="text-sm font-label uppercase tracking-[0.2em] text-primary mb-2 block">Curation Hub</span>
+<h2 class="text-4xl font-headline font-bold text-on-surface leading-tight">Category Ecosystem</h2>
+<p class="text-on-surface-variant mt-4 leading-relaxed">Manage your atelier's collection through high-end categorization. Monitor inventory flow and track the positive environmental footprint of each garment lifecycle.</p>
+</div>
+<div class="flex gap-2 p-1 bg-surface-container-low rounded-xl">
+<button class="px-4 py-2 bg-surface-container-lowest rounded-lg text-sm font-bold text-primary shadow-sm">Grid</button>
+<button class="px-4 py-2 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-surface-container-highest transition-colors">List</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
+<div class="aspect-[4/5] overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="High-end designer overcoat hanging on a minimalist brass rail against a soft cream plaster wall with subtle shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWd8b_X0UwHL6InfcLWQB9A1B1rx7wr06k70MKHMQorqd3JPOAGDbvpuwEZpYE-0XdsUs-R2svP3PrkU4MVCrz8V9wFDQ3GJrg00Bjn-WG9G-z9izLTLhWlY7_B1-rvnTVF6MM9JO3fL8EmtOtXW5HPUlNvWNI5wQxk9Rre40D3G4NM0b9_SpuFmmOziic3bWDQ7JwuhvoYzk0O-s4C3kq_FjR6I15XsuYH1LzKYtqTQAXASRvZCP8XxqdKC8oQuD6Ulcr5_72Sj54"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-1">Outerwear</h3>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">124 Artifacts</p>
+</div>
+<span class="bg-tertiary-container/20 text-tertiary text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest">Premium</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[10px] font-bold uppercase text-on-surface-variant/60">
+<span>CO2 Savings Target</span>
+<span class="text-primary">82%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[82%]"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] text-on-surface-variant font-medium">Updated 2h ago</span>
+<button class="text-primary text-xs font-bold hover:underline underline-offset-4 transition-all">View Details</button>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-500 hover:-translate-y-2">
+<div class="aspect-[4/5] overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close-up of luxury vintage watch with mechanical detail on a silk dark green fabric background with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsBAERYcxYhvI_8J6RSGZPALE3qKWdnNWHVDiJjlreaFSvXw-cS4j8PMv36wFBJY4ZyAjlwiM-A0baV8d9GAxJTsmEKmCoDXUU9SIodsezWNG2Pym95j9Y6sLaEl1n4AC9cxUkuqvoW19cRWKyCE37ipCwG6t7hXOZ-XIuURdtf5G5LNJwJi64TyXLBtBpcWkFG_EYKf24zv7bacpajofwVaFrrSw7t0m5ITZUt2Mydy-vqGfRfKmfQ2s5HPmGyW6zUp01--3Pnxw9"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-1">Vintage Watches</h3>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">42 Artifacts</p>
+</div>
+<span class="bg-tertiary-container/20 text-tertiary text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest">Investment</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[10px] font-bold uppercase text-on-surface-variant/60">
+<span>Longevity Index</span>
+<span class="text-primary">95%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[95%]"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] text-on-surface-variant font-medium">Updated 1d ago</span>
+<button class="text-primary text-xs font-bold hover:underline underline-offset-4 transition-all">View Details</button>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-500 hover:-translate-y-2 lg:mt-12">
+<div class="aspect-[4/5] overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Detailed texture of high-quality indigo selvedge denim neatly folded on a rustic wooden table under warm morning sun" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEJN8CLaZInY-VVQ7uP2tnwPxYfGUzaxv3zWVdIg2chhMyFvbppZFvozK_WSLuQbp9fHIgV4Kpg5ylIfrgQPlEXkswFPZHHe15UkcLd8wRr9qzkmxdElhUqpl6jZAe36jPyo0cT-2Mfw-IPttTXYn-X4KsAPEuEy0BuLacYqzStefUA5u8UE35Yh1Oh-PgKvhPaeQJvv3tDMdJK7hEsPr6DVCSpx2URHUmZEwhke60UXw2aEHGl8d4SqJEnx5lLkDKVoMEzpGLDFwk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-1">Denim</h3>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">215 Artifacts</p>
+</div>
+<span class="bg-tertiary-container/20 text-tertiary text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest">Heritage</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[10px] font-bold uppercase text-on-surface-variant/60">
+<span>Water Saved Target</span>
+<span class="text-primary">68%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[68%]"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] text-on-surface-variant font-medium">Updated 4h ago</span>
+<button class="text-primary text-xs font-bold hover:underline underline-offset-4 transition-all">View Details</button>
+</div>
+</div>
+</div>
+</div>
+<div class="group relative bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-500 hover:-translate-y-2 lg:mt-12">
+<div class="aspect-[4/5] overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Selection of minimalist leather bags and artisan jewelry arranged on a tiered neutral stone pedestal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxDDnsD0pxjbANWr6KRN0z-xgR1SWwFf2F48eYPCPdAfjrdpdvljsFLy6jSY4WwkPHdW-t4FT742lLlqco-Nets20wZLzzeSDaoZKIxfwpbvYuOIwR_Ud_RbriMC_pWA3MrO6j5CelIgQPdA91VbNzkxflGoaz7sbJrrSEEboQqa-ZRoQLW4xoAAb-VqkGYhsbCl64sKtrPlSb8DpYfy-h1eSlagVchszHR3H7nTKcKdRO9kONCTnZpsbOAGhXvux_TImt9nSsekgL"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-headline font-bold text-on-surface mb-1">Accessories</h3>
+<p class="text-xs font-medium text-on-surface-variant uppercase tracking-wider">312 Artifacts</p>
+</div>
+<span class="bg-tertiary-container/20 text-tertiary text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest">Essential</span>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-[10px] font-bold uppercase text-on-surface-variant/60">
+<span>Waste Reduction</span>
+<span class="text-primary">74%</span>
+</div>
+<div class="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[74%]"></div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant/10 flex justify-between items-center">
+<span class="text-[10px] text-on-surface-variant font-medium">Updated 12h ago</span>
+<button class="text-primary text-xs font-bold hover:underline underline-offset-4 transition-all">View Details</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-surface-container-low rounded-2xl p-10 flex flex-col justify-center border border-outline-variant/20">
+<h3 class="text-2xl font-headline font-bold text-on-surface mb-4">Eco-Impact Summary</h3>
+<p class="text-on-surface-variant mb-8 leading-relaxed max-w-md text-sm">Across all categories, the atelier has diverted 4.2 tons of textile waste this quarter. Your inventory rotation is currently 15% more efficient than the industry benchmark.</p>
+<div class="flex gap-12">
+<div>
+<span class="block text-3xl font-headline font-bold text-primary">1,240kg</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Carbon Saved</span>
+</div>
+<div>
+<span class="block text-3xl font-headline font-bold text-primary">450k L</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Water Conserved</span>
+</div>
+</div>
+</div>
+<div class="relative rounded-2xl overflow-hidden aspect-[21/9] md:aspect-auto">
+<img class="w-full h-full object-cover" data-alt="Artistic wide-angle shot of a bright modern boutique interior with natural wood furniture and plants" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPTEIkXDt0whBdxAmeySWov-s6W0G3K7W71DeHmadyBv0Tdj4hMUVK7MpdGMy-ONbX-dWMtB6lmyZRcBu-ZBvMXTyr-lQzTHoLOIxFrDoHKthhuImCopq3W2D_saTHlGmYpw7RepOO2RCw1o9a1qecR8_H7vgJb2YuUpS-t0h_xJJGNbc43D-vyl9SidjtvuClQ-5bkLuP2XA4BACCcicXDyjJWpY3JdhC6ZYJvcZ4AFnLa1PKTZKrZ19x81cl2uf4tRc3hcpGiIdg"/>
+<div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+<div class="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-on-surface/80 to-transparent">
+<h4 class="text-surface font-headline text-xl font-bold">New Category Drop</h4>
+<p class="text-surface/80 text-xs mt-2">Summer 'Heritage Knitwear' collection launches in 4 days.</p>
+</div>
+</div>
+</div>
+</section>
+<footer class="px-12 py-12 bg-surface-container-low/50 mt-12">
+<div class="flex justify-between items-center opacity-40">
+<p class="text-xs font-medium">© 2024 Ethos Archive Management Suite</p>
+<div class="flex gap-8">
+<a class="text-xs hover:text-primary transition-colors" href="#">Privacy Protocol</a>
+<a class="text-xs hover:text-primary transition-colors" href="#">Global Inventory API</a>
+</div>
+</div>
+</footer>
+</main>
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

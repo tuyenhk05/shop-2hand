@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { message } from 'antd';
 import { getProductById } from '../../services/products';
 import { addToCartApi } from '../../services/cart.service';
@@ -16,7 +17,7 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
 
     // Khai báo trước useEffect để tránh lỗi Temporal Dead Zone
-    const userId = getCookie('userId') || localStorage.getItem('userId') || '66bb1f9d506a73c1d51ab4cd';
+    const userId = useSelector((state) => state.auth.userId);
 
     useEffect(() => {
         window.scrollTo(0, 0); // cuộn lên đầu khi vào trang
@@ -39,6 +40,7 @@ const ProductDetail = () => {
         };
 
         const checkWishlistStatus = async (productId) => {
+            if (!userId) return;
             try {
                 const res = await getWishlistApi(userId);
                 if (res && res.data) {
@@ -59,12 +61,17 @@ const ProductDetail = () => {
 
     const handleAddToCart = async () => {
         if (!product) return;
+        if (!userId) {
+            message.warning('Vui lòng đăng nhập để thêm vào giỏ hàng!');
+            navigate('/login');
+            return;
+        }
         try {
             const res = await addToCartApi(userId, product._id || product.slug, 1);
             if (res && res.success) {
                 message.success('Đã đưa sản phẩm vào Giỏ hàng!');
             } else {
-                message.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại!');
+                message.warning(res.message || 'Không thể thêm vào giỏ hàng. Vui lòng thử lại!');
             }
         } catch (error) {
             console.error('Lỗi khi thêm vào giỏ hàng:', error);
@@ -74,6 +81,11 @@ const ProductDetail = () => {
 
     const handleAddToWishlist = async () => {
         if (!product) return;
+        if (!userId) {
+            message.warning('Vui lòng đăng nhập để lưu sản phẩm yêu thích!');
+            navigate('/login');
+            return;
+        }
         const productId = product._id || product.slug;
 
         try {
@@ -128,12 +140,19 @@ const ProductDetail = () => {
     };
 
     // Calculate dynamic fake metrics
-    const rrpPrice = product.price * 1.8;
-    const savePercent = Math.round(((rrpPrice - product.price) / rrpPrice) * 100);
-    const co2Saved = Math.round(product.price * 0.02 + 5);
-    const waterSaved = Math.round(product.price * 1.5 + 500);
-    const pastPrice1 = Math.round(product.price * 0.7);
-    const pastPrice2 = Math.round(product.price * 0.85);
+    const rrpPrice = product ? Math.round(product.price * 2.2 / 1000) * 1000 : 0;
+    const savePercent = product ? Math.round(((rrpPrice - product.price) / rrpPrice) * 100) : 0;
+    const co2Saved = product ? (product.price / 100000).toFixed(1) : 0;
+    const waterSaved = product ? Math.round(product.price / 500) : 0;
+    const pastPrice1 = product ? Math.round(product.price * 0.75) : 0;
+    const pastPrice2 = product ? Math.round(product.price * 0.88) : 0;
+
+    const marketData = product ? [
+        { month: 'T10', price: Math.round(product.price * 0.92) },
+        { month: 'T11', price: Math.round(product.price * 0.95) },
+        { month: 'T12', price: Math.round(product.price * 0.98) },
+        { month: 'T1', price: product.price },
+    ] : [];
 
     return (
         <main className="pt-10 pb-32 max-w-7xl mx-auto px-6">
@@ -157,10 +176,15 @@ const ProductDetail = () => {
                             alt={product.title}
                             src={getProductImg(0)}
                         />
-                        <div className="absolute top-6 left-6">
+                        <div className="absolute top-6 left-6 flex flex-col gap-2">
                             <span className="bg-tertiary-container/90 backdrop-blur text-on-tertiary-container px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
                                 Xác minh 100%
                             </span>
+                            {product.status === 'sold' && (
+                                <span className="bg-red-500/90 backdrop-blur text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase shadow-lg shadow-red-500/20">
+                                    Đã bán
+                                </span>
+                            )}
                         </div>
                     </div>
                     <div className="aspect-square rounded-xl overflow-hidden bg-surface-container-low">
@@ -227,9 +251,14 @@ const ProductDetail = () => {
                             <div className="flex gap-4">
                                 <button
                                     onClick={handleAddToCart}
-                                    className="flex-1 bg-primary text-on-primary py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20"
+                                    disabled={product.status === 'sold'}
+                                    className={`flex-1 py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all active:scale-95 shadow-lg ${
+                                        product.status === 'sold'
+                                        ? 'bg-outline-variant text-on-surface-variant cursor-not-allowed shadow-none'
+                                        : 'bg-primary text-on-primary hover:opacity-90 shadow-primary/20'
+                                    }`}
                                 >
-                                    Đưa vào Bộ sưu tập
+                                    {product.status === 'sold' ? 'Sản phẩm đã hết hàng' : 'Đưa vào Bộ sưu tập'}
                                 </button>
                                 <button
                                     onClick={handleAddToWishlist}
@@ -239,6 +268,13 @@ const ProductDetail = () => {
                                     <span className="material-symbols-outlined" style={{ fontVariationSettings: isFavorite ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
                                 </button>
                             </div>
+
+                            {product.status === 'sold' && (
+                                <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600">
+                                    <span className="material-symbols-outlined shrink-0">info</span>
+                                    <p className="text-xs font-medium">Sản phẩm này đã được một khách hàng khác sở hữu. Bạn có thể thêm vào danh sách yêu thích để nhận thông báo nếu sản phẩm tương tự xuất hiện!</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Transparency Details */}

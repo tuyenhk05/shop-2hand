@@ -11,8 +11,22 @@ import Sustain from "../pages/sustain/Sustain";
 import Wishlist from "../pages/wishlist/Wishlist";
 import Dashboard from "../pages/dashboard/Dashboard";
 import Checkout from "../pages/checkout/Checkout";
+import VnPayReturn from "../pages/checkout/VnPayReturn";
 import Consignment from "../pages/consignment/Consignment";
 import PurchaseHistory from "../pages/history/PurchaseHistory";
+import OrderDetail from "../pages/history/OrderDetail";
+import AdminLogin from "../pages/admin/AdminLogin";
+import AdminLayout from "../components/admin/AdminLayout";
+import RequireAdminAuth from "../components/admin/RequireAdminAuth";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import RolesManagement from "../pages/admin/RolesManagement";
+import UsersManagement from "../pages/admin/UsersManagement";
+import CategoriesManagement from "../pages/admin/CategoriesManagement";
+import ProductsManagement from "../pages/admin/ProductsManagement";
+import ConsignmentsManagement from "../pages/admin/ConsignmentsManagement";
+import OrdersManagement from "../pages/admin/OrdersManagement";
+import { Navigate } from "react-router-dom";
+
 export const routes = [
     {
         path: "/",
@@ -47,6 +61,10 @@ export const routes = [
                 element: <Checkout />
             },
             {
+                path: "/checkout/vnpay_return",
+                element: <VnPayReturn />
+            },
+            {
                 path: "/cart", // Tạm thời ánh xạ chung với checkout
                 element: <Checkout />
             },
@@ -57,6 +75,10 @@ export const routes = [
             {
                 path: "/history",
                 element: <PurchaseHistory />
+            },
+            {
+                path: "/history/:orderId",
+                element: <OrderDetail />
             }
         ]
     },
@@ -75,5 +97,52 @@ export const routes = [
     {
         path: "/forgot-password",
         element: <ForgotPassword />
+    },
+    {
+        path: "/admin/login",
+        element: <AdminLogin />
+    },
+    {
+        path: "/admin",
+        element: <RequireAdminAuth />,
+        children: [
+            {
+                element: <AdminLayout />,
+                children: [
+                    {
+                        path: "",
+                        element: <Navigate to="dashboard" replace />
+                    },
+                    {
+                        path: "dashboard",
+                        element: <AdminDashboard />
+                    },
+                    {
+                        path: "roles",
+                        element: <RolesManagement />
+                    },
+                    {
+                        path: "users",
+                        element: <UsersManagement />
+                    },
+                    {
+                        path: "categories",
+                        element: <CategoriesManagement />
+                    },
+                    {
+                        path: "products",
+                        element: <ProductsManagement />
+                    },
+                    {
+                        path: "consignments",
+                        element: <ConsignmentsManagement />
+                    },
+                    {
+                        path: "orders",
+                        element: <OrdersManagement />
+                    }
+                ]
+            }
+        ]
     }
 ]

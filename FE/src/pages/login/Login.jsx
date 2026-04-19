@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
 import { postLogin } from "../../services/login";
 import AnimateWhenVisible from "../../helpers/animationScroll";
@@ -8,12 +8,16 @@ import useScrollToTop from "../../hooks/useScrollToTop";
 import imageLogin from "../../assets/images/image_login.png";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { socialLogin, handleGoogleLogin } from '../../services/social';
+import { checkLogin } from "../../action/auth";
 
 const Login = () => {
   useScrollToTop();
 
   const navigate = useNavigate();
+
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.isLogin);
+
 
   const [formData, setFormData] = useState({
     email: '',
@@ -25,7 +29,11 @@ const Login = () => {
   const [submitError, setSubmitError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState(false);
-
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/');
+    }
+  }, [isLoggedIn, navigate]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -88,8 +96,19 @@ const Login = () => {
           navigate('/complete-profile');
         } else {
           message.success('Đăng nhập thành công!');
+          
+          localStorage.setItem('user', JSON.stringify({
+            id: data.data.id,
+            fullName: data.data.fullName,
+            email: data.data.email,
+            phone: data.data.phone
+          }));
+          localStorage.setItem('role', data.data.role);
+
+          dispatch(checkLogin(data.data));
           navigate('/');
         }
+
       } else {
         message.error(data?.message || 'Đăng nhập Google thất bại');
       }
@@ -133,6 +152,9 @@ const Login = () => {
           phone: data.data.phone
         }));
         localStorage.setItem('role', data.data.role);
+        // Cập nhật Redux state ngay lập tức để đồng bộ dữ liệu phiên làm việc
+        dispatch(checkLogin(data.data));
+
         if (rememberMe) {
           localStorage.setItem('rememberMe', formData.email);
         }
@@ -162,7 +184,6 @@ const Login = () => {
   const togglePasswordVisibility = () => {
     setPasswordVisibility(!passwordVisibility);
   };
-
 
 
   return (
@@ -292,8 +313,8 @@ const Login = () => {
                                 onChange={handleChange}
                                 placeholder="example@atelier.com"
                                 className={`w-full bg-surface-container-highest border rounded-xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline/50 ${errors.email
-                                    ? 'border-error ring-2 ring-error/50 bg-error-container/10'
-                                    : 'border-outline-variant/30 hover:border-outline-variant/50'
+                                  ? 'border-error ring-2 ring-error/50 bg-error-container/10'
+                                  : 'border-outline-variant/30 hover:border-outline-variant/50'
                                   }`}
                               />
                             </div>
@@ -321,8 +342,8 @@ const Login = () => {
                                 onChange={handleChange}
                                 placeholder="••••••••"
                                 className={`w-full bg-surface-container-highest border rounded-xl px-5 py-4  focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-surface-container-lowest transition-all duration-300 placeholder:text-outline/50 ${errors.password
-                                    ? 'border-error ring-2 ring-error/50 bg-error-container/10'
-                                    : 'border-outline-variant/30 hover:border-outline-variant/50'
+                                  ? 'border-error ring-2 ring-error/50 bg-error-container/10'
+                                  : 'border-outline-variant/30 hover:border-outline-variant/50'
                                   }`}
                               />
                               {/*<button*/}

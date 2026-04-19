@@ -79,6 +79,7 @@ const productSchema = new mongoose.Schema({
         default: 0,
         min: [0, 'Views cannot be negative']
     },
+    
     slug: {
         type: String,
         slug: 'title',

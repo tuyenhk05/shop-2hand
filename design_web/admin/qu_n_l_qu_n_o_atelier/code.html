@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethos Archive | Inventory Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-primary-fixed": "#0a2007",
+                        "surface-container-low": "#f6f3ee",
+                        "primary-fixed": "#ceebc2",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "surface-container": "#f0ede8",
+                        "on-surface": "#1c1c19",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#f3e0c6",
+                        "tertiary-fixed": "#d3e8d5",
+                        "primary-container": "#809b77",
+                        "surface-container-highest": "#e5e2dd",
+                        "tertiary": "#506354",
+                        "on-primary-container": "#1b3116",
+                        "on-secondary-container": "#6e614c",
+                        "on-secondary-fixed": "#231a0a",
+                        "inverse-primary": "#b3cea7",
+                        "tertiary-container": "#849887",
+                        "surface": "#fcf9f4",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "inverse-surface": "#31302d",
+                        "surface-variant": "#e5e2dd",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "secondary-container": "#f0ddc3",
+                        "on-primary": "#ffffff",
+                        "primary": "#4c6545",
+                        "inverse-on-surface": "#f3f0eb",
+                        "secondary": "#6a5c48",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dcdad5",
+                        "on-secondary-fixed-variant": "#514532",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "background": "#fcf9f4",
+                        "surface-bright": "#fcf9f4",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#ebe8e3",
+                        "primary-fixed-dim": "#b3cea7",
+                        "outline-variant": "#c6c8b8",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "outline": "#76786b",
+                        "surface-tint": "#4c6545",
+                        "on-surface-variant": "#46483c",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#1e3023"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .serif { font-family: 'Noto Serif', serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar (Shared Component JSON) -->
+<aside class="bg-[#f6f3ee] dark:bg-[#252522] h-screen w-64 fixed left-0 top-0 z-40 flex flex-col py-8 px-4 gap-y-6 transition-all duration-200 ease-in-out">
+<div class="mb-4">
+<h2 class="font-['Manrope'] text-sm font-medium tracking-wide text-[#46483c] dark:text-[#c6c8b8] px-4 uppercase text-[10px]">Management Tier</h2>
+<p class="serif italic text-[#4c6545] dark:text-[#ceebc2] text-xl px-4 mt-1">Admin Portal</p>
+</div>
+<nav class="flex-1 flex flex-col gap-y-2">
+<a class="flex items-center gap-x-3 px-4 py-3 rounded-lg text-[#46483c] dark:text-[#c6c8b8] hover:bg-[#fcf9f4] dark:hover:bg-[#1c1c19] hover:text-[#4c6545] transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Dashboard</span>
+</a>
+<!-- Active State: Inventory -->
+<a class="flex items-center gap-x-3 px-4 py-3 rounded-lg text-[#4c6545] dark:text-[#ceebc2] font-bold border-r-2 border-[#4c6545] dark:border-[#ceebc2] bg-[#fcf9f4]/50" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Inventory</span>
+</a>
+<a class="flex items-center gap-x-3 px-4 py-3 rounded-lg text-[#46483c] dark:text-[#c6c8b8] hover:bg-[#fcf9f4] dark:hover:bg-[#1c1c19] hover:text-[#4c6545] transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Users</span>
+</a>
+<a class="flex items-center gap-x-3 px-4 py-3 rounded-lg text-[#46483c] dark:text-[#c6c8b8] hover:bg-[#fcf9f4] dark:hover:bg-[#1c1c19] hover:text-[#4c6545] transition-all" href="#">
+<span class="material-symbols-outlined">handshake</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Consignments</span>
+</a>
+<a class="flex items-center gap-x-3 px-4 py-3 rounded-lg text-[#46483c] dark:text-[#c6c8b8] hover:bg-[#fcf9f4] dark:hover:bg-[#1c1c19] hover:text-[#4c6545] transition-all" href="#">
+<span class="material-symbols-outlined">category</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Categories</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/20 pt-6 flex flex-col gap-y-2">
+<button class="mb-4 bg-primary text-on-primary py-3 px-4 rounded-md text-sm font-semibold flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                New Consignment
+            </button>
+<a class="flex items-center gap-x-3 px-4 py-2 text-[#46483c] dark:text-[#c6c8b8] hover:text-[#4c6545]" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Settings</span>
+</a>
+<a class="flex items-center gap-x-3 px-4 py-2 text-[#46483c] dark:text-[#c6c8b8] hover:text-[#4c6545]" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-['Manrope'] text-sm font-medium tracking-wide">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 min-h-screen bg-surface flex flex-col">
+<!-- TopNavBar (Shared Component JSON) -->
+<header class="bg-[#fcf9f4]/80 dark:bg-[#1c1c19]/80 backdrop-blur-md flex justify-between items-center w-full px-8 h-16 docked full-width top-0 sticky z-50 no-border">
+<div class="flex items-center gap-8">
+<h1 class="text-2xl font-['Noto_Serif'] italic text-[#4c6545] dark:text-[#ceebc2]">Ethos Archive</h1>
+<div class="relative w-72">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/30" placeholder="Search archive inventory..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8">
+<a class="text-[#46483c] dark:text-[#c6c8b8] font-['Manrope'] text-sm font-medium hover:text-[#4c6545] transition-colors" href="#">Archive</a>
+<a class="text-[#4c6545] dark:text-[#ceebc2] font-bold font-['Manrope'] text-sm" href="#">Inventory</a>
+<a class="text-[#46483c] dark:text-[#c6c8b8] font-['Manrope'] text-sm font-medium hover:text-[#4c6545] transition-colors" href="#">Analytics</a>
+</nav>
+<div class="flex items-center gap-4 text-[#4c6545] dark:text-[#ceebc2]">
+<span class="material-symbols-outlined cursor-pointer active:opacity-70">notifications</span>
+<span class="material-symbols-outlined cursor-pointer active:opacity-70">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Canvas Content -->
+<div class="p-8 max-w-7xl mx-auto w-full">
+<!-- Breadcrumbs & Title -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<span class="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-2 block">Management Suite</span>
+<h2 class="serif text-4xl font-bold text-on-surface tracking-tight">Active Inventory</h2>
+</div>
+<div class="flex gap-3">
+<button class="bg-secondary-container text-on-secondary-container px-6 py-3 rounded-md font-semibold text-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span> Export Report
+                    </button>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-md font-semibold text-sm hover:bg-primary-container transition-all flex items-center gap-2 shadow-md">
+<span class="material-symbols-outlined text-[20px]">add</span> Add New Item
+                    </button>
+</div>
+</div>
+<!-- Filters Section (No-Line Principle) -->
+<div class="bg-surface-container-low rounded-xl p-4 mb-8 flex flex-wrap items-center gap-4">
+<span class="text-sm font-bold text-on-surface-variant px-2">Filter by:</span>
+<div class="flex gap-2">
+<button class="bg-primary-fixed text-on-primary-fixed px-5 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check</span> Luxury
+                    </button>
+<button class="bg-surface-container-highest text-on-surface-variant px-5 py-2 rounded-full text-xs font-bold hover:bg-primary-fixed/50 transition-all">Sustainable</button>
+<button class="bg-surface-container-highest text-on-surface-variant px-5 py-2 rounded-full text-xs font-bold hover:bg-primary-fixed/50 transition-all">Vintage</button>
+</div>
+<div class="h-6 w-[1px] bg-outline-variant/30 mx-2"></div>
+<div class="flex items-center gap-2 bg-surface-container-highest/50 px-4 py-2 rounded-lg cursor-pointer">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">filter_list</span>
+<span class="text-xs font-bold text-on-surface-variant">More Filters</span>
+</div>
+<div class="ml-auto text-xs font-medium text-on-surface-variant">
+                    Showing 1,240 items
+                </div>
+</div>
+<!-- Inventory Grid/Table Hybrid -->
+<div class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant border-none">
+<th class="py-5 px-6 text-[11px] font-bold uppercase tracking-wider">Product Name</th>
+<th class="py-5 px-6 text-[11px] font-bold uppercase tracking-wider">Category</th>
+<th class="py-5 px-6 text-[11px] font-bold uppercase tracking-wider">Price</th>
+<th class="py-5 px-6 text-[11px] font-bold uppercase tracking-wider">Status</th>
+<th class="py-5 px-6 text-[11px] font-bold uppercase tracking-wider">Consignor</th>
+<th class="py-5 px-6 text-[11px] font-bold uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low">
+<!-- Item 1 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-18 bg-surface-container rounded-md overflow-hidden flex-shrink-0">
+<img alt="Vintage trench coat" class="w-full h-full object-cover" data-alt="Close up shot of a classic tan vintage trench coat with high quality fabric texture and belt details in natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIncIKZ08Ik9FvtA970-7cPC7cAYM4tzEzX-HXiFr7USnRjebgpG9mspNn-AHIg6eEW7JXF8nZj1RR4okGWZ9MAQ1PJ0te7DTo30fMdn8LomPtDKD6vxR7y857CSiMZTOuNEYEWZJ7aXkBGp-GG0YoHNe_vAnyRsl3xvpayp7CuQhEezoEoIYRN99qkw9I0ROXJylB8R836af5hJjK2LFpObBJORrlQHnTA6WUqV9pPih4htDrgLTIj3GRmHznaTdfKpzNhx_AQxq-"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">1990s Heritage Trench</div>
+<div class="text-[11px] text-on-surface-variant mt-0.5">SKU: ETH-882-VG</div>
+<div class="mt-1 flex gap-1">
+<span class="bg-tertiary-container/20 text-tertiary px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-tighter">Provenance</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="text-sm text-on-surface-variant">Outerwear</span>
+</td>
+<td class="py-4 px-6 font-bold text-sm text-on-surface">$845.00</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> In Stock
+                                </span>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary-fixed-dim text-[10px] flex items-center justify-center font-bold">EL</div>
+<span class="text-sm text-on-surface font-medium">Eleanor L.</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Item 2 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-18 bg-surface-container rounded-md overflow-hidden flex-shrink-0">
+<img alt="Silk blouse" class="w-full h-full object-cover" data-alt="Ethereal cream silk blouse draped softly over a minimalist stand, showing delicate button details and luminous sheen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZUheeBl3Xc1d9bv0356nvq-VWew_UcT-uzh7VULs8v9IhdNKGeSi4QMwVhFPbgbom57eQCSRIkP5ukpvramSkFkYxvO2i_wkkTOX7LT8M9CQjRza87zOzm2zZvnfYJaaexfpdjfbTtR1fLEqHJXQS03wlncRo8T0hL4-G4XL1VKYgetuuqMeIpq_jaNsT13Vz7DqK9mFLPrysrIiwh_7yQeffoGgG3Ikrl1Grs0KSFU1wL485_WxMenjA6zG1YpbRzrCcem52s_9T"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Asymmetric Silk Blouse</div>
+<div class="text-[11px] text-on-surface-variant mt-0.5">SKU: ETH-441-SL</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="text-sm text-on-surface-variant">Tops</span>
+</td>
+<td class="py-4 px-6 font-bold text-sm text-on-surface">$290.00</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-xs font-bold">
+                                    Sold
+                                </span>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary-fixed text-[10px] flex items-center justify-center font-bold">JS</div>
+<span class="text-sm text-on-surface font-medium">Julian S.</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Item 3 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-18 bg-surface-container rounded-md overflow-hidden flex-shrink-0">
+<img alt="Wool trousers" class="w-full h-full object-cover" data-alt="Close-up of charcoal grey wool trousers on a wooden hanger, highlighting the textured weave and impeccable tailoring" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXFFDmmEq-_Wl_8nkk34P_ueD6UNwLxbSfeV_H7zYZ_cv87-6gUJwKP9ieBOtxdBZM0RXhFb-mxK-APx4jm2jC61r__sxZTGSwRDjldff3ZogcuDHmOxEb2eNaSleTP20ZWH6onxkXKscrsnENvT_Eaei5-eaYQihQBT2_ZoFojQ2-SVyznOY2XLo8Ch68TxX7XCwxmpqJ1jhW-qToRbmZkQ_CXTiw3bbVrjhl7Ra6zoaxmLZBQpBNSpMeH-DFuYTSiif9KGM8Xjqm"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Sculptural Wool Trouser</div>
+<div class="text-[11px] text-on-surface-variant mt-0.5">SKU: ETH-212-WT</div>
+<div class="mt-1 flex gap-1">
+<span class="bg-primary-fixed/30 text-primary px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-tighter">Sustainable</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="text-sm text-on-surface-variant">Bottoms</span>
+</td>
+<td class="py-4 px-6 font-bold text-sm text-on-surface">$420.00</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-xs font-bold">
+                                    QC Pending
+                                </span>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-tertiary-fixed text-[10px] flex items-center justify-center font-bold">MK</div>
+<span class="text-sm text-on-surface font-medium">Marc K.</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+<!-- Item 4 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="py-4 px-6">
+<div class="flex items-center gap-4">
+<div class="w-14 h-18 bg-surface-container rounded-md overflow-hidden flex-shrink-0">
+<img alt="Designer bag" class="w-full h-full object-cover" data-alt="Luxury structured leather handbag in deep mahogany brown against a neutral studio background with soft directional light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-d-VTHB-vD3jVNOIyDMxXnGyLgLhq0AWkHRy9RySA9leafQiPGqbGMPalZ8Wl6i-1zIEtOUI0fE5A1UNUJFotCaxl1xyfm0T_qeTJQ_1dc2uDlm7VHyQsEPFjHOeKy30HV3bXRWfbwqlgSpF0M_-_oPIuX5q0iwFyueWHRdP9N3BKDLcIV5bqSNLvdl9oLeu-dpkfHYkJ6IJK9QLA3mVglFcMFI4oSrSjnBw3nuVLWaZWbyfNChjCOww0L5HSDSJa29c2YeStYJ5z"/>
+</div>
+<div>
+<div class="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">Margiela Archive Pouch</div>
+<div class="text-[11px] text-on-surface-variant mt-0.5">SKU: ETH-901-AC</div>
+<div class="mt-1 flex gap-1">
+<span class="bg-tertiary-container/20 text-tertiary px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase tracking-tighter">Luxury</span>
+</div>
+</div>
+</div>
+</td>
+<td class="py-4 px-6">
+<span class="text-sm text-on-surface-variant">Accessories</span>
+</td>
+<td class="py-4 px-6 font-bold text-sm text-on-surface">$1,150.00</td>
+<td class="py-4 px-6">
+<span class="inline-flex items-center gap-1.5 bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-xs font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> In Stock
+                                </span>
+</td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-outline-variant text-[10px] flex items-center justify-center font-bold">SA</div>
+<span class="text-sm text-on-surface font-medium">Sophie A.</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination / Footer -->
+<div class="bg-surface-container/30 px-6 py-4 flex items-center justify-between">
+<span class="text-xs text-on-surface-variant font-medium">Page 1 of 124</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded-full border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-xs">1</button>
+<button class="w-8 h-8 rounded-full hover:bg-white flex items-center justify-center text-xs font-bold transition-colors">2</button>
+<button class="w-8 h-8 rounded-full hover:bg-white flex items-center justify-center text-xs font-bold transition-colors">3</button>
+<button class="w-8 h-8 rounded-full border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Eco-Impact Stats (Bento Component) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+<div class="bg-primary-container/10 p-6 rounded-xl relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="text-xs font-bold uppercase tracking-widest text-primary mb-2">Sustainable Impact</h4>
+<div class="text-3xl serif font-bold text-primary mb-2">4,280 kg</div>
+<p class="text-sm text-on-primary-container leading-relaxed">Total CO2 emissions saved across your current active inventory through circular trade.</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-[120px] text-primary/5 select-none">eco</span>
+</div>
+<div class="bg-secondary-container/20 p-6 rounded-xl">
+<h4 class="text-xs font-bold uppercase tracking-widest text-secondary mb-2">Archive Value</h4>
+<div class="text-3xl serif font-bold text-secondary mb-2">$142,800</div>
+<p class="text-sm text-on-secondary-container leading-relaxed">Estimated resale valuation of your entire managed consignment collection.</p>
+</div>
+<div class="bg-tertiary-container/10 p-6 rounded-xl">
+<h4 class="text-xs font-bold uppercase tracking-widest text-tertiary mb-2">Consignor Trust</h4>
+<div class="text-3xl serif font-bold text-tertiary mb-2">98.4%</div>
+<p class="text-sm text-on-tertiary-container leading-relaxed">Percentage of items passing high-fidelity quality control on the first inspection.</p>
+</div>
+</div>
+</div>
+</main>
+</body></html>

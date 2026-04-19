@@ -2,21 +2,27 @@ import React from 'react';
 import GlobalSearch from './GlobalSearch';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { deleteCookie, getCookie } from '../../helpers/cookie';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../action/auth';
 
 const ClientLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     // Kiểm tra trạng thái đăng nhập dựa vào token (chuẩn xác thực)
     const token = getCookie('token') || localStorage.getItem('token');
     const isLoggedIn = !!token;
 
     const handleLogout = () => {
-        deleteCookie('userId');
+        dispatch(logout());
         deleteCookie('token');
-        localStorage.removeItem('userId');
         localStorage.removeItem('token');
-        navigate('/login');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        
+        window.location.href = '/login';
     };
 
     // Determine active classes

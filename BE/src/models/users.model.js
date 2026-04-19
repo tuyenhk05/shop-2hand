@@ -1,4 +1,4 @@
-﻿const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
@@ -26,9 +26,8 @@ const userSchema = new mongoose.Schema({
         select: false // Không trả về password trong query
     },
     role: {
-        type: String,
-        enum: ['user', 'admin'],
-        default: 'user'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role'
     },
     isActive: {
         type: Boolean,

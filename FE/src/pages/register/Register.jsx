@@ -1,19 +1,27 @@
-﻿/* eslint-disable no-undef */
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
-import { postRegister } from "../../services/register"; 
+import { postRegister } from "../../services/register";
 import useScrollToTop from "../../hooks/useScrollToTop";
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import imageRegister from "../../assets/images/image_register.png";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { socialLogin, handleGoogleLogin } from '../../services/social';
+import { checkLogin } from "../../action/auth";
+
 
 const Register = () => {
     useScrollToTop();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const isLoggedIn = useSelector((state) => state.auth.isLogin);
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/');
+        }
+    }, [isLoggedIn, navigate]);
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -34,7 +42,7 @@ const Register = () => {
 
     // Initialize Facebook SDK
     useEffect(() => {
-        window.fbAsyncInit = function() {
+        window.fbAsyncInit = function () {
             FB.init({
                 appId: import.meta.env.VITE_FACEBOOK_APP_ID,
                 xfbml: true,
@@ -43,7 +51,7 @@ const Register = () => {
         };
 
         // Load the Facebook SDK script
-        (function(d, s, id) {
+        (function (d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) return;
             js = d.createElement(s); js.id = id;
@@ -142,7 +150,7 @@ const Register = () => {
 
             if (data?.success) {
                 localStorage.setItem('token', data.data.token);
-                
+
                 message.success({
                     content: 'Đăng ký thành công!',
                     duration: 2,
@@ -196,8 +204,19 @@ const Register = () => {
                     navigate('/complete-profile');
                 } else {
                     message.success('Đăng nhập thành công!');
+
+                    localStorage.setItem('user', JSON.stringify({
+                        id: data.data.id,
+                        fullName: data.data.fullName,
+                        email: data.data.email,
+                        phone: data.data.phone
+                    }));
+                    localStorage.setItem('role', data.data.role);
+
+                    dispatch(checkLogin(data.data));
                     navigate('/');
                 }
+
             } else {
                 message.error(data?.message || 'Đăng nhập Google thất bại');
             }
@@ -213,7 +232,7 @@ const Register = () => {
         message.error('Đăng nhập Google thất bại. Vui lòng thử lại.');
     };
 
-    
+
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
             <div className="min-h-screen bg-surface flex flex-col">
@@ -234,7 +253,7 @@ const Register = () => {
                                     <div className="absolute inset-0 opacity-30">
                                         <img
                                             className="w-full h-full object-cover"
-                                            src={imageRegister} 
+                                            src={imageRegister}
                                             alt="Atelier Fabric"
                                         />
                                     </div>
@@ -280,11 +299,10 @@ const Register = () => {
                                                     value={formData.fullName}
                                                     onChange={handleChange}
                                                     placeholder="Nguyễn Văn A"
-                                                    className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${
-                                                        errors.fullName
+                                                    className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${errors.fullName
                                                             ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                                             : 'border-outline-variant/30 hover:border-outline-variant/50'
-                                                    }`}
+                                                        }`}
                                                     required
                                                 />
                                                 {errors.fullName && (
@@ -301,11 +319,10 @@ const Register = () => {
                                                     name="dateOfBirth"
                                                     value={formData.dateOfBirth}
                                                     onChange={handleChange}
-                                                    className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${
-                                                        errors.dateOfBirth
+                                                    className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${errors.dateOfBirth
                                                             ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                                             : 'border-outline-variant/30 hover:border-outline-variant/50'
-                                                    }`}
+                                                        }`}
                                                     required
                                                 />
                                                 {errors.dateOfBirth && (
@@ -323,11 +340,10 @@ const Register = () => {
                                                     value={formData.phone}
                                                     onChange={handleChange}
                                                     placeholder="0901 234 567"
-                                                    className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${
-                                                        errors.phone
+                                                    className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${errors.phone
                                                             ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                                             : 'border-outline-variant/30 hover:border-outline-variant/50'
-                                                    }`}
+                                                        }`}
                                                     required
                                                 />
                                                 {errors.phone && (
@@ -346,11 +362,10 @@ const Register = () => {
                                                         value={formData.email}
                                                         onChange={handleChange}
                                                         placeholder="example@atelier.com"
-                                                        className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${
-                                                            errors.email
+                                                        className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${errors.email
                                                                 ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                                                 : 'border-outline-variant/30 hover:border-outline-variant/50'
-                                                        }`}
+                                                            }`}
                                                         required
                                                     />
                                                     {errors.email && (
@@ -369,11 +384,10 @@ const Register = () => {
                                                             value={formData.password}
                                                             onChange={handleChange}
                                                             placeholder="••••••••"
-                                                            className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${
-                                                                errors.password
+                                                            className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${errors.password
                                                                     ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                                                     : 'border-outline-variant/30 hover:border-outline-variant/50'
-                                                            }`}
+                                                                }`}
                                                             required
                                                         />
                                                     </div>
@@ -394,11 +408,10 @@ const Register = () => {
                                                         value={formData.confirmPassword}
                                                         onChange={handleChange}
                                                         placeholder="••••••••"
-                                                        className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${
-                                                            errors.confirmPassword
+                                                        className={`w-full bg-surface-container-highest border rounded-lg px-4 py-3 text-on-surface placeholder:text-outline/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 ${errors.confirmPassword
                                                                 ? 'border-error ring-2 ring-error/50 bg-error-container/10'
                                                                 : 'border-outline-variant/30 hover:border-outline-variant/50'
-                                                        }`}
+                                                            }`}
                                                         required
                                                     />
                                                 </div>
@@ -458,7 +471,7 @@ const Register = () => {
                                                 )}
                                             />
 
-                                            
+
                                         </div>
 
                                         <div className="text-center pt-2">

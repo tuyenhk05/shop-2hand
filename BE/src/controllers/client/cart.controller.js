@@ -1,4 +1,5 @@
 const Cart = require('../../models/carts.model');
+const Product = require('../../models/products.model');
 const ProductImage = require('../../models/productImages.model');
 
 exports.getCart = async (req, res) => {
@@ -10,9 +11,12 @@ exports.getCart = async (req, res) => {
             return res.status(200).json({ success: true, cart: [] });
         }
 
+        // Loại bỏ các sản phẩm đã bán khỏi giỏ hàng hiển thị (tuỳ chọn nhưng nên làm)
+        const validItems = cart.items.filter(item => item.productId && item.productId.status === 'active');
+        
         // Lookup ảnh cho từng sản phẩm trong giỏ hàng
         const itemsWithImages = await Promise.all(
-            (cart.items || []).map(async (item) => {
+            validItems.map(async (item) => {
                 if (item.productId && item.productId._id) {
                     const images = await ProductImage.find({ productId: item.productId._id })
                         .sort({ isPrimary: -1, sortOrder: 1 })
@@ -40,15 +44,29 @@ exports.addToCart = async (req, res) => {
         const { userId } = req.params;
         const { productId, quantity = 1 } = req.body;
         
+        // Kiểm tra trạng thái sản phẩm trước khi thêm
+        const product = await Product.findById(productId);
+        if (!product || product.status !== 'active') {
+            return res.status(400).json({ 
+                success: false, 
+                message: product?.status === 'sold' ? 'Sản phẩm này đã bán' : 'Sản phẩm hiện không khả dụng' 
+            });
+        }
+
         let cart = await Cart.findOne({ userId });
         if (!cart) cart = new Cart({ userId, items: [] });
 
         const itemIndex = cart.items.findIndex(p => p.productId && p.productId.toString() === productId);
         if (itemIndex > -1) {
-            cart.items[itemIndex].quantity += quantity;
-        } else {
-            cart.items.push({ productId, quantity });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Sản phẩm này đã có trong giỏ hàng' 
+            });
         }
+        
+        // Luôn ép số lượng là 1 cho hàng độc bản (second-hand)
+        const finalQuantity = 1;
+        cart.items.push({ productId, quantity: finalQuantity });
 
         await cart.save();
         res.status(200).json({ success: true, message: 'Added to cart' });

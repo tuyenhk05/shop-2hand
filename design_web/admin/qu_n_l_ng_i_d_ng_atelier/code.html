@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ethos Archive | User Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-primary-fixed": "#0a2007",
+                        "surface-container-low": "#f6f3ee",
+                        "primary-fixed": "#ceebc2",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "surface-container": "#f0ede8",
+                        "on-surface": "#1c1c19",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#f3e0c6",
+                        "tertiary-fixed": "#d3e8d5",
+                        "primary-container": "#809b77",
+                        "surface-container-highest": "#e5e2dd",
+                        "tertiary": "#506354",
+                        "on-primary-container": "#1b3116",
+                        "on-secondary-container": "#6e614c",
+                        "on-secondary-fixed": "#231a0a",
+                        "inverse-primary": "#b3cea7",
+                        "tertiary-container": "#849887",
+                        "surface": "#fcf9f4",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "inverse-surface": "#31302d",
+                        "surface-variant": "#e5e2dd",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "secondary-container": "#f0ddc3",
+                        "on-primary": "#ffffff",
+                        "primary": "#4c6545",
+                        "inverse-on-surface": "#f3f0eb",
+                        "secondary": "#6a5c48",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dcdad5",
+                        "on-secondary-fixed-variant": "#514532",
+                        "surface-container-lowest": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "background": "#fcf9f4",
+                        "surface-bright": "#fcf9f4",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#ebe8e3",
+                        "primary-fixed-dim": "#b3cea7",
+                        "outline-variant": "#c6c8b8",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "outline": "#76786b",
+                        "surface-tint": "#4c6545",
+                        "on-surface-variant": "#46483c",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#1e3023"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #fcf9f4;
+            color: #1c1c19;
+        }
+        h1, h2, h3, .serif-italic {
+            font-family: 'Noto Serif', serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 z-40 bg-[#f6f3ee] flex flex-col py-8 px-4 gap-y-6">
+<div class="px-4 mb-4">
+<h2 class="text-primary font-headline italic text-2xl font-semibold">Ethos Archive</h2>
+<p class="text-xs font-medium tracking-widest text-on-surface-variant mt-1 uppercase">Management Tier</p>
+</div>
+<nav class="flex flex-col gap-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-['Manrope'] text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-['Manrope'] text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#4c6545] font-bold border-r-2 border-[#4c6545] bg-[#fcf9f4] font-['Manrope'] text-sm tracking-wide" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group</span>
+                Users
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-['Manrope'] text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">handshake</span>
+                Consignments
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-['Manrope'] text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">category</span>
+                Categories
+            </a>
+</nav>
+<div class="mt-auto flex flex-col gap-y-1">
+<button class="mx-2 mb-6 bg-primary text-on-primary py-3 px-4 rounded-md text-sm font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Consignment
+            </button>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-['Manrope'] text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-[#46483c] hover:bg-[#fcf9f4] hover:text-[#4c6545] transition-all duration-200 ease-in-out font-['Manrope'] text-sm font-medium tracking-wide" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar Anchor -->
+<header class="flex justify-between items-center w-full px-8 h-16 docked full-width top-0 sticky z-50 bg-[#fcf9f4]/80 backdrop-blur-md">
+<div class="flex items-center gap-8">
+<h1 class="text-2xl font-['Noto_Serif'] italic text-[#4c6545]">User Management</h1>
+<div class="relative w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-surface-container-highest border-none rounded-md py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body" placeholder="Search archive directory..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-error border-2 border-surface"></span>
+</button>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Admin Tier</p>
+<p class="text-[10px] text-on-surface-variant">Director Level</p>
+</div>
+<img alt="Admin Avatar" class="w-8 h-8 rounded-full object-cover group-active:opacity-70 transition-opacity" data-alt="professional portrait of a man with spectacles in a beige linen shirt with warm studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAixVnlyOZdva6HLBIKLEZKcp5hvU-3CGrwjYnOyYF3TjZtT-pu3VG2VSwaAR1sBLmofOuBQVKcG3ww5D4LazOHItkpqWU4ID41gEXQO4ZwxcYsCakMmv1IkJF1QBNghb0hBufQfzZgGOwtqFQ_sDiGYm53aTXDHllFbdBsHc8SCDkvDzpW7RF6odyfidH9Sk266fT69LSqvMap_9sHpqAbikyk9onwiTsd7QOQadL68jy6XGrrwNDz19MkdX3l7r8DdKf6ihe3AP2l"/>
+</div>
+</div>
+</header>
+<section class="p-10 max-w-7xl mx-auto">
+<!-- Editorial Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden flex flex-col justify-between h-32">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Active Buyers</span>
+<span class="text-3xl font-headline font-bold text-primary">1,284</span>
+<div class="absolute -right-2 -bottom-2 opacity-5">
+<span class="material-symbols-outlined text-6xl">shopping_bag</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden flex flex-col justify-between h-32">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Consignors</span>
+<span class="text-3xl font-headline font-bold text-primary">492</span>
+<div class="absolute -right-2 -bottom-2 opacity-5">
+<span class="material-symbols-outlined text-6xl">handshake</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden flex flex-col justify-between h-32">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Eco-Impact Index</span>
+<span class="text-3xl font-headline font-bold text-tertiary">8.4<span class="text-sm ml-1 font-body font-normal text-outline">tons CO₂</span></span>
+<div class="absolute -right-2 -bottom-2 opacity-5">
+<span class="material-symbols-outlined text-6xl">eco</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl relative overflow-hidden flex flex-col justify-between h-32 border-2 border-primary/10">
+<span class="text-on-surface-variant font-label text-xs tracking-widest uppercase">Pending Verification</span>
+<span class="text-3xl font-headline font-bold text-secondary">24</span>
+<div class="absolute -right-2 -bottom-2 opacity-5">
+<span class="material-symbols-outlined text-6xl">verified_user</span>
+</div>
+</div>
+</div>
+<!-- The Data Atelier Table -->
+<div class="bg-surface-container-low rounded-xl p-1 overflow-hidden">
+<div class="bg-surface-container-lowest rounded-lg overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="text-on-surface-variant border-b border-surface-container-low">
+<th class="px-8 py-5 font-headline italic font-semibold text-lg">Name</th>
+<th class="px-6 py-5 font-label text-xs tracking-widest uppercase font-medium">Contact</th>
+<th class="px-6 py-5 font-label text-xs tracking-widest uppercase font-medium">Role</th>
+<th class="px-6 py-5 font-label text-xs tracking-widest uppercase font-medium">Impact Score</th>
+<th class="px-6 py-5 font-label text-xs tracking-widest uppercase font-medium">Last Active</th>
+<th class="px-8 py-5 text-right font-label text-xs tracking-widest uppercase font-medium">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low/30">
+<!-- User Row 1 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="User Image" class="w-full h-full object-cover" data-alt="portrait of a woman with natural hair and minimal makeup in soft daylight looking calmly at camera" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuaqmXDQPsar4Wd-VWF4NSXmN2MyQTa4ElbswdcXuBxQJH-i3NIHYuTHSNW7sBx0Ig-3GS9TDDAgdtP7OL_TZ0Q5cimbrfbbTz7lm3-I2EHFFn_voqYokNZ-gS0y2X8Nobbcu5BB-nhU-W65u7ynUlj8kEfP9ZgTACRHD-lpy49K83eway3U19NPw_fw3jQomnq9YIuo8oNtburjV8_3Io4EGyzjc6QZ0zeKinlYdPfGh0J3sFQHGaxV2G1JXOE_RWsgLHMFHeom0j"/>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Julianne Moore</p>
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container text-on-tertiary-container text-[10px] font-bold tracking-tight">PROVENANCE VERIFIED</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm font-medium text-on-surface">j.moore@archive.com</p>
+<p class="text-xs text-outline">NYC, USA</p>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+<span class="text-sm text-on-surface">Consignor</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[88%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">882</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm text-on-surface-variant">2 hours ago</p>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:underline font-label text-sm font-semibold transition-all">Edit User</button>
+</td>
+</tr>
+<!-- User Row 2 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="User Image" class="w-full h-full object-cover" data-alt="portrait of a man with a beard wearing a dark olive jacket in a high-end minimalist setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpo55WsidNIX0XWLQsjKydxpCuwEwxmsEF5lbrjb3p1WymbiA49PhDrmhoFe6HsjS1vAecW0aWI6trMvXJ6BFf6HAIdgdYgaig5UTCoGpxm-yGfhPvQFKCglOcL7zejnuJBelLRVhAXOmBJWTbv13z6Aa4CYOSIZx80LMaFvYZczz7P42RJUynwV-WuaQ1pN1GWTOFEHZJ3qZipRbztHygsYCPNMbKIyQ10GlynDEgdeSsKGFTxxaL9RNT2pmWtET429rJ0DP8eLYO"/>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Marcus Sterling</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm font-medium text-on-surface">m.sterling@global.net</p>
+<p class="text-xs text-outline">London, UK</p>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-secondary-container"></span>
+<span class="text-sm text-on-surface">Buyer</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[42%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">421</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm text-on-surface-variant">Yesterday</p>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:underline font-label text-sm font-semibold transition-all">Edit User</button>
+</td>
+</tr>
+<!-- User Row 3 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<span class="text-primary font-bold">SD</span>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Sarah Dupont</p>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold tracking-tight">CURATOR TIER</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm font-medium text-on-surface">s.dupont@atelier.com</p>
+<p class="text-xs text-outline">Paris, FR</p>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-error"></span>
+<span class="text-sm text-on-surface font-semibold">Admin</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[94%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">942</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm text-on-surface-variant">Active Now</p>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:underline font-label text-sm font-semibold transition-all">Edit User</button>
+</td>
+</tr>
+<!-- User Row 4 -->
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-8 py-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container-highest">
+<img alt="User Image" class="w-full h-full object-cover" data-alt="portrait of a young woman with a sharp gaze and editorial lighting in a minimalist studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-ojcjM0FiO_T1h-Q8QzQ7YBg27eVFKk6VHjtBdohTz_Z2o7AOdMoOHUrkevP6fldzdJarkywkDXMGHIzX9P03kMh8yFK44SsgwhJ64ECNhc_ycvX1XoqNxtWN45J9PpfCuGyReSpGxmXOwIXaCMpcDWCSisjvudLFZr4kR5m5TW3iEkt0df8uiVh3my5hgfy13G1AUfFb7vwqGeZl8szs25NUMCGP733xp1YBIa6bsz2ZQlARms7QkfUogBJdMpuM94KbIsMpC57c"/>
+</div>
+<div>
+<p class="font-headline font-bold text-on-surface">Elena Rossi</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm font-medium text-on-surface">e.rossi@archive.it</p>
+<p class="text-xs text-outline">Milan, IT</p>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+<span class="text-sm text-on-surface">Consignor</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<div class="flex items-center gap-2">
+<div class="w-24 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[76%]"></div>
+</div>
+<span class="text-xs font-bold text-primary">765</span>
+</div>
+</td>
+<td class="px-6 py-6">
+<p class="text-sm text-on-surface-variant">5 days ago</p>
+</td>
+<td class="px-8 py-6 text-right">
+<button class="text-primary hover:underline font-label text-sm font-semibold transition-all">Edit User</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Asymmetric Editorial Footer -->
+<footer class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
+<div>
+<h3 class="text-4xl font-headline italic text-primary leading-tight max-w-sm">Curating tomorrow’s vintage, today.</h3>
+<p class="text-on-surface-variant text-sm mt-4 font-body leading-relaxed max-w-md">
+                        Every user in Ethos Archive contributes to a circular fashion economy. Our Impact Score measures carbon reduction through consignment and intentional purchasing.
+                    </p>
+</div>
+<div class="flex justify-end gap-12">
+<div class="text-right">
+<p class="font-label text-xs tracking-widest uppercase text-outline mb-2">Internal Policy</p>
+<nav class="flex flex-col gap-1">
+<a class="text-sm hover:text-primary transition-colors" href="#">Privacy Ethics</a>
+<a class="text-sm hover:text-primary transition-colors" href="#">Data Provenance</a>
+<a class="text-sm hover:text-primary transition-colors" href="#">Audit Logs</a>
+</nav>
+</div>
+<div class="text-right">
+<p class="font-label text-xs tracking-widest uppercase text-outline mb-2">Archive Tools</p>
+<nav class="flex flex-col gap-1">
+<a class="text-sm hover:text-primary transition-colors" href="#">Bulk Import</a>
+<a class="text-sm hover:text-primary transition-colors" href="#">Role Export</a>
+<a class="text-sm hover:text-primary transition-colors" href="#">API Access</a>
+</nav>
+</div>
+</div>
+</footer>
+</section>
+</main>
+<!-- Floating Action Button (Contextual) -->
+<button class="fixed bottom-8 right-8 h-14 w-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform z-50">
+<span class="material-symbols-outlined" style="font-variation-settings: 'opsz' 32;">person_add</span>
+</button>
+</body></html>

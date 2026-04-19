@@ -1,9 +1,10 @@
-﻿const User = require('../../models/users.model.js');
+const User = require('../../models/users.model.js');
 const { generateToken } = require('../../utils/jwt.utils');
 const { OAuth2Client } = require('google-auth-library');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt'); // Dùng để mã hóa mật khẩu
+const Role = require('../../models/roles.model.js');
 
 
 // ✅ ĐĂNG KÝ
@@ -27,20 +28,34 @@ exports.register = async (req, res) => {
         }
 
         // Check user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
             return res.status(409).json({
                 success: false,
-                message: 'Email already registered'
+                message: 'Email này đã được đăng ký'
             });
         }
+
+        if (phone) {
+            const existingPhone = await User.findOne({ phone });
+            if (existingPhone) {
+                return res.status(409).json({
+                    success: false,
+                    message: 'Số điện thoại này đã được sử dụng'
+                });
+            }
+        }
+
+        // Get default role
+        let defaultRole = await Role.findOne({ title: 'Khách hàng' });
 
         // Create new user
         const user = new User({
             fullName,
             email,
             password,
-            phone
+            phone,
+            role: defaultRole ? defaultRole._id : undefined
         });
 
         await user.save();
@@ -83,7 +98,7 @@ exports.login = async (req, res) => {
         }
 
         // Check user exists and get password field
-        const user = await User.findOne({ email }).select('+password');
+        const user = await User.findOne({ email }).select('+password').populate('role');
         if (!user) {
             return res.status(401).json({
                 success: false,
@@ -186,12 +201,13 @@ exports.socialLogin = async (req, res) => {
         // ==========================================
         // 2. XỬ LÝ DATABASE (Dùng dữ liệu đã verified)
         // ==========================================
-        let user = await User.findOne({ email: verifiedEmail });
+        let user = await User.findOne({ email: verifiedEmail }).populate('role');
         let isNewUser = false; // Tạo biến cờ để báo cho frontend
 
         if (!user) {
             isNewUser = true;
             const randomPassword = Math.random().toString(36).slice(-15);
+            let defaultRole = await Role.findOne({ title: 'Khách hàng' });
 
             user = new User({
                 fullName: verifiedFullName,
@@ -200,7 +216,8 @@ exports.socialLogin = async (req, res) => {
                // phone: '',
                 avatar: verifiedAvatar || null,
                 provider: provider,
-                isActive: true
+                isActive: true,
+                role: defaultRole ? defaultRole._id : undefined
             });
 
             await user.save();
@@ -267,6 +284,15 @@ exports.completeProfile = async (req, res) => {
             });
         }
 
+        // Kiểm tra xem số điện thoại có bị trùng với user khác không
+        const existingPhone = await User.findOne({ phone, _id: { $ne: userId } });
+        if (existingPhone) {
+            return res.status(400).json({
+                success: false,
+                message: 'Số điện thoại này đã được sử dụng bởi tài khoản khác'
+            });
+        }
+
         // Tìm user và cập nhật thông tin
         const updatedUser = await User.findByIdAndUpdate(
             userId,
@@ -304,7 +330,7 @@ exports.completeProfile = async (req, res) => {
 // ✅ GET CURRENT USER
 exports.getCurrentUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.id).populate('role');
         
         if (!user) {
             return res.status(404).json({

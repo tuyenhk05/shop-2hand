@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { message } from 'antd';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import WishlistItem from './WishlistItem';
@@ -16,11 +17,15 @@ const Wishlist = () => {
     const [isLoading, setIsLoading] = useState(true);
     
     // Giả sử UserID được lưu ở cookie `userId` hoặc lấy từ token
-    const userId = getCookie('userId') || localStorage.getItem('userId') || '66bb1f9d506a73c1d51ab4cd';
+    const userId = useSelector((state) => state.auth.userId);
 
     useEffect(() => {
+        if (!userId) {
+            setIsLoading(false);
+            return;
+        }
         fetchWishlists();
-    }, []);
+    }, [userId]);
 
     const fetchWishlists = async () => {
         try {
@@ -60,7 +65,7 @@ const Wishlist = () => {
             if (res && res.success) {
                 message.success('Đã thêm vào giỏ hàng!');
             } else {
-                message.error('Không thể thêm vào giỏ hàng. Vui lòng thử lại!');
+                message.warning(res.message || 'Không thể thêm vào giỏ hàng. Vui lòng thử lại!');
             }
         } catch (error) {
             console.error('Lỗi thêm vào giỏ hàng', error);

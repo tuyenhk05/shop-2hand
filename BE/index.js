@@ -1,10 +1,11 @@
-﻿const express = require('express');
+const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const database = require('./src/configs/database.js');
 const systemconfig = require('./src/configs/system');
 const methodOverride = require('method-override');
-const router = require('./src/routes/client/index.routes');
+// router and adminRoutes are required below
+const { cleanupExpiredOrders } = require('./src/controllers/client/order.controller');
 require('dotenv').config();
 
 const app = express();
@@ -29,8 +30,12 @@ app.locals.prefixAdmin = systemconfig.prefixAdmin;
 // ✅ Kết nối database
 database.connect();
 
+const router = require('./src/routes/client/index.routes');
+const adminRoutes = require('./src/routes/admin/index.route');
+
 // ✅ Routes
 router(app);
+adminRoutes(app);
 
 // ✅ Global Error Handler (phải đặt sau tất cả routes)
 app.use((err, req, res, next) => {
@@ -53,4 +58,9 @@ app.use((req, res) => {
 // ✅ Start server
 app.listen(port, () => {
   console.log(`🚀 Backend API running at http://localhost:${port}`);
+
+  // ✅ Chạy task kiểm tra đơn hàng hết hạn mỗi phút
+  setInterval(() => {
+    cleanupExpiredOrders();
+  }, 60000);
 });

@@ -32,10 +32,10 @@ const CartItem = ({ item, formatPrice, onRemove }) => {
             <div className="flex-grow">
                 <div className="flex justify-between items-start">
                     <h4 className="font-bold text-sm uppercase tracking-tight">{product.title || product.name}</h4>
-                    <span className="font-bold text-sm">{formatPrice(product.price * item.quantity)}</span>
+                    <span className="font-bold text-sm">{formatPrice(product.price)}</span>
                 </div>
                 <p className="text-xs text-on-surface-variant mt-1">
-                    SL: {item.quantity} {product.size && `| Size: ${product.size}`} {product.color && `| Màu: ${product.color}`}
+                    {product.size && `Size: ${product.size}`} {product.color && `| Màu: ${product.color}`}
                 </p>
                 {product.condition && (
                     <div className="mt-2 text-primary text-[10px] font-bold uppercase tracking-widest">

@@ -1,20 +1,31 @@
 import React from 'react';
 
 const OrderCard = ({ order, formatPrice }) => {
-    // Determine status badge colors
+    // Dịch trạng thái từ DB sang tiếng Việt
+    const translateStatus = (status) => {
+        switch (status) {
+            case 'pending_payment': return 'Chờ thanh toán';
+            case 'paid': return 'Đã thanh toán';
+            case 'processing': return 'Đang xử lý';
+            case 'shipped': return 'Đang vận chuyển';
+            case 'delivered': return 'Đã giao hàng';
+            case 'cancelled': return 'Đã hủy';
+            case 'returned': return 'Đã hoàn trả';
+            default: return status || 'Đang xử lý';
+        }
+    };
+
+    // Màu badge theo trạng thái (dùng Tailwind chuẩn)
     const getStatusStyle = (status) => {
-        switch (status?.toLowerCase()) {
-            case 'completed':
-            case 'đã giao hàng':
-                return 'bg-tertiary-fixed text-on-tertiary-fixed';
-            case 'processing':
-            case 'đang xử lý':
-                return 'bg-surface-container-high text-on-surface-variant';
-            case 'shipping':
-            case 'đang vận chuyển':
-                return 'bg-secondary-container text-on-secondary-container';
-            default:
-                return 'bg-surface-container text-on-surface-variant';
+        switch (status) {
+            case 'delivered':       return 'bg-green-100 text-green-800';
+            case 'paid':            return 'bg-blue-100 text-blue-800';
+            case 'processing':      return 'bg-indigo-100 text-indigo-700';
+            case 'shipped':         return 'bg-cyan-100 text-cyan-800';
+            case 'cancelled':       return 'bg-red-100 text-red-700';
+            case 'returned':        return 'bg-orange-100 text-orange-700';
+            case 'pending_payment': return 'bg-yellow-100 text-yellow-800';
+            default:                return 'bg-gray-100 text-gray-600';
         }
     };
 
@@ -30,7 +41,7 @@ const OrderCard = ({ order, formatPrice }) => {
                 </div>
                 <div className="text-right">
                     <span className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-full ${getStatusStyle(order.status)}`}>
-                        {order.status || 'Đang xử lý'}
+                        {translateStatus(order.status)}
                     </span>
                     <p className="text-xs text-on-surface-variant mt-2">
                         Ngày mua: {order.createdAt ? new Date(order.createdAt).toLocaleDateString('vi-VN') : 'N/A'}
@@ -69,13 +80,13 @@ const OrderCard = ({ order, formatPrice }) => {
                 </div>
                 <div className="text-right">
                     <p className="text-xs text-outline font-bold uppercase tracking-widest mb-1">Tổng cộng</p>
-                    <p className="font-notoSerif font-bold border-l border-b border-primary/20 text-xl text-primary pl-2">{formatPrice(order.totalPrice)}</p>
+                    <p className="font-notoSerif font-bold border-l border-b border-primary/20 text-xl text-primary pl-2">{formatPrice(order.totalAmount)}</p>
                 </div>
             </div>
             
             <div className="mt-6 flex justify-end gap-3">
                 <button className="text-primary text-xs font-bold hover:underline transition-all px-3 py-2">Hỗ trợ</button>
-                <button className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-xs font-bold active:scale-95 hover:bg-primary hover:text-white transition-all">Chi tiết</button>
+                <button onClick={() => window.location.href = `/history/${order._id}`} className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-xs font-bold active:scale-95 hover:bg-primary hover:text-white transition-all">Chi tiết</button>
             </div>
         </div>
     );

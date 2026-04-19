@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { useSelector } from 'react-redux';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import OrderCard from './OrderCard';
 import { getOrdersApi } from '../../services/order.service';
@@ -10,15 +12,31 @@ import Loading from '../../components/loading/loading';
 const PurchaseHistory = () => {
     useScrollToTop();
     const navigate = useNavigate();
-    const [filter, setFilter] = useState('all'); // all, pending, completed
-    const [orders, setOrders] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const location = useLocation();
+    const [filter, setFilter] = useState(location.state?.filter || 'all'); // all, pending, completed
 
-    const userId = getCookie('userId') || localStorage.getItem('userId') || '66bb1f9d506a73c1d51ab4cd';
+    const [isLoading, setIsLoading] = useState(true);
+    const [orders, setOrders] = useState([]);
+
+    const totalCarbonSaved = React.useMemo(() => {
+        return orders.reduce((total, order) => {
+            if (order.status !== 'cancelled' && order.status !== 'returned') {
+                const itemCount = order.items?.length || 1;
+                return total + (itemCount * 1.5);
+            }
+            return total;
+        }, 0);
+    }, [orders]);
+
+    const userId = useSelector((state) => state.auth.userId);
 
     useEffect(() => {
+        if (!userId) {
+            setIsLoading(false);
+            return;
+        }
         fetchOrders();
-    }, []);
+    }, [userId]);
 
     const fetchOrders = async () => {
         try {
@@ -40,8 +58,8 @@ const PurchaseHistory = () => {
 
     const filteredOrders = orders.filter(order => {
         if (filter === 'all') return true;
-        if (filter === 'pending') return order.status === 'Đang xử lý';
-        if (filter === 'completed') return order.status === 'Hoàn thành' || order.status === 'Đã giao hàng';
+        if (filter === 'pending') return ['pending_payment', 'processing', 'shipped'].includes(order.status);
+        if (filter === 'completed') return ['delivered', 'paid'].includes(order.status);
         return true;
     });
 
@@ -65,7 +83,7 @@ const PurchaseHistory = () => {
                             <span className="font-bold tracking-widest text-xs text-primary uppercase">Tác động Môi trường</span>
                         </div>
                         <div className="flex items-baseline gap-2">
-                            <span className="font-notoSerif text-5xl font-black text-primary">124.5</span>
+                            <span className="font-notoSerif text-5xl font-black text-primary">{totalCarbonSaved.toFixed(1)}</span>
                             <span className="font-notoSerif text-xl text-primary/80">kg CO2</span>
                         </div>
                         <p className="text-on-primary-container text-sm mt-2 opacity-80">Tổng lượng phát thải đã giảm thiểu từ các đơn hàng của bạn.</p>
