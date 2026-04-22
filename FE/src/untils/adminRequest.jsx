@@ -14,9 +14,24 @@ const getHeaders = (isFormData = false) => {
     return headers;
 };
 
-export const adminGet = async (path) => {
+export const adminGet = async (path, params = {}) => {
     try {
-        const res = await fetch(`${ADMIN_API}${path}`, {
+        let url = `${ADMIN_API}${path}`;
+        
+        // Append query parameters if provided
+        const queryParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                queryParams.append(key, value);
+            }
+        });
+        
+        const queryString = queryParams.toString();
+        if (queryString) {
+            url += `?${queryString}`;
+        }
+
+        const res = await fetch(url, {
             headers: getHeaders(),
         });
         return await res.json();

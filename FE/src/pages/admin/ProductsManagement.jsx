@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import {
     Table, Button, Modal, Form, Input, Select, message, Tag, InputNumber, Upload, Space, Popconfirm
 } from 'antd';
@@ -7,7 +8,7 @@ import { getAllProducts, getProductById, createProduct, updateProduct, updatePro
 import { getAllCategories } from '../../services/admin/categories.service.jsx';
 import { adminGet } from '../../untils/adminRequest.jsx';
 
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 
 const STATUS_CONFIG = {
     draft: { color: 'default', label: 'Nháp' },
@@ -27,6 +28,9 @@ const CONDITION_OPTIONS = [
 ];
 
 const ProductsManagement = () => {
+    const { role } = useSelector((state) => state.auth);
+    const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
+
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
@@ -38,12 +42,30 @@ const ProductsManagement = () => {
     const [submitting, setSubmitting] = useState(false);
     const [form] = Form.useForm();
 
+    // ─── Filter State ──────────────────────────────────────────
+    const [filters, setFilters] = useState({
+        q: '',
+        status: undefined,
+        categoryId: undefined,
+        minPrice: undefined,
+        maxPrice: undefined
+    });
+
     // ─── Fetch ───────────────────────────────────────────────
-    const fetchData = async () => {
+    const fetchData = async (currentFilters = filters) => {
         try {
             setLoading(true);
+            
+            // Lọc bỏ các filter undefined/empty để gửi lên API
+            const params = {};
+            if (currentFilters.q) params.q = currentFilters.q;
+            if (currentFilters.status) params.status = currentFilters.status;
+            if (currentFilters.categoryId) params.categoryId = currentFilters.categoryId;
+            if (currentFilters.minPrice) params.minPrice = currentFilters.minPrice;
+            if (currentFilters.maxPrice) params.maxPrice = currentFilters.maxPrice;
+
             const [prodRes, catRes, brandRes] = await Promise.all([
-                getAllProducts(),
+                getAllProducts(params),
                 getAllCategories(),
                 adminGet('/brands')
             ]);
@@ -57,14 +79,38 @@ const ProductsManagement = () => {
         }
     };
 
-    useEffect(() => { fetchData(); }, []);
+    // Trigger fetch khi filter (trừ search q) thay đổi trực tiếp
+    useEffect(() => {
+        fetchData();
+    }, [filters.status, filters.categoryId, filters.minPrice, filters.maxPrice]);
+
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchData();
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [filters.q]);
+
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleResetFilters = () => {
+        setFilters({
+            q: '',
+            status: undefined,
+            categoryId: undefined,
+            minPrice: undefined,
+            maxPrice: undefined
+        });
+    };
 
     // ─── Mở modal Thêm ────────────────────────────────────────
     const handleAdd = () => {
         setEditingProduct(null);
         setUploadedImages([]);
         setExistingImages([]);
-        form.resetFields();
         setIsModalVisible(true);
     };
 
@@ -72,24 +118,8 @@ const ProductsManagement = () => {
     const handleEdit = async (record) => {
         setEditingProduct(record);
         setUploadedImages([]);
-        form.setFieldsValue({
-            title: record.title,
-            description: record.description,
-            price: record.price,
-            originalPrice: record.originalPrice,
-            condition: record.condition,
-            size: record.size,
-            color: record.color,
-            material: record.material,
-            gender: record.gender,
-            stock: record.stock,
-            status: record.status,
-            listingType: record.listingType,
-            categoryId: record.categoryId?._id || record.categoryId,
-            brandId: record.brandId?._id || record.brandId,
-        });
 
-        // Lấy danh sách ảnh hiện tại
+        // Lấy danh sách ảnh hiện tại (vẫn giữ ở đây để load async)
         try {
             const res = await getProductById(record._id);
             if (res.success) setExistingImages(res.data.images || []);
@@ -97,6 +127,32 @@ const ProductsManagement = () => {
 
         setIsModalVisible(true);
     };
+
+    // ─── Đồng bộ Form khi Modal mở ─────────────────────────────
+    useEffect(() => {
+        if (isModalVisible) {
+            if (editingProduct) {
+                form.setFieldsValue({
+                    title: editingProduct.title,
+                    description: editingProduct.description,
+                    price: editingProduct.price,
+                    originalPrice: editingProduct.originalPrice,
+                    condition: editingProduct.condition,
+                    size: editingProduct.size,
+                    color: editingProduct.color,
+                    material: editingProduct.material,
+                    gender: editingProduct.gender,
+                    stock: editingProduct.stock,
+                    status: editingProduct.status,
+                    listingType: editingProduct.listingType,
+                    categoryId: editingProduct.categoryId?._id || editingProduct.categoryId,
+                    brandId: editingProduct.brandId?._id || editingProduct.brandId,
+                });
+            } else {
+                form.resetFields();
+            }
+        }
+    }, [isModalVisible, editingProduct, form]);
 
     // ─── Xử lý file upload local (chưa gửi BE) ────────────────
     const beforeUpload = (file) => {
@@ -133,7 +189,12 @@ const ProductsManagement = () => {
             // Thêm các trường dữ liệu
             Object.entries(values).forEach(([key, val]) => {
                 if (val !== undefined && val !== null && val !== '') {
-                    formData.append(key, val);
+                    // Nếu là brandId và đang dùng mode="tags", lấy phần tử đầu tiên
+                    if (key === 'brandId' && Array.isArray(val)) {
+                        formData.append(key, val[0]);
+                    } else {
+                        formData.append(key, val);
+                    }
                 }
             });
 
@@ -145,16 +206,22 @@ const ProductsManagement = () => {
             let res;
             if (editingProduct) {
                 res = await updateProduct(editingProduct._id, formData);
-                message.success('Cập nhật sản phẩm thành công!');
             } else {
                 res = await createProduct(formData);
-                message.success('Thêm sản phẩm mới thành công!');
             }
 
-            setIsModalVisible(false);
-            fetchData();
+            if (res.success) {
+                message.success(editingProduct ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm mới thành công!');
+                setUploadedImages([]);
+                setExistingImages([]);
+                setIsModalVisible(false);
+                fetchData();
+            } else {
+                message.error(res.message || 'Có lỗi xảy ra khi lưu sản phẩm');
+            }
         } catch (error) {
-            message.error(error.response?.data?.message || 'Có lỗi xảy ra');
+            console.error('Submit error:', error);
+            message.error('Lỗi kết nối server');
         } finally {
             setSubmitting(false);
         }
@@ -232,9 +299,9 @@ const ProductsManagement = () => {
                     size="small"
                 >
                     {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
-                        <Option key={val} value={val}>
+                        <Select.Option key={val} value={val}>
                             <Tag color={cfg.color} className="m-0">{cfg.label}</Tag>
-                        </Option>
+                        </Select.Option>
                     ))}
                 </Select>
             )
@@ -245,22 +312,26 @@ const ProductsManagement = () => {
             width: 120,
             render: (_, record) => (
                 <Space>
-                    <Button
-                        type="link"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEdit(record)}
-                        className="text-primary p-0"
-                    />
-                    <Popconfirm
-                        title="Xóa sản phẩm?"
-                        description="Hành động này không thể hoàn tác và sẽ xóa tất cả ảnh."
-                        onConfirm={() => handleDelete(record._id)}
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        okButtonProps={{ danger: true }}
-                    >
-                        <Button type="link" icon={<DeleteOutlined />} danger className="p-0" />
-                    </Popconfirm>
+                    {hasPerm('products_edit') && (
+                        <Button
+                            type="link"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEdit(record)}
+                            className="text-primary p-0"
+                        />
+                    )}
+                    {hasPerm('products_delete') && (
+                        <Popconfirm
+                            title="Xóa sản phẩm?"
+                            description="Hành động này không thể hoàn tác và sẽ xóa tất cả ảnh."
+                            onConfirm={() => handleDelete(record._id)}
+                            okText="Xóa"
+                            cancelText="Hủy"
+                            okButtonProps={{ danger: true }}
+                        >
+                            <Button type="link" icon={<DeleteOutlined />} danger className="p-0" />
+                        </Popconfirm>
+                    )}
                 </Space>
             ),
         },
@@ -274,15 +345,89 @@ const ProductsManagement = () => {
                     <h2 className="font-notoSerif text-2xl font-bold text-on-surface">Quản lý Sản phẩm</h2>
                     <p className="text-sm text-on-surface-variant">Tổng cộng {products.length} sản phẩm</p>
                 </div>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={handleAdd}
-                    size="large"
-                    className="bg-primary"
-                >
-                    Thêm sản phẩm
-                </Button>
+                {hasPerm('products_edit') && (
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={handleAdd}
+                        size="large"
+                        className="bg-primary"
+                    >
+                        Thêm sản phẩm
+                    </Button>
+                )}
+            </div>
+
+            {/* Filter Bar */}
+            <div className="bg-surface-container-low p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end border border-outline-variant/10">
+                <div className="flex-1 min-w-[240px]">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tìm kiếm</p>
+                    <Search
+                        placeholder="Tên sản phẩm hoặc mô tả..."
+                        allowClear
+                        value={filters.q}
+                        onChange={(e) => handleFilterChange('q', e.target.value)}
+                        className="w-full"
+                    />
+                </div>
+
+                <div className="w-36">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Trạng thái</p>
+                    <Select
+                        placeholder="Tất cả"
+                        className="w-full"
+                        allowClear
+                        value={filters.status}
+                        onChange={(val) => handleFilterChange('status', val)}
+                    >
+                        {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
+                            <Select.Option key={val} value={val}>{cfg.label}</Select.Option>
+                        ))}
+                    </Select>
+                </div>
+
+                <div className="w-44">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Danh mục</p>
+                    <Select
+                        placeholder="Tất cả danh mục"
+                        className="w-full"
+                        allowClear
+                        showSearch
+                        optionFilterProp="children"
+                        value={filters.categoryId}
+                        onChange={(val) => handleFilterChange('categoryId', val)}
+                    >
+                        {categories.map(c => (
+                            <Select.Option key={c._id} value={c._id}>{c.name}</Select.Option>
+                        ))}
+                    </Select>
+                </div>
+
+                <div className="w-64">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Khoảng giá (VNĐ)</p>
+                    <Space.Compact className="w-full">
+                        <InputNumber
+                            placeholder="Từ"
+                            className="w-full"
+                            min={0}
+                            value={filters.minPrice}
+                            onChange={(val) => handleFilterChange('minPrice', val)}
+                            formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            parser={v => v.replace(/,/g, '')}
+                        />
+                        <InputNumber
+                            placeholder="Đến"
+                            className="w-full"
+                            min={0}
+                            value={filters.maxPrice}
+                            onChange={(val) => handleFilterChange('maxPrice', val)}
+                            formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            parser={v => v.replace(/,/g, '')}
+                        />
+                    </Space.Compact>
+                </div>
+
+                <Button onClick={handleResetFilters} className="mb-0.5">Đặt lại</Button>
             </div>
 
             {/* Table */}
@@ -305,7 +450,7 @@ const ProductsManagement = () => {
                 onCancel={() => setIsModalVisible(false)}
                 footer={null}
                 width={780}
-                destroyOnClose
+                destroyOnHidden
             >
                 <Form form={form} layout="vertical" onFinish={handleSubmit} className="mt-4">
                     <div className="grid grid-cols-2 gap-x-4">
@@ -353,31 +498,38 @@ const ProductsManagement = () => {
                         {/* Danh mục */}
                         <Form.Item label="Danh mục" name="categoryId" rules={[{ required: true, message: 'Chọn danh mục' }]}>
                             <Select placeholder="Chọn danh mục" showSearch optionFilterProp="children">
-                                {categories.map(c => <Option key={c._id} value={c._id}>{c.name}</Option>)}
+                                {categories.map(c => <Select.Option key={c._id} value={c._id}>{c.name}</Select.Option>)}
                             </Select>
                         </Form.Item>
 
                         {/* Thương hiệu */}
                         <Form.Item label="Thương hiệu" name="brandId">
-                            <Select placeholder="Chọn thương hiệu" showSearch optionFilterProp="children" allowClear>
-                                {brands.map(b => <Option key={b._id} value={b._id}>{b.name}</Option>)}
+                            <Select 
+                                placeholder="Chọn hoặc nhập thương hiệu mới" 
+                                showSearch 
+                                mode="tags"
+                                maxCount={1}
+                                optionFilterProp="children" 
+                                allowClear
+                            >
+                                {brands.map(b => <Select.Option key={b._id} value={b._id}>{b.name}</Select.Option>)}
                             </Select>
                         </Form.Item>
 
                         {/* Tình trạng */}
                         <Form.Item label="Tình trạng" name="condition" rules={[{ required: true, message: 'Chọn tình trạng' }]}>
                             <Select placeholder="Chọn tình trạng">
-                                {CONDITION_OPTIONS.map(o => <Option key={o.value} value={o.value}>{o.label}</Option>)}
+                                {CONDITION_OPTIONS.map(o => <Select.Option key={o.value} value={o.value}>{o.label}</Select.Option>)}
                             </Select>
                         </Form.Item>
 
                         {/* Giới tính */}
                         <Form.Item label="Giới tính" name="gender">
                             <Select placeholder="Chọn giới tính">
-                                <Option value="male">Nam</Option>
-                                <Option value="female">Nữ</Option>
-                                <Option value="unisex">Unisex</Option>
-                                <Option value="kids">Trẻ em</Option>
+                                <Select.Option value="male">Nam</Select.Option>
+                                <Select.Option value="female">Nữ</Select.Option>
+                                <Select.Option value="unisex">Unisex</Select.Option>
+                                <Select.Option value="kids">Trẻ em</Select.Option>
                             </Select>
                         </Form.Item>
 
@@ -404,9 +556,9 @@ const ProductsManagement = () => {
                         {/* Loại niêm yết */}
                         <Form.Item label="Loại niêm yết" name="listingType">
                             <Select placeholder="Chọn loại">
-                                <Option value="direct_sale">Bán trực tiếp</Option>
-                                <Option value="consignment">Ký gửi</Option>
-                                <Option value="buyback">Mua lại</Option>
+                                <Select.Option value="direct_sale">Bán trực tiếp</Select.Option>
+                                <Select.Option value="consignment">Ký gửi</Select.Option>
+                                <Select.Option value="buyback">Mua lại</Select.Option>
                             </Select>
                         </Form.Item>
 
@@ -414,7 +566,7 @@ const ProductsManagement = () => {
                         <Form.Item label="Trạng thái" name="status">
                             <Select>
                                 {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
-                                    <Option key={val} value={val}>{cfg.label}</Option>
+                                    <Select.Option key={val} value={val}>{cfg.label}</Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>

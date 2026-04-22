@@ -1,302 +1,119 @@
-# ??? Shop-2hand - Backend API
+# Atelier - Sustainable Second-Hand Fashion Platform
 
-H? th?ng backend cho n?n t?ng mua bán hàng c? tr?c tuy?n **Shop-2hand**. ???c xây d?ng b?ng **Node.js**, **Express.js** và **MongoDB**.
+![Atelier Banner](https://img.shields.io/badge/Status-Development-orange)
+![Atelier Banner](https://img.shields.io/badge/Tech-React--Node--MongoDB-blue)
 
----
+Atelier is a premium e-commerce platform dedicated to second-hand fashion, focusing on sustainability and circular economy. It provides a seamless interface for users to buy, sell (consignment), and manage high-quality pre-owned garments.
 
-## ?? M?c l?c
-
-- [Gi?i thi?u](#gi?i-thi?u)
-- [Yêu c?u h? th?ng](#yêu-c?u-h?-th?ng)
-- [Cài ??t](#cài-??t)
-- [C?u hình](#c?u-hình)
-- [Ch?y d? án](#ch?y-d?-án)
-- [API Documentation](#api-documentation)
-- [C?u trúc folder](#c?u-trúc-folder)
-- [Công ngh? s? d?ng](#công-ngh?-s?-d?ng)
-- [B?o m?t](#b?o-m?t)
-- [L?u ı quan tr?ng](#l?u-ı-quan-tr?ng)
-- [?óng góp](#?óng-góp)
-- [Liên h?](#liên-h?)
-- [License](#license)
+## ğŸš€ Vision
+Our mission is to redefine the second-hand market by providing a professional, trustworthy, and aesthetically pleasing environment for fashion lovers to extend the lifecycle of their clothes.
 
 ---
 
-## ?? Gi?i thi?u
+## âœ¨ Key Features
 
-**Shop-2hand** là m?t n?n t?ng e-commerce cho phép ng??i dùng mua bán các s?n ph?m c?, tái ch?. Backend API cung c?p các ch?c n?ng:
+### ğŸ›ï¸ Client Features
+- **Modern Storefront**: Browse through curated second-hand items with advanced filtering (Brands, Categories, Price).
+- **Consignment Workflow**: Users can submit their items for consignment, track status (QC, Received, Listed), and earn from sales.
+- **Wishlist & Cart**: Interactive wishlist and streamlined checkout process.
+- **Social Login**: Secure authentication with Google and Facebook.
+- **Payment Integration**: Support for VNPay for secure transactions.
+- **Eco-Impact Tracking**: Visual representation of the environmental benefits of buying second-hand.
 
-? Qu?n lı ng??i dùng (??ng kı, ??ng nh?p)  
-? Xác th?c ng??i dùng b?ng JWT  
-? Qu?n lı s?n ph?m  
-? Qu?n lı ??n hàng  
-? X? lı thanh toán  
-? H? th?ng bình lu?n và ?ánh giá  
-
----
-
-## ?? Yêu c?u h? th?ng
-
-- **Node.js**: v16.0.0 tr? lên
-- **npm**: v8.0.0 tr? lên
-- **MongoDB**: Cloud (MongoDB Atlas) ho?c Local
-- **Git**: ?? clone repository
+### ğŸ›¡ï¸ Admin Features
+- **Comprehensive Dashboard**: Real-time stats on sales, users, and orders.
+- **Consignment Management**: Full control over the quality check and listing process for user-submitted items.
+- **Product & Category Management**: Tools to manage the inventory with SEO-friendly slugs.
+- **Order Tracking**: Handle order statuses from processing to shipping and fulfillment.
+- **Role-Based Access Control (RBAC)**: Manage permissions for different staff roles.
 
 ---
 
-## ?? Cài ??t
+## ğŸ› ï¸ Technology Stack
 
-### B??c 1: Clone repository
+### Frontend
+- **Framework**: [React](https://reactjs.org/) (Vite)
+- **State Management**: [Redux](https://redux.js.org/)
+- **UI Components**: [Ant Design](https://ant.design/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/), [SASS](https://sass-lang.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Icons**: React Icons, Ant Design Icons
 
-
-git clone https://github.com/tuyenhk05/Shop-2hand.git
-cd Shop-2hand/BE
-
-### B??c 2: Cài ??t dependencies
-
-
-npm install
-
-### B??c 3: C?u hình bi?n môi tr??ng
-
-T?o file `.env` trong th? m?c `BE/`:
-
-PORT=3001
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/shop-2hand?retryWrites=true&w=majority&appName=Cluster0
-JWT_SECRET=your-super-secret-key-here-change-this
-CLIENT_URL=http://localhost:3001
-NODE_ENV=development
-
-**Gi?i thích:**
-- `PORT`: Port ch?y server
-- `MONGODB_URI`: Connection string MongoDB Atlas
-- `JWT_SECRET`: Secret key ?? mã hóa JWT token (t?o b?ng OpenSSL ho?c Node.js)
-- `CLIENT_URL`: URL c?a frontend
-- `NODE_ENV`: Môi tr??ng phát tri?n
+### Backend
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express.js](https://expressjs.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/) (Mongoose)
+- **Image Hosting**: [Cloudinary](https://cloudinary.com/)
+- **Authentication**: JWT, Google Auth Library
+- **Mailing**: Nodemailer
+- **Payment**: VNPay Integration
 
 ---
 
-## ?? C?u hình MongoDB Atlas
+## ğŸ“‚ Project Structure
 
-1. ??ng nh?p vào [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. T?o Cluster m?i
-3. Vào **Security > Database Access** ? T?o user m?i
-4. Vào **Security > Network Access** ? Thêm IP: `0.0.0.0/0` (cho development)
-5. Vào **Clusters** ? **Connect** ? Sao chép connection string
-6. Thay `<password>` b?ng m?t kh?u user
-7. Thêm tên database: `/shop-2hand` vào URI
-
----
-
-## ?? Ch?y d? án
-
-### Development mode (v?i auto-reload)
-
-npm start
-
-Output:
-? Database connected successfully
-?? Backend API running at http://localhost:3001
-
-### Debug mode
-
-npm start
-
-Server s? ch?y ? `http://localhost:3001` và Debugger ? `ws://127.0.0.1:9229`
+```text
+Shop-2hand/
+â”œâ”€â”€ BE/               # Backend (Node.js/Express)
+â”‚   â”œâ”€â”€ src/
+â”‚   â”‚   â”œâ”€â”€ configs/  # DB, Cloudinary, System configs
+â”‚   â”‚   â”œâ”€â”€ controllers/ # Business logic
+â”‚   â”‚   â”œâ”€â”€ models/    # Database schemas
+â”‚   â”‚   â”œâ”€â”€ routes/    # API Endpoints
+â”‚   â”‚   â””â”€â”€ utils/     # Shared utilities (JWT, Mail)
+â”‚   â””â”€â”€ index.js       # Entry point
+â””â”€â”€ FE/               # Frontend (React/Vite)
+    â”œâ”€â”€ src/
+    â”‚   â”œâ”€â”€ action/    # Redux actions
+    â”‚   â”œâ”€â”€ components/# Reusable UI components
+    â”‚   â”œâ”€â”€ pages/     # Full-page components
+    â”‚   â”œâ”€â”€ routes/    # Routing configuration
+    â”‚   â””â”€â”€ services/  # API service layer
+    â””â”€â”€ vite.config.js # Vite configuration
+```
 
 ---
 
-## ?? API Documentation
+## âš™ï¸ Quick Start
 
-### Authentication Endpoints
+### Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas account
+- Cloudinary account
+- Google Cloud Console project (for Login)
 
-#### 1. **??ng kı** (Register)
+### Setup
 
-POST /api/auth/register
-Content-Type: application/json
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/tuyenhk05/shop-2hand.git
+   cd shop-2hand
+   ```
 
-{
-  "fullName": "Nguy?n V?n A",
-  "email": "user@example.com",
-  "password": "123456",
-  "confirmPassword": "123456",
-  "phone": "0123456789"
-}
+2. **Backend Setup**
+   ```bash
+   cd BE
+   npm install
+   # Create .env file based on technical documentation
+   npm start
+   ```
 
-**Response (201):**
-{
-  "success": true,
-  "message": "User registered successfully",
-  "data": {
-    "id": "507f1f77bcf86cd799439011",
-    "fullName": "Nguy?n V?n A",
-    "email": "user@example.com",
-    "phone": "0123456789",
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
-
----
-
-#### 2. **??ng nh?p** (Login)
-
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "123456"
-}
-
-**Response (200):**
-{
-  "success": true,
-  "message": "Login successful",
-  "data": {
-    "id": "507f1f77bcf86cd799439011",
-    "fullName": "Nguy?n V?n A",
-    "email": "user@example.com",
-    "phone": "0123456789",
-    "role": "user",
-    "avatar": null,
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-  }
-}
+3. **Frontend Setup**
+   ```bash
+   cd FE
+   npm install
+   # Create .env file based on technical documentation
+   npm run dev
+   ```
 
 ---
 
-#### 3. **L?y thông tin user hi?n t?i** (Get Current User)
-
-GET /api/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-**Response (200):**
-{
-  "success": true,
-  "data": {
-    "id": "507f1f77bcf86cd799439011",
-    "fullName": "Nguy?n V?n A",
-    "email": "user@example.com",
-    "phone": "0123456789",
-    "avatar": null,
-    "role": "user"
-  }
-}
+## ğŸ“ License
+Distributed under the ISC License.
 
 ---
 
-#### 4. **??ng xu?t** (Logout)
+## ğŸ¤ Contact
+Huynh Kim Tuyen - [GitHub](https://github.com/tuyenhk05)
 
-POST /api/auth/logout
-
-**Response (200):**
-{
-  "success": true,
-  "message": "Logout successful"
-}
-
----
-
-#### 5. **Health Check**
-
-GET /api/health
-
-**Response (200):**
-{
-  "success": true,
-  "message": "API is running",
-  "timestamp": "2024-04-02T10:30:00.000Z"
-}
-
----
-
-## ?? C?u trúc folder
-
-BE/
-??? src/
-?   ??? models/
-?   ?   ??? users.model.js          # Schema User
-?   ??? controllers/
-?   ?   ??? auth.controller.js      # Logic x? lı auth
-?   ??? routes/
-?   ?   ??? auth.routes.js          # Routes authentication
-?   ?   ??? client/
-?   ?       ??? index.routes.js     # Routes chính
-?   ??? middleware/
-?   ?   ??? auth.middleware.js      # Middleware xác th?c JWT
-?   ??? utils/
-?   ?   ??? jwt.utils.js            # Hàm JWT
-?   ??? configs/
-?       ??? database.js             # K?t n?i MongoDB
-?       ??? system.js               # C?u hình h? th?ng
-??? index.js                         # Entry point
-??? .env                             # Bi?n môi tr??ng
-??? .env.example                     # Ví d? .env
-??? .gitignore                       # Git ignore
-??? package.json                     # Dependencies
-??? README.md                        # Tài li?u này
-
----
-
-## ??? Công ngh? s? d?ng
-
-| Công ngh? | Phiên b?n | M?c ?ích |
-|-----------|----------|---------|
-| **Node.js** | v16+ | Runtime JavaScript |
-| **Express.js** | v5.1.0 | Web framework |
-| **MongoDB** | Cloud | Database |
-| **Mongoose** | v9.0.0 | ODM (Object Data Modeling) |
-| **JWT** | v9.0.3 | Xác th?c token |
-| **Bcrypt** | v6.0.0 | Mã hóa password |
-| **Cors** | v2.8.6 | Cross-origin requests |
-| **Helmet** | - | Security headers |
-| **Dotenv** | v17.2.3 | Qu?n lı bi?n môi tr??ng |
-| **Nodemon** | v3.1.11 | Auto-reload (dev) |
-
----
-
-## ?? B?o m?t
-
-? Passwords ???c hash b?ng bcrypt (salt rounds: 10)  
-? JWT tokens có th?i gian h?t h?n (7 ngày)  
-? CORS ???c c?u hình cho phép requests t? frontend  
-? Helmet middleware b?o v? headers  
-? `.env` file không ???c commit lên Git  
-
----
-
-## ?? L?u ı quan tr?ng
-
-1. **JWT_SECRET**: Thay ??i giá tr? secret key trong `.env` thành chu?i bí m?t m?nh
-2. **MongoDB Connection**: Ki?m tra IP whitelist trong MongoDB Atlas
-3. **Password hashing**: Passwords ???c hash t? ??ng khi save user
-4. **Token expiration**: Token s? h?t h?n sau 7 ngày
-
----
-
-## ?? ?óng góp
-
-?? ?óng góp vào d? án:
-
-1. Fork repository
-2. T?o branch feature: `git checkout -b feature/AmazingFeature`
-3. Commit changes: `git commit -m 'Add some AmazingFeature'`
-4. Push to branch: `git push origin feature/AmazingFeature`
-5. Open a Pull Request
-
----
-
-## ?? Liên h?
-
-- **GitHub**: [tuyenhk05](https://github.com/tuyenhk05)
-- **Email**: [Liên h? qua GitHub Issues]
-
----
-
-## ?? License
-
-Project này s? d?ng License ISC. Chi ti?t xem file `LICENSE`.
-
----
-
-**C?p nh?t l?n cu?i**: 02/04/2026
+Developed with â¤ï¸ for sustainable fashion.

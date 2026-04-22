@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProtectedRoute from '../../components/checkLogin/ProtectedRoute';
@@ -7,6 +8,8 @@ import ProtectedRoute from '../../components/checkLogin/ProtectedRoute';
 import useScrollToTop from '../../hooks/useScrollToTop';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import { createConsignmentApi } from '../../services/consignment.service';
+import { getAllCategories } from '../../services/category.service';
+import { getAllBrands } from '../../services/brand.service';
 import { getCookie } from '../../helpers/cookie';
 
 const Consignment = () => {
@@ -19,12 +22,40 @@ const Consignment = () => {
     // States lưu trữ thông tin thực tế từ người dùng
     const [uploadedFiles, setUploadedFiles] = useState([]); // Lưu file thật để gửi API
     const [previewUrls, setPreviewUrls] = useState([]); // Lưu URL tạm để hiển thị trên UI
+    
+    // Detailed fields
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [expectedPrice, setExpectedPrice] = useState('');
     const [condition, setCondition] = useState('excellent');
+    const [categoryId, setCategoryId] = useState('');
+    const [brandId, setBrandId] = useState('');
+    const [gender, setGender] = useState('unisex');
+    const [size, setSize] = useState('');
+    const [color, setColor] = useState('');
+    const [material, setMaterial] = useState('');
+
+    const [categories, setCategories] = useState([]);
+    const [brands, setBrands] = useState([]);
+    const [submitting, setSubmitting] = useState(false);
 
     // Ref để trigger thẻ input file bị ẩn
     const fileInputRef = useRef(null);
 
     const userId = useSelector((state) => state.auth.userId);
+
+    // Fetch data for dropdowns
+    useEffect(() => {
+        const fetchData = async () => {
+            const [catRes, brandRes] = await Promise.all([
+                getAllCategories(),
+                getAllBrands()
+            ]);
+            if (catRes.success) setCategories(catRes.data || []);
+            if (brandRes.success) setBrands(brandRes.data || []);
+        };
+        fetchData();
+    }, []);
 
     // Dọn dẹp URL tạm thời khi component unmount để tránh rò rỉ bộ nhớ
     useEffect(() => {
@@ -74,12 +105,25 @@ const Consignment = () => {
     };
 
     const submitConsignment = async () => {
+        if (!title || !description || !categoryId || uploadedFiles.length === 0) {
+            alert('Vui lòng điền đầy đủ thông tin (Tên, Mô tả, Danh mục) và tải ảnh.');
+            return;
+        }
+
         try {
+            setSubmitting(true);
             const formData = new FormData();
             formData.append('userId', userId);
-            formData.append('productName', uploadedFiles[0]?.name?.split('.')[0] || 'Sản phẩm ký gửi');
+            formData.append('title', title);
+            formData.append('description', description);
             formData.append('condition', condition);
-            formData.append('expectedPrice', 0); // User should ideally set this, but for now 0 or default
+            formData.append('expectedPrice', expectedPrice || 0);
+            formData.append('categoryId', categoryId);
+            formData.append('brandId', brandId);
+            formData.append('gender', gender);
+            formData.append('size', size);
+            formData.append('color', color);
+            formData.append('material', material);
             
             uploadedFiles.forEach(file => {
                 formData.append('images', file);
@@ -88,13 +132,16 @@ const Consignment = () => {
             const res = await createConsignmentApi(formData);
 
             if (res && res.success) {
-                alert('Yêu cầu ký gửi đã được gửi thành công!');
-                navigate('/dashboard');
+                message.success('Yêu cầu ký gửi đã được gửi thành công!');
+                navigate('/dashboard', { state: { activeTab: 'consignor' } });
             } else {
-                alert('Lưu yêu cầu thất bại. Vui lòng thử lại.');
+                message.error('Lưu yêu cầu thất bại: ' + (res.message || 'Lỗi không xác định'));
             }
         } catch (error) {
             console.error("Lỗi gửi ký gửi", error);
+            message.error('Có lỗi xảy ra kết nối server.');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -189,16 +236,173 @@ const Consignment = () => {
 
                         {step === 2 && (
                             <AnimateWhenVisible direction="fadeInUp">
-                                <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10 min-h-[300px] flex items-center justify-center text-on-surface-variant">
-                                    <i>Form thông tin chi tiết (Thương hiệu, Danh mục, Phụ kiện...) sẽ hiển thị ở đây.</i>
+                                <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10 space-y-6">
+                                    <h2 className="font-notoSerif text-2xl font-bold mb-6">Thông tin chi tiết</h2>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Tên sản phẩm *</label>
+                                            <input 
+                                                type="text"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
+                                                placeholder="Ví dụ: Túi Chanel Boy Size M Black"
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Mô tả sản phẩm *</label>
+                                            <textarea 
+                                                rows={4}
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                                placeholder="Mô tả về tình trạng chi tiết, phụ kiện đi kèm..."
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Danh mục *</label>
+                                            <select 
+                                                value={categoryId}
+                                                onChange={(e) => setCategoryId(e.target.value)}
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            >
+                                                <option value="">Chọn danh mục</option>
+                                                {categories.map(cat => (
+                                                    <option key={cat._id} value={cat._id}>{cat.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Thương hiệu</label>
+                                            <select 
+                                                value={brandId}
+                                                onChange={(e) => setBrandId(e.target.value)}
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            >
+                                                <option value="">Chọn thương hiệu (nếu có)</option>
+                                                {brands.map(brand => (
+                                                    <option key={brand._id} value={brand._id}>{brand.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Giới tính</label>
+                                            <select 
+                                                value={gender}
+                                                onChange={(e) => setGender(e.target.value)}
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            >
+                                                <option value="male">Nam</option>
+                                                <option value="female">Nữ</option>
+                                                <option value="unisex">Unisex</option>
+                                                <option value="kids">Trẻ em</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Kích cỡ (Size)</label>
+                                            <input 
+                                                type="text"
+                                                value={size}
+                                                onChange={(e) => setSize(e.target.value)}
+                                                placeholder="S, M, L, 38, 40..."
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Màu sắc</label>
+                                            <input 
+                                                type="text"
+                                                value={color}
+                                                onChange={(e) => setColor(e.target.value)}
+                                                placeholder="Đen, Trắng, Đỏ..."
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Chất liệu</label>
+                                            <input 
+                                                type="text"
+                                                value={material}
+                                                onChange={(e) => setMaterial(e.target.value)}
+                                                placeholder="Cotton, Lụa, Da..."
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            />
+                                        </div>
+
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-bold text-on-surface mb-2">Giá bạn kỳ vọng (VNĐ) *</label>
+                                            <input 
+                                                type="number"
+                                                value={expectedPrice}
+                                                onChange={(e) => setExpectedPrice(e.target.value)}
+                                                placeholder="Ví dụ: 5000000"
+                                                className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
+                                            />
+                                            <p className="text-[10px] text-on-surface-variant mt-2 italic">* Đây là mức giá bạn mong muốn nhận được. Shop sẽ thẩm định và đưa báo giá cuối cùng.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </AnimateWhenVisible>
                         )}
 
                         {step === 3 && (
                             <AnimateWhenVisible direction="fadeInUp">
-                                <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10 min-h-[300px] flex items-center justify-center text-on-surface-variant">
-                                    <i>Tóm tắt thông tin gửi kiện và Xác nhận hoàn tất ký gửi hiển thị ở đây.</i>
+                                <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10">
+                                    <h2 className="font-notoSerif text-2xl font-bold mb-6 text-center">Xác nhận thông tin</h2>
+                                    
+                                    <div className="space-y-6">
+                                        <div className="flex gap-4 p-4 bg-surface-container-low rounded-xl">
+                                            <img src={previewUrls[0]} className="w-20 h-24 object-cover rounded-lg shadow-sm" alt="main" />
+                                            <div>
+                                                <h3 className="font-bold text-lg">{title || 'Chưa đặt tên'}</h3>
+                                                <p className="text-sm text-on-surface-variant line-clamp-1">{description || 'Chưa có mô tả'}</p>
+                                                <p className="text-xs font-bold text-primary mt-2">Giá kỳ vọng: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(expectedPrice || 0)}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                            <div className="p-4 rounded-xl border border-outline-variant/20">
+                                                <p className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Danh mục</p>
+                                                <p className="text-sm font-bold">{categories.find(c => c._id === categoryId)?.name || 'N/A'}</p>
+                                            </div>
+                                            <div className="p-4 rounded-xl border border-outline-variant/20">
+                                                <p className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Thương hiệu</p>
+                                                <p className="text-sm font-bold">{brands.find(b => b._id === brandId)?.name || 'N/A'}</p>
+                                            </div>
+                                            <div className="p-4 rounded-xl border border-outline-variant/20">
+                                                <p className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Tình trạng</p>
+                                                <p className="text-sm font-bold">
+                                                    {condition === 'perfect' ? 'Hoàn hảo' : condition === 'excellent' ? 'Tuyệt vời' : condition === 'very_good' ? 'Rất tốt' : 'Tốt'}
+                                                </p>
+                                            </div>
+                                            <div className="p-4 rounded-xl border border-outline-variant/20">
+                                                <p className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Giới tính</p>
+                                                <p className="text-sm font-bold uppercase">{gender}</p>
+                                            </div>
+                                            <div className="p-4 rounded-xl border border-outline-variant/20">
+                                                <p className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Size / Màu</p>
+                                                <p className="text-sm font-bold">{size || 'N/A'} / {color || 'N/A'}</p>
+                                            </div>
+                                            <div className="p-4 rounded-xl border border-outline-variant/20">
+                                                <p className="text-[10px] uppercase font-bold text-on-surface-variant mb-1">Hình ảnh</p>
+                                                <p className="text-sm font-bold">{uploadedFiles.length} tập tin đã tải</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                                            <p className="text-sm leading-relaxed text-on-surface-variant text-center">
+                                                Khi nhấn <strong>Hoàn tất</strong>, yêu cầu của bạn sẽ được gửi tới đội ngũ thẩm định. Chúng tôi sẽ phản hồi lại mức giá đề xuất trong vòng 24h qua trang Dashboard.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </AnimateWhenVisible>
                         )}
@@ -242,13 +446,16 @@ const Consignment = () => {
                                 <div className="mt-8 relative z-10">
                                     <button
                                         onClick={handleNext}
-                                        disabled={previewUrls.length === 0}
-                                        className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-md ${previewUrls.length > 0 ? 'bg-primary text-white hover:bg-primary-container active:scale-95' : 'bg-surface-variant text-on-surface-variant/40 cursor-not-allowed'}`}
+                                        disabled={previewUrls.length === 0 || submitting}
+                                        className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-md ${previewUrls.length > 0 && !submitting ? 'bg-primary text-white hover:bg-primary-container active:scale-95' : 'bg-surface-variant text-on-surface-variant/40 cursor-not-allowed'}`}
                                     >
-                                        {step === 3 ? 'Hoàn tất Ký gửi' : 'Tiếp tục Bước tiếp theo'}
+                                        {submitting ? 'Đang gửi...' : (step === 3 ? 'Hoàn tất Ký gửi' : 'Tiếp tục Bước tiếp theo')}
                                     </button>
                                     {previewUrls.length === 0 && step === 1 && (
                                         <p className="text-center text-[10px] text-error mt-3">* Vui lòng tải lên ít nhất 1 ảnh để tiếp tục</p>
+                                    )}
+                                    {step > 1 && !submitting && (
+                                        <button onClick={() => setStep(step - 1)} className="w-full mt-4 text-xs font-bold text-on-surface-variant uppercase tracking-widest hover:text-primary transition-colors">Quay lại</button>
                                     )}
                                 </div>
                             </div>

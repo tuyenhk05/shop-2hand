@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Input, Checkbox, message } from 'antd';
 import { getAllRoles, createRole, updateRole, deleteRole } from '../../services/admin/roles.service.jsx';
 
 const RolesManagement = () => {
+    const { role } = useSelector((state) => state.auth);
+    const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
+
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -11,15 +15,32 @@ const RolesManagement = () => {
 
     const permissionOptions = [
         { label: 'Toàn quyền (Admin)', value: 'all' },
+        
         { label: 'Xem Danh mục', value: 'categories_view' },
+        { label: 'Thêm Danh mục', value: 'categories_create' },
         { label: 'Sửa Danh mục', value: 'categories_edit' },
+        { label: 'Xóa Danh mục', value: 'categories_delete' },
+        
         { label: 'Xem Sản phẩm', value: 'products_view' },
-        { label: 'Sửa Sản phẩm', value: 'products_edit' },
+        { label: 'Thêm/Sửa Sản phẩm', value: 'products_edit' },
+        { label: 'Xóa Sản phẩm', value: 'products_delete' },
+        
         { label: 'Xem Người dùng', value: 'users_view' },
         { label: 'Sửa Người dùng', value: 'users_edit' },
-        { label: 'Quản lý Đơn hàng', value: 'orders_view' },
-        { label: 'Quản lý Ký gửi', value: 'consignments_view' },
-        { label: 'Quản lý Phân quyền', value: 'roles_view' },
+        { label: 'Xóa Người dùng', value: 'users_delete' },
+        
+        { label: 'Xem Đơn hàng', value: 'orders_view' },
+        { label: 'Cập nhật Đơn hàng', value: 'orders_edit' },
+        { label: 'Hủy Đơn hàng', value: 'orders_delete' },
+        
+        { label: 'Xem Ký gửi', value: 'consignments_view' },
+        { label: 'Cập nhật Ký gửi', value: 'consignments_edit' },
+        { label: 'Xóa Ký gửi', value: 'consignments_delete' },
+        
+        { label: 'Xem Phân quyền', value: 'roles_view' },
+        { label: 'Tạo Phân quyền', value: 'roles_create' },
+        { label: 'Sửa Phân quyền', value: 'roles_edit' },
+        { label: 'Xóa Phân quyền', value: 'roles_delete' },
     ];
 
     const fetchRoles = async () => {
@@ -106,9 +127,11 @@ const RolesManagement = () => {
             key: 'action',
             render: (_, record) => (
                 <div className="flex gap-2">
-                    <Button type="link" onClick={() => handleEdit(record)}>Sửa</Button>
+                    {hasPerm('roles_edit') && (
+                        <Button type="link" onClick={() => handleEdit(record)}>Sửa</Button>
+                    )}
                     {/* KHÔNG CHO PHÉP XÓA QUẢN TRỊ VIÊN MẶC ĐỊNH */}
-                    {record.title !== 'Quản trị viên' && record.title !== 'Khách hàng' && (
+                    {hasPerm('roles_delete') && record.title !== 'Quản trị viên' && record.title !== 'Khách hàng' && (
                         <Button type="link" danger onClick={() => handleDelete(record._id)}>Xóa</Button>
                     )}
                 </div>
@@ -123,9 +146,11 @@ const RolesManagement = () => {
                     <h2 className="font-notoSerif text-2xl font-bold text-on-surface">Quản lý Phân quyền</h2>
                     <p className="text-sm text-on-surface-variant">Thiết lập nhóm quyền và giới hạn truy cập cho từng bộ phận</p>
                 </div>
-                <Button type="primary" className="bg-primary hover:bg-primary/90" size="large" onClick={handleAdd}>
-                    + Thêm nhóm quyền
-                </Button>
+                {hasPerm('roles_create') && (
+                    <Button type="primary" className="bg-primary hover:bg-primary/90" size="large" onClick={handleAdd}>
+                        + Thêm nhóm quyền
+                    </Button>
+                )}
             </div>
 
             <Table 

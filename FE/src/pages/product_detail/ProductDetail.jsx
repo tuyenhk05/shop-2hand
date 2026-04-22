@@ -116,8 +116,8 @@ const ProductDetail = () => {
         return (
             <div className="pt-32 pb-32 flex flex-col items-center justify-center w-full min-h-[70vh] text-on-surface-variant">
                 <span className="material-symbols-outlined text-6xl mb-4" data-icon="error_outline">error_outline</span>
-                <p className="text-xl font-bold mb-4">Không tìm thấy tác phẩm này</p>
-                <button onClick={() => navigate('/products')} className="text-primary hover:underline">Quay lại Kho lưu trữ</button>
+                <p className="text-xl font-bold mb-4 uppercase tracking-widest">Sản phẩm này không còn nữa</p>
+                <button onClick={() => navigate('/products')} className="text-primary hover:underline font-bold uppercase text-xs tracking-widest">Quay lại cửa hàng</button>
             </div>
         );
     }

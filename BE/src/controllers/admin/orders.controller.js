@@ -1,10 +1,27 @@
 const Order = require('../../models/orders.model');
 const ProductImage = require('../../models/productImages.model');
+const User = require('../../models/users.model');
 
 // ✅ Lấy danh sách toàn bộ đơn hàng
 exports.getAllOrders = async (req, res) => {
     try {
-        const orders = await Order.find({})
+        const { status, startDate, endDate } = req.query;
+        let query = {};
+
+        // 1. Lọc theo trạng thái đơn hàng
+        if (status) {
+            query.status = status;
+        }
+
+        // 2. Lọc theo ngày đặt hàng
+        if (startDate && endDate) {
+            query.createdAt = {
+                $gte: new Date(startDate + 'T00:00:00.000Z'),
+                $lte: new Date(endDate + 'T23:59:59.999Z')
+            };
+        }
+
+        const orders = await Order.find(query)
             .populate('buyerId', 'fullName email phone')
             .populate({
                 path: 'items.productId',

@@ -56,10 +56,10 @@ module.exports.getProductById = async (req, res) => {
             .populate('categoryId', 'name')
             .lean();
 
-        if (!product) {
+        if (!product || product.status === 'delete') {
             return res.status(404).json({
                 success: false,
-                message: 'Product not found'
+                message: 'Product not found or has been deleted'
             });
         }
 

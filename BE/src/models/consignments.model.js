@@ -23,9 +23,36 @@ const consignmentSchema = new mongoose.Schema({
         type: String, // URLs to images hosted on Cloudinary
         required: true
     }],
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'
+    },
+    brandId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Brand'
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'unisex', 'kids'],
+        default: 'unisex'
+    },
+    size: {
+        type: String
+    },
+    color: {
+        type: String
+    },
+    material: {
+        type: String
+    },
+    condition: {
+        type: String,
+        enum: ['perfect', 'excellent', 'very_good', 'good'],
+        default: 'excellent'
+    },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected', 'completed'],
+        enum: ['pending', 'valued', 'approved', 'rejected', 'completed'],
         default: 'pending'
     },
     adminNotes: {

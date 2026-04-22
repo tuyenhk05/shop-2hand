@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Select, Switch, message, Tag } from 'antd';
 import { getAllUsers, updateUser, deleteUser } from '../../services/admin/users.service.jsx';
 import { getAllRoles } from '../../services/admin/roles.service.jsx';
 
 const UsersManagement = () => {
+    const { role } = useSelector((state) => state.auth);
+    const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
+
     const [users, setUsers] = useState([]);
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -106,8 +110,10 @@ const UsersManagement = () => {
             key: 'action',
             render: (_, record) => (
                 <div className="flex gap-2">
-                    <Button type="link" onClick={() => handleEdit(record)}>Phân quyền</Button>
-                    {record.role?.title !== 'Quản trị viên' && (
+                    {hasPerm('users_edit') && (
+                        <Button type="link" onClick={() => handleEdit(record)}>Phân quyền</Button>
+                    )}
+                    {hasPerm('users_delete') && record.role?.title !== 'Quản trị viên' && (
                         <Button type="link" danger onClick={() => handleDelete(record._id)}>Xóa</Button>
                     )}
                 </div>

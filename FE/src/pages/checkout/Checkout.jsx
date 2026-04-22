@@ -115,7 +115,10 @@ const Checkout = () => {
     };
 
     const handleCheckout = async () => {
-        if (cartItems.length === 0) return alert('Giỏ hàng trống');
+        if (cartItems.length === 0) {
+            message.warning('Giỏ hàng của bạn đang trống.');
+            return;
+        }
         if (!validateForm()) {
             document.getElementById('address-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
@@ -151,13 +154,13 @@ const Checkout = () => {
                 if (payRes.success && payRes.url) {
                     window.location.href = payRes.url;
                 } else {
-                    alert('Lỗi tạo cổng thanh toán VNPAY (Vui lòng config ENV ở BE)');
+                    message.error('Lỗi tạo cổng thanh toán VNPAY (Vui lòng kiểm tra cấu hình hệ thống).');
                     navigate('/history');
                 }
             }
         } catch (error) {
             console.error('Checkout error:', error);
-            alert('Quá trình checkout xảy ra lỗi');
+            message.error('Quá trình checkout xảy ra lỗi. Vui lòng thử lại sau.');
         }
     };
 

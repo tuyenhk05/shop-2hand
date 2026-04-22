@@ -7,7 +7,9 @@ import { message } from 'antd';
 const AdminLayout = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { fullName,role } = useSelector((state) => state.auth);
+    const { fullName, role } = useSelector((state) => state.auth);
+
+    const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
 
     // Basic protective logic, but typically you'd wrap this with a PrivateRoute
     // For now if they reach here, we assume PrivateRoute has validated them, or we do a lazy check
@@ -40,30 +42,42 @@ const AdminLayout = () => {
                         <span className="material-symbols-outlined">dashboard</span>
                         Dashboard
                     </NavLink>
-                    <NavLink to="/admin/products" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined">inventory_2</span>
-                        Inventory
-                    </NavLink>
-                    <NavLink to="/admin/categories" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined">category</span>
-                        Categories
-                    </NavLink>
-                    <NavLink to="/admin/orders" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined">receipt_long</span>
-                        Orders
-                    </NavLink>
-                    <NavLink to="/admin/consignments" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined">handshake</span>
-                        Consignments
-                    </NavLink>
-                    <NavLink to="/admin/users" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined">group</span>
-                        Users
-                    </NavLink>
-                    <NavLink to="/admin/roles" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined">security</span>
-                        Roles
-                    </NavLink>
+                    {hasPerm('products_view') && (
+                        <NavLink to="/admin/products" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">inventory_2</span>
+                            Inventory
+                        </NavLink>
+                    )}
+                    {hasPerm('categories_view') && (
+                        <NavLink to="/admin/categories" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">category</span>
+                            Categories
+                        </NavLink>
+                    )}
+                    {hasPerm('orders_view') && (
+                        <NavLink to="/admin/orders" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">receipt_long</span>
+                            Orders
+                        </NavLink>
+                    )}
+                    {hasPerm('consignments_view') && (
+                        <NavLink to="/admin/consignments" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">handshake</span>
+                            Consignments
+                        </NavLink>
+                    )}
+                    {hasPerm('users_view') && (
+                        <NavLink to="/admin/users" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">group</span>
+                            Users
+                        </NavLink>
+                    )}
+                    {hasPerm('roles_view') && (
+                        <NavLink to="/admin/roles" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-surface-container hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold border-r-2 border-primary bg-primary-fixed/20' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">security</span>
+                            Roles
+                        </NavLink>
+                    )}
                 </nav>
 
                 <div className="mt-auto pt-6 space-y-4">

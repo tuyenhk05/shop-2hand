@@ -9,9 +9,9 @@ exports.getStats = async (req, res) => {
         const totalProducts = await Product.countDocuments();
         const totalOrders = await Order.countDocuments();
         
-        // Tính tổng doanh thu từ các Order đã hoàn thành
+        // Tính tổng doanh thu từ các Order đã thanh toán
         const revenueResult = await Order.aggregate([
-            { $match: { status: 'completed' } },
+            { $match: { paymentStatus: 'paid' } },
             { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } }
         ]);
         const totalRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;

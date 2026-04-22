@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Select, message, Tag, Descriptions, Popconfirm, Badge } from 'antd';
+import { useSelector } from 'react-redux';
+import { Table, Button, Modal, Form, Select, message, Tag, Descriptions, Popconfirm, Badge, DatePicker } from 'antd';
 import { EyeOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
 import { getAllOrders, updateOrderStatus, cancelOrder } from '../../services/admin/orders.service.jsx';
 
+const { RangePicker } = DatePicker;
 const API = 'http://localhost:3001';
 
 const STATUS_CONFIG = {
@@ -26,6 +28,9 @@ const formatMoney = (val) =>
     val != null ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val) : '—';
 
 const OrdersManagement = () => {
+    const { role } = useSelector((state) => state.auth);
+    const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
+
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -33,11 +38,24 @@ const OrdersManagement = () => {
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [form] = Form.useForm();
 
+    // ─── Filter State ──────────────────────────────────────────
+    const [filters, setFilters] = useState({
+        status: undefined,
+        dateRange: null
+    });
+
     // ─── Fetch ────────────────────────────────────────────────
-    const fetchOrders = async () => {
+    const fetchOrders = async (currentFilters = filters) => {
         try {
             setLoading(true);
-            const res = await getAllOrders();
+            const params = {};
+            if (currentFilters.status) params.status = currentFilters.status;
+            if (currentFilters.dateRange && currentFilters.dateRange.length === 2) {
+                params.startDate = currentFilters.dateRange[0].format('YYYY-MM-DD');
+                params.endDate = currentFilters.dateRange[1].format('YYYY-MM-DD');
+            }
+
+            const res = await getAllOrders(params);
             if (res.success) setOrders(res.data);
         } catch {
             message.error('Lỗi khi tải danh sách đơn hàng');
@@ -46,7 +64,18 @@ const OrdersManagement = () => {
         }
     };
 
-    useEffect(() => { fetchOrders(); }, []);
+    // Trigger fetch khi status hoặc ngày thay đổi
+    useEffect(() => {
+        fetchOrders();
+    }, [filters.status, filters.dateRange]);
+
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key] : value }));
+    };
+
+    const resetFilters = () => {
+        setFilters({ status: undefined, dateRange: null });
+    };
 
     // ─── Xem chi tiết ─────────────────────────────────────────
     const handleViewDetail = (record) => {
@@ -86,17 +115,6 @@ const OrdersManagement = () => {
 
     // ─── Columns ──────────────────────────────────────────────
     const columns = [
-        {
-            title: 'Mã đơn',
-            dataIndex: '_id',
-            key: 'id',
-            width: 90,
-            render: (id) => (
-                <span className="font-mono text-xs font-bold bg-surface-container px-2 py-1 rounded">
-                    #{id?.slice(-6).toUpperCase()}
-                </span>
-            )
-        },
         {
             title: 'Khách hàng',
             key: 'buyer',
@@ -166,23 +184,27 @@ const OrdersManagement = () => {
             width: 120,
             render: (_, record) => (
                 <div className="flex gap-1">
-                    <Button
-                        type="link"
-                        size="small"
-                        icon={<EyeOutlined />}
-                        onClick={() => handleViewDetail(record)}
-                        className="p-1"
-                        title="Xem chi tiết"
-                    />
-                    <Button
-                        type="link"
-                        size="small"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEdit(record)}
-                        className="p-1"
-                        title="Cập nhật trạng thái"
-                    />
-                    {record.status !== 'cancelled' && record.status !== 'delivered' && (
+                    {hasPerm('orders_view') && (
+                        <Button
+                            type="link"
+                            size="small"
+                            icon={<EyeOutlined />}
+                            onClick={() => handleViewDetail(record)}
+                            className="p-1"
+                            title="Xem chi tiết"
+                        />
+                    )}
+                    {hasPerm('orders_edit') && (
+                        <Button
+                            type="link"
+                            size="small"
+                            icon={<EditOutlined />}
+                            onClick={() => handleEdit(record)}
+                            className="p-1"
+                            title="Cập nhật trạng thái"
+                        />
+                    )}
+                    {hasPerm('orders_delete') && record.status !== 'cancelled' && record.status !== 'delivered' && (
                         <Popconfirm
                             title="Hủy đơn hàng?"
                             description="Xác nhận bạn muốn hủy đơn hàng này."
@@ -225,6 +247,39 @@ const OrdersManagement = () => {
                         );
                     })}
                 </div>
+            </div>
+
+            {/* Filter Bar */}
+            <div className="bg-surface-container-low p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end border border-outline-variant/10">
+                <div className="flex-1 min-w-[280px]">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Lọc theo ngày đặt</p>
+                    <RangePicker
+                        format="DD/MM/YYYY"
+                        value={filters.dateRange}
+                        onChange={(dates) => handleFilterChange('dateRange', dates)}
+                        className="w-full"
+                        placeholder={['Từ ngày', 'Đến ngày']}
+                    />
+                </div>
+
+                <div className="w-48">
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Lọc trạng thái</p>
+                    <Select
+                        placeholder="Tất cả trạng thái"
+                        className="w-full"
+                        allowClear
+                        value={filters.status}
+                        onChange={(val) => handleFilterChange('status', val)}
+                    >
+                        {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
+                            <Select.Option key={val} value={val}>
+                                <Badge color={cfg.color} text={cfg.label} />
+                            </Select.Option>
+                        ))}
+                    </Select>
+                </div>
+
+                <Button onClick={resetFilters} className="mb-0.5">Đặt lại</Button>
             </div>
 
             <Table

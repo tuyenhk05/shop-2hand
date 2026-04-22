@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import { getOrdersApi } from '../../services/order.service';
-import { getConsignmentsApi } from '../../services/consignment.service';
+import { getConsignmentsApi, updateUserConsignmentStatusApi } from '../../services/consignment.service';
 import { getWishlistApi } from '../../services/wishlist.service';
+import { Modal, message } from 'antd';
 
 import { getCookie } from '../../helpers/cookie';
 import useScrollToTop from '../../hooks/useScrollToTop';
@@ -13,12 +14,15 @@ import ProtectedRoute from '../../components/checkLogin/ProtectedRoute';
 const Dashboard = () => {
     useScrollToTop();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('buyer');
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'buyer');
 
     const [orders, setOrders] = useState([]);
     const [consignments, setConsignments] = useState([]);
     const [wishlistItems, setWishlistItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
+    const [selectedConsignmentId, setSelectedConsignmentId] = useState(null);
 
 
     const userId = useSelector((state) => state.auth.userId);
@@ -75,11 +79,61 @@ const Dashboard = () => {
 
     const translateConsignmentStatus = (status) => {
         switch (status) {
-            case 'pending': return 'Đang chờ xử lý';
-            case 'approved': return 'Đã duyệt';
-            case 'rejected': return 'Từ chối';
-            case 'completed': return 'Đã hoàn thành';
+            case 'pending': return 'Đang chờ shop định giá';
+            case 'valued': return 'Đã báo giá - Chờ bạn xác nhận';
+            case 'approved': return 'Đã chấp nhận - Chờ nhận hàng';
+            case 'received': return 'Đã nhận hàng & Đạt chất lượng';
+            case 'rejected': return 'Đã từ chối/hủy';
+            case 'completed': return 'Đã hoàn tất';
             default: return status || 'Đang chờ xử lý';
+        }
+    };
+
+    const handleUserAction = async (id, status) => {
+        if (status === 'approved') {
+            setSelectedConsignmentId(id);
+            setIsAddressModalVisible(true);
+            return;
+        }
+
+        const confirmMsg = status === 'rejected'
+            ? 'Bạn muốn hủy yêu cầu ký gửi này?'
+            : 'Bạn đồng ý với yêu cầu này?';
+
+        if (!window.confirm(confirmMsg)) return;
+
+        try {
+            const res = await updateUserConsignmentStatusApi(id, { status });
+            if (res.success) {
+                // Refresh data
+                const consignmentsRes = await getConsignmentsApi(userId);
+                if (consignmentsRes.success) {
+                    setConsignments(consignmentsRes.consignments || []);
+                }
+            } else {
+                message.error('Có lỗi xảy ra: ' + (res.message || 'Lỗi không xác định'));
+            }
+        } catch (error) {
+            console.error("Action error:", error);
+            message.error('Lỗi khi thực hiện thao tác.');
+        }
+    };
+
+    const confirmAddressAndApprove = async () => {
+        try {
+            const res = await updateUserConsignmentStatusApi(selectedConsignmentId, { status: 'approved' });
+            if (res.success) {
+                setIsAddressModalVisible(false);
+                message.success('Đã xác nhận đồng ý ký gửi. Vui lòng gửi hàng cho Shop nhé!');
+                // Refresh data
+                const consignmentsRes = await getConsignmentsApi(userId);
+                if (consignmentsRes.success) {
+                    setConsignments(consignmentsRes.consignments || []);
+                }
+            }
+        } catch (error) {
+            console.error("Confirm address error:", error);
+            message.error('Lỗi khi thực hiện thao tác.');
         }
     };
 
@@ -144,6 +198,48 @@ const Dashboard = () => {
                         Người ký gửi
                     </button>
                 </AnimateWhenVisible>
+
+                {/* Modal hiển thị địa chỉ */}
+                <Modal
+                    title="Thông tin Gửi hàng"
+                    open={isAddressModalVisible}
+                    onCancel={() => setIsAddressModalVisible(false)}
+                    footer={[
+                        <button 
+                            key="cancel"
+                            onClick={() => setIsAddressModalVisible(false)}
+                            className="px-6 py-2 border border-outline-variant text-[10px] font-bold uppercase tracking-widest rounded-lg mr-3 hover:bg-surface-variant/20 transition-all font-manrope text-on-surface-variant"
+                        >
+                            Quay lại
+                        </button>,
+                        <button 
+                            key="confirm"
+                            onClick={confirmAddressAndApprove}
+                            className="px-6 py-2 bg-primary text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:shadow-lg transition-all font-manrope hover:bg-primary-container"
+                        >
+                            Tôi đã hiểu & Gửi hàng
+                        </button>
+                    ]}
+                    centered
+                >
+                    <div className="py-4 space-y-4 font-manrope">
+                        <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                            <p className="text-xs font-bold text-primary uppercase mb-2">Địa chỉ Shop:</p>
+                            <p className="text-sm font-medium text-on-surface">123 Đường Sư Vạn Hạnh, Phường 12, Quận 10, TP. Hồ Chí Minh</p>
+                        </div>
+                        <div className="space-y-3">
+                            <p className="text-xs leading-relaxed text-on-surface-variant">
+                                • <strong>Nếu bạn ở gần:</strong> Bạn có thể đến trực tiếp địa chỉ trên để bàn giao sản phẩm cho Shop kiểm định chất lượng.
+                            </p>
+                            <p className="text-xs leading-relaxed text-on-surface-variant">
+                                • <strong>Nếu bạn ở xa:</strong> Vui lòng gửi hàng qua các đơn vị chuyển phát (GHTK, Viettel Post, v.v.). Sau khi gửi, hãy giữ lại mã vận đơn.
+                            </p>
+                            <p className="text-xs text-error/80 font-medium italic">
+                                * Lưu ý: Shop sẽ tiến hành nhận hàng và kiểm tra thực tế một lần nữa trước khi đăng bán chính thức.
+                            </p>
+                        </div>
+                    </div>
+                </Modal>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                     {/* Left Column */}
@@ -235,23 +331,78 @@ const Dashboard = () => {
                                     ) : (
                                         <div className="space-y-6">
                                             {consignments.map(item => (
-                                                <div key={item._id} className="flex justify-between items-center border-b border-outline-variant/20 pb-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="flex -space-x-4">
-                                                            {item.photos?.slice(0, 2).map((img, idx) => (
-                                                                <img key={idx} src={img} className="w-12 h-12 object-cover rounded-full border-2 border-white shadow-sm" alt="consignment item" />
-                                                            ))}
+                                                <React.Fragment key={item._id}>
+                                                    <div className="flex justify-between items-center border-b border-outline-variant/20 pb-4">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="flex -space-x-4">
+                                                                {item.photos?.slice(0, 2).map((img, idx) => (
+                                                                    <img key={idx} src={img} className="w-12 h-12 object-cover rounded-full border-2 border-white shadow-sm" alt="consignment item" />
+                                                                ))}
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-bold text-sm text-on-surface">{item.title || 'Yêu cầu ký gửi'}</p>
+                                                                <div className="flex gap-2 text-[10px] text-on-surface-variant mt-1 italic">
+                                                                    <span>{item.categoryId?.name || 'Chưa phân loại'}</span>
+                                                                    <span>•</span>
+                                                                    <span>{item.brandId?.name || 'No Brand'}</span>
+                                                                    <span>•</span>
+                                                                    <span>{new Date(item.createdAt).toLocaleDateString('vi-VN')}</span>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <p className="font-bold text-sm text-on-surface">{item.title || 'Yêu cầu ký gửi'}</p>
-                                                            <p className="text-xs text-on-surface-variant mt-1">{new Date(item.createdAt).toLocaleDateString('vi-VN')}</p>
+                                                        <div className="text-right">
+                                                            <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${item.status === 'pending' ? 'bg-surface-container-high text-on-surface' : (item.status === 'valued' ? 'bg-primary/10 text-primary' : (item.status === 'rejected' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed'))}`}>{translateConsignmentStatus(item.status)}</span>
+                                                            <p className="text-xs text-primary font-bold mt-2">{formatPrice(item.expectedPrice)}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="text-right">
-                                                        <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${item.status === 'pending' ? 'bg-surface-container-high text-on-surface' : (item.status === 'rejected' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed')}`}>{translateConsignmentStatus(item.status)}</span>
-                                                        <p className="text-xs text-primary font-bold mt-2">{formatPrice(item.expectedPrice)}</p>
-                                                    </div>
-                                                </div>
+                                                    {item.status === 'pending' && (
+                                                        <div className="mt-4 p-4 bg-surface-container-high/30 rounded-xl border border-outline-variant/20 flex justify-between items-center">
+                                                            <div>
+                                                                <p className="text-xs font-bold text-on-surface">Đang chờ Shop thẩm định...</p>
+                                                                <p className="text-[10px] text-on-surface-variant">Thường mất khoảng 24h để có kết quả báo giá.</p>
+                                                            </div>
+                                                            <button 
+                                                                onClick={() => handleUserAction(item._id, 'rejected')}
+                                                                className="px-4 py-2 border border-outline-variant text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-error/10 hover:text-error hover:border-error transition-all"
+                                                            >
+                                                                Hủy yêu cầu
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                    {item.status === 'approved' && (
+                                                        <div className="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/10">
+                                                            <p className="text-xs font-bold text-primary italic">Vui lòng gửi hàng đến địa chỉ Shop để được đội ngũ chuyên gia nhận hàng và kiểm định chất lượng trước khi lên kệ.</p>
+                                                            <p className="text-[10px] text-on-surface-variant mt-1 italic">* Liên hệ Hotline nếu bạn cần hỗ trợ về quy trình vận chuyển.</p>
+                                                        </div>
+                                                    )}
+                                                    {item.status === 'received' && (
+                                                        <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-100">
+                                                            <p className="text-xs font-bold text-green-700 italic">Shop đã nhận được hàng và hoàn thành kiểm định. Sản phẩm của bạn chuẩn bị được đăng bán!</p>
+                                                        </div>
+                                                    )}
+                                                    {item.status === 'valued' && (
+                                                        <div className="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/10 flex flex-col md:flex-row justify-between items-center gap-4">
+                                                            <div>
+                                                                <p className="text-xs font-bold text-on-surface text-primary">Shop đã đề xuất mức giá thẩm định!</p>
+                                                                <p className="text-[10px] text-on-surface-variant">Vui lòng chọn tiếp tục nếu bạn đồng ý bán.</p>
+                                                            </div>
+                                                            <div className="flex gap-3">
+                                                                <button 
+                                                                    onClick={() => handleUserAction(item._id, 'approved')}
+                                                                    className="px-5 py-2 bg-primary text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:shadow-md transition-all active:scale-95"
+                                                                >
+                                                                    Chấp nhận & Gửi đồ
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => handleUserAction(item._id, 'rejected')}
+                                                                    className="px-5 py-2 border border-outline-variant text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-surface-variant/20 transition-all active:scale-95"
+                                                                >
+                                                                    Từ chối / Hủy
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </React.Fragment>
                                             ))}
 
                                         </div>

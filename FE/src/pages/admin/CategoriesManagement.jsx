@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Input, Select, message, Space, Popconfirm, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { getAllCategories, createCategory, updateCategory, deleteCategory } from '../../services/admin/categories.service.jsx';
 
 const CategoriesManagement = () => {
+    const { role } = useSelector((state) => state.auth);
+    const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
+
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -107,23 +111,10 @@ const CategoriesManagement = () => {
 
     const columns = [
         {
-            title: 'ID',
-            dataIndex: 'category_id',
-            key: 'category_id',
-            width: 80,
-            render: (id) => <span className="font-mono text-xs font-bold text-gray-500">#{id}</span>
-        },
-        {
             title: 'Tên danh mục',
             dataIndex: 'name',
             key: 'name',
             className: 'font-semibold',
-        },
-        {
-            title: 'Đường dẫn (Slug)',
-            dataIndex: 'slug',
-            key: 'slug',
-            render: (slug) => <code className="text-xs bg-gray-100 px-1 rounded">{slug}</code>
         },
         {
             title: 'Danh mục cha',
@@ -137,31 +128,35 @@ const CategoriesManagement = () => {
             width: 150,
             render: (_, record) => (
                 <Space>
-                    <Button 
-                        type="link" 
-                        icon={<EditOutlined />} 
-                        onClick={() => handleEdit(record)}
-                        className="p-0"
-                    >
-                        Sửa
-                    </Button>
-                    <Popconfirm
-                        title="Xóa danh mục này?"
-                        description="Bạn có chắc chắn muốn xóa danh mục này không?"
-                        onConfirm={() => handleDelete(record._id)}
-                        okText="Xóa"
-                        cancelText="Hủy"
-                        okButtonProps={{ danger: true }}
-                    >
+                    {hasPerm('categories_edit') && (
                         <Button 
                             type="link" 
-                            danger 
-                            icon={<DeleteOutlined />}
+                            icon={<EditOutlined />} 
+                            onClick={() => handleEdit(record)}
                             className="p-0"
                         >
-                            Xóa
+                            Sửa
                         </Button>
-                    </Popconfirm>
+                    )}
+                    {hasPerm('categories_delete') && (
+                        <Popconfirm
+                            title="Xóa danh mục này?"
+                            description="Bạn có chắc chắn muốn xóa danh mục này không?"
+                            onConfirm={() => handleDelete(record._id)}
+                            okText="Xóa"
+                            cancelText="Hủy"
+                            okButtonProps={{ danger: true }}
+                        >
+                            <Button 
+                                type="link" 
+                                danger 
+                                icon={<DeleteOutlined />}
+                                className="p-0"
+                            >
+                                Xóa
+                            </Button>
+                        </Popconfirm>
+                    )}
                 </Space>
             ),
         },
@@ -174,15 +169,17 @@ const CategoriesManagement = () => {
                     <h2 className="font-notoSerif text-2xl font-bold text-on-surface">Quản lý Danh mục</h2>
                     <p className="text-sm text-on-surface-variant">Phân loại sản phẩm theo cấp bậc cha - con</p>
                 </div>
-                <Button 
-                    type="primary" 
-                    className="bg-primary hover:opacity-90 flex items-center" 
-                    size="large" 
-                    onClick={handleAdd}
-                    icon={<PlusOutlined />}
-                >
-                    Thêm danh mục
-                </Button>
+                {hasPerm('categories_create') && (
+                    <Button 
+                        type="primary" 
+                        className="bg-primary hover:opacity-90 flex items-center" 
+                        size="large" 
+                        onClick={handleAdd}
+                        icon={<PlusOutlined />}
+                    >
+                        Thêm danh mục
+                    </Button>
+                )}
             </div>
 
             <Table 

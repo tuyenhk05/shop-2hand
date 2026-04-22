@@ -1,6 +1,6 @@
 import { adminGet, adminPost, adminPut, adminPatch, adminDelete } from '../../untils/adminRequest.jsx';
 
-export const getAllProducts = async () => adminGet('/products');
+export const getAllProducts = async (params = {}) => adminGet('/products', params);
 
 export const getProductById = async (id) => adminGet(`/products/${id}`);
 

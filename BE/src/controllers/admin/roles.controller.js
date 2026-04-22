@@ -2,7 +2,10 @@ const Role = require('../../models/roles.model');
 
 exports.getAllRoles = async (req, res) => {
     try {
-        const roles = await Role.find({ isDeleted: false }).sort({ createdAt: -1 });
+        const roles = await Role.find({ 
+            isDeleted: false,
+            title: { $ne: 'Khách hàng' } 
+        }).sort({ createdAt: -1 });
         res.status(200).json({ success: true, data: roles });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

@@ -1,11 +1,15 @@
 const Consignment = require('../../models/consignments.model');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { uploadToCloudinary } = require('../../configs/cloudinary');
 
 // GET consignments by user
 exports.getConsignments = async (req, res) => {
     try {
         const { userId } = req.params;
-        const items = await Consignment.find({ userId }).sort({ createdAt: -1 });
+        const items = await Consignment.find({ userId })
+            .populate('categoryId', 'name')
+            .populate('brandId', 'name')
+            .sort({ createdAt: -1 });
         res.status(200).json({ success: true, consignments: items });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -15,23 +19,66 @@ exports.getConsignments = async (req, res) => {
 // POST create consignment
 exports.createConsignment = async (req, res) => {
     try {
-        const { userId, title, description, expectedPrice, condition, photos, accessories } = req.body;
+        const { 
+            userId, title, description, expectedPrice, condition,
+            categoryId, brandId, gender, size, color, material 
+        } = req.body;
 
-        if (!userId || !title || !description || !expectedPrice || !photos?.length) {
+        if (!userId || !title || !description) {
             return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin.' });
+        }
+
+        let photoUrls = [];
+        if (req.files && req.files.length > 0) {
+            const uploadPromises = req.files.map(file => uploadToCloudinary(file.buffer, 'shop-2hand/consignments'));
+            const uploadResults = await Promise.all(uploadPromises);
+            photoUrls = uploadResults.map(result => result.secure_url);
         }
 
         const newCon = new Consignment({
             userId,
             title,
             description,
-            expectedPrice: Number(expectedPrice),
-            photos,
+            expectedPrice: Number(expectedPrice) || 0,
+            photos: photoUrls,
+            condition: condition || 'excellent',
+            categoryId: categoryId || null,
+            brandId: brandId || null,
+            gender: gender || 'unisex',
+            size: size || '',
+            color: color || '',
+            material: material || '',
             status: 'pending'
         });
         await newCon.save();
 
         res.status(201).json({ success: true, consignment: newCon, message: 'Yêu cầu ký gửi đã được gửi thành công!' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// PATCH update consignment status (for User response: approved/rejected)
+exports.updateConsignmentStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!['approved', 'rejected'].includes(status)) {
+            return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ.' });
+        }
+
+        const consignment = await Consignment.findByIdAndUpdate(
+            id,
+            { status, processedAt: Date.now() },
+            { new: true }
+        );
+
+        if (!consignment) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy yêu cầu ký gửi.' });
+        }
+
+        res.status(200).json({ success: true, consignment, message: 'Đã cập nhật trạng thái thành công.' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

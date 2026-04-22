@@ -29,6 +29,20 @@ export const post = async (path, body) => {
     }
 }
 
+export const postFormData = async (path, formData) => {
+    try {
+        const response = await fetch(`${API + path}`, {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error in POST Form Data:', error);
+        return { success: false, message: error.message };
+    }
+}
+
 export const del = async (path) => {
     try {
         const response = await fetch(`${API + path}`, {
