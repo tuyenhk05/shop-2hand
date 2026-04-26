@@ -12,6 +12,8 @@ try {
 const initialState = {
   isLogin: !!token,
   userId: user ? user.id : null,
+  fullName: user ? user.fullName : null,
+  email: user ? user.email : null,
   token: token || null,
   role: role || null
 };
@@ -23,6 +25,8 @@ const authReducer = (state = initialState, action) => {
         ...state,
         isLogin: true,
         userId: action.userId,
+        fullName: action.fullName,
+        email: action.email,
         token: action.token,
         role: action.role
       };

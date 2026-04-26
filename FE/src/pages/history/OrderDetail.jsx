@@ -123,8 +123,8 @@ const OrderDetail = () => {
                 </button>
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-outline-variant/30">
                     <div>
-                        <h1 className="font-notoSerif text-4xl md:text-5xl font-black text-on-surface tracking-tight mb-2">Chi tiết đơn hàng</h1>
-                        <p className="text-on-surface-variant font-medium">#{order._id?.slice(-8).toUpperCase()} • Đặt ngày {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+                        <h2 className="font-notoSerif text-3xl font-bold tracking-tight mb-1">Chi tiết Đơn hàng</h2>
+                        <p className="text-on-surface-variant font-medium">{order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`} • Đặt ngày {new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
                     </div>
                 </div>
             </AnimateWhenVisible>

@@ -62,9 +62,8 @@ const ConsignmentsManagement = () => {
     const columns = [
         {
             title: 'Mã Ký Gửi',
-            dataIndex: '_id',
-            key: 'id',
-            render: (id) => <span className="font-mono text-xs">{id.slice(-6).toUpperCase()}</span>
+            key: 'code',
+            render: (_, r) => <span className="font-mono text-xs font-bold text-primary">{r.consignmentCode || r._id.slice(-6).toUpperCase()}</span>
         },
         {
             title: 'Khách hàng',

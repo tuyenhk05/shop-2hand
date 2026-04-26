@@ -6,6 +6,10 @@ const orderSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'Buyer ID is required']
     },
+    orderCode: {
+        type: String,
+        unique: true
+    },
     items: [
         {
             productId: {
@@ -68,5 +72,25 @@ const orderSchema = new mongoose.Schema({
         default: Date.now
     }
 }, { collection: 'orders' });
+
+// Hàm sinh mã Order (VD: ORD-260426-8A3F)
+orderSchema.pre('save', async function(next) {
+    if (!this.orderCode) {
+        let isUnique = false;
+        while (!isUnique) {
+            const date = new Date();
+            const dateStr = `${String(date.getFullYear()).slice(-2)}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+            const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const newCode = `ORD-${dateStr}-${randomStr}`;
+            
+            // Kiểm tra trùng lặp
+            const existing = await mongoose.models.Order.findOne({ orderCode: newCode });
+            if (!existing) {
+                this.orderCode = newCode;
+                isUnique = true;
+            }
+        }
+    }
+});
 
 module.exports = mongoose.model('Order', orderSchema, 'orders');

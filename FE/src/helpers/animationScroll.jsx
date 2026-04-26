@@ -1,4 +1,4 @@
-﻿// src/components/AnimateWhenVisible.js
+// src/components/AnimateWhenVisible.js
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -36,7 +36,8 @@ function AnimateWhenVisible({
   direction = 'fadeInUp',
   transition = { duration: 1, ease: "easeInOut" },
   viewport = { once: true },
-  className = ''
+  className = '',
+  ...rest
 }) {
   const animation = variants[direction] || variants.fadeInUp;
 
@@ -47,6 +48,7 @@ function AnimateWhenVisible({
       transition={transition}
       viewport={viewport}
       className={className}
+      {...rest}
     >
       {children}
     </motion.div>

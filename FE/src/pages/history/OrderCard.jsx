@@ -37,7 +37,7 @@ const OrderCard = ({ order, formatPrice }) => {
             <div className="flex flex-wrap justify-between items-start mb-6 gap-4">
                 <div>
                     <span className="block text-[10px] tracking-[0.2em] uppercase font-bold text-outline mb-1">MÃ ĐƠN HÀNG</span>
-                    <h3 className="font-notoSerif font-bold text-lg text-on-surface">#{order._id?.slice(-8).toUpperCase() || 'ATL-XXXX'}</h3>
+                    <h3 className="font-notoSerif font-bold text-lg text-on-surface">{order.orderCode || `#${order._id?.slice(-8).toUpperCase() || 'ATL-XXXX'}`}</h3>
                 </div>
                 <div className="text-right">
                     <span className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider rounded-full ${getStatusStyle(order.status)}`}>

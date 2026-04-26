@@ -11,6 +11,7 @@ import { getCookie } from '../../helpers/cookie';
 import useScrollToTop from '../../hooks/useScrollToTop';
 import Loading from '../../components/loading/loading';
 import ProtectedRoute from '../../components/checkLogin/ProtectedRoute';
+import vnpay from "../../assets/images/VNpay.webp";
 
 const Checkout = () => {
     useScrollToTop();
@@ -21,13 +22,15 @@ const Checkout = () => {
 
     const userId = useSelector((state) => state.auth.userId);
 
-    // Đọc thông tin user từ localStorage (được lưu khi đăng nhập)
-    const storedName = localStorage.getItem('fullName') || '';
-    const storedPhone = localStorage.getItem('phone') || '';
+    let storedName = localStorage.getItem('fullName');
+    if (storedName === 'undefined' || storedName === 'null') storedName = '';
+
+    let storedPhone = localStorage.getItem('phone');
+    if (storedPhone === 'undefined' || storedPhone === 'null') storedPhone = '';
 
     const [form, setForm] = useState({
-        buyerName: storedName,
-        buyerPhone: storedPhone,
+        buyerName: storedName || '',
+        buyerPhone: storedPhone || '',
         shippingAddress: '',
     });
 
@@ -107,6 +110,9 @@ const Checkout = () => {
 
     const validateForm = () => {
         const errors = {};
+        if (!form.buyerPhone || form.buyerPhone.trim() === '') {
+            errors.buyerPhone = 'Vui lòng nhập số điện thoại để tiếp tục.';
+        }
         if (!form.shippingAddress || form.shippingAddress.trim() === '') {
             errors.shippingAddress = 'Vui lòng nhập địa chỉ nhận hàng để tiếp tục.';
         }
@@ -120,7 +126,11 @@ const Checkout = () => {
             return;
         }
         if (!validateForm()) {
-            document.getElementById('address-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (formErrors.buyerPhone) {
+                document.getElementById('phone-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                document.getElementById('address-input')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
         }
 
@@ -157,6 +167,12 @@ const Checkout = () => {
                     message.error('Lỗi tạo cổng thanh toán VNPAY (Vui lòng kiểm tra cấu hình hệ thống).');
                     navigate('/history');
                 }
+            } else {
+                // Xử lý lỗi từ Backend (Đặc biệt là lỗi mua trùng / hết hàng)
+                message.error(orderRes.message || 'Lỗi đặt hàng. Vui lòng thử lại.');
+                
+                // Load lại giỏ hàng vì có thể sản phẩm đã bị xóa/đổi trạng thái
+                fetchCart();
             }
         } catch (error) {
             console.error('Checkout error:', error);
@@ -201,23 +217,41 @@ const Checkout = () => {
                                     />
                                 </div>
 
-                                {/* Số điện thoại - auto-fill từ tài khoản */}
+                                {/* Số điện thoại - nếu đã có từ tài khoản thì không cần nhập */}
                                 <div className="space-y-2">
                                     <label className="text-xs font-bold uppercase tracking-widest text-on-surface-variant ml-1 flex items-center gap-2">
                                         Số điện thoại
                                         {storedPhone && (
                                             <span className="text-[10px] normal-case font-normal bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                                                Tự động từ tài khoản
+                                                Từ tài khoản
                                             </span>
                                         )}
                                     </label>
-                                    <input
-                                        className="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-1 focus:ring-primary/30 outline-none"
-                                        placeholder="090 123 4567"
-                                        type="tel"
-                                        value={form.buyerPhone}
-                                        onChange={e => setForm(prev => ({ ...prev, buyerPhone: e.target.value }))}
-                                    />
+                                    {storedPhone ? (
+                                        <div className="w-full bg-surface-container border-none rounded-xl px-4 py-3 text-on-surface font-medium cursor-not-allowed select-none">
+                                            {form.buyerPhone}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <input
+                                                id="phone-input"
+                                                className={`w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 focus:ring-2 outline-none transition-all ${formErrors.buyerPhone ? 'ring-2 ring-red-400 focus:ring-red-400' : 'focus:ring-primary/30'}`}
+                                                placeholder="090 123 4567"
+                                                type="tel"
+                                                value={form.buyerPhone}
+                                                onChange={e => {
+                                                    setForm(prev => ({ ...prev, buyerPhone: e.target.value }));
+                                                    if (e.target.value.trim()) setFormErrors(prev => ({ ...prev, buyerPhone: '' }));
+                                                }}
+                                            />
+                                            {formErrors.buyerPhone && (
+                                                <p className="text-red-500 text-xs font-medium flex items-center gap-1 ml-1 mt-1">
+                                                    <span className="material-symbols-outlined text-sm">error</span>
+                                                    {formErrors.buyerPhone}
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
 
                                 {/* Địa chỉ - bắt buộc, có gợi ý địa chỉ cũ */}
@@ -303,7 +337,7 @@ const Checkout = () => {
                                             <span className="text-xs font-medium text-on-surface-variant">Thanh toán bảo mật 100% qua VnPay Sandbox</span>
                                         </div>
                                     </div>
-                                    <img src="https://vnpay.vn/s1/statics.vnpay.vn/2023/9/06ncktiwd6dc1694418189687.png" alt="VNPay" className="h-8 object-contain" />
+                                    <img src={vnpay} alt="VNPay" className="h-8 object-contain" />
                                 </button>
                             </div>
                         </AnimateWhenVisible>

@@ -1,9 +1,11 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import useScrollToTop from "../../hooks/useScrollToTop";
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import { useSelector } from 'react-redux';
+import { updateCompleteProfile } from '../../services/client/completeProfile.service';
+
 const CompleteProfile = () => {
     useScrollToTop();
     const navigate = useNavigate();
@@ -69,21 +71,8 @@ const CompleteProfile = () => {
         setLoading(true);
 
         try {
-            const token = localStorage.getItem('token');
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-            console.log(import.meta.env.VITE_API_URL);
-
             // Gọi API cập nhật thông tin
-            const response = await fetch(`${apiUrl}/auth/complete-profile`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Gửi token lên để xác thực
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
+            const data = await updateCompleteProfile(formData);
 
             if (data?.success) {
                 message.success('Cập nhật thông tin thành công!');

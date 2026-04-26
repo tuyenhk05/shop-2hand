@@ -1,4 +1,4 @@
-const ADMIN_API = `http://localhost:3001/admin`;
+const ADMIN_API = import.meta.env.VITE_ADMIN_URL || 'http://localhost:3001/admin';
 
 // Lấy token từ localStorage
 const getToken = () => localStorage.getItem('token');
@@ -17,7 +17,7 @@ const getHeaders = (isFormData = false) => {
 export const adminGet = async (path, params = {}) => {
     try {
         let url = `${ADMIN_API}${path}`;
-        
+
         // Append query parameters if provided
         const queryParams = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
@@ -25,7 +25,7 @@ export const adminGet = async (path, params = {}) => {
                 queryParams.append(key, value);
             }
         });
-        
+
         const queryString = queryParams.toString();
         if (queryString) {
             url += `?${queryString}`;

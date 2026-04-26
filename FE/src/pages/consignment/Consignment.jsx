@@ -60,9 +60,10 @@ const Consignment = () => {
     // Dọn dẹp URL tạm thời khi component unmount để tránh rò rỉ bộ nhớ
     useEffect(() => {
         return () => {
-            previewUrls.forEach(url => URL.revokeObjectURL(url));
+            // Không revoke ở đây mỗi khi previewUrls thay đổi vì sẽ làm mất ảnh cũ.
+            // Component unmount sẽ bị xóa khỏi bộ nhớ bởi trình duyệt sau đó.
         };
-    }, [previewUrls]);
+    }, []);
 
     // Xử lý khi người dùng chọn file
     const handleFileChange = (e) => {

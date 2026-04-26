@@ -135,8 +135,8 @@ const ProductDetail = () => {
     };
 
     const formatPrice = (price) => {
-        if (!price) return '0';
-        return price.toLocaleString();
+        if (!price) return '0 ₫';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     };
 
     // Calculate dynamic fake metrics
@@ -213,8 +213,8 @@ const ProductDetail = () => {
                         </h1>
 
                         <div className="flex flex-wrap items-baseline gap-4 mb-8">
-                            <p className="text-3xl font-manrope font-light text-on-background">${formatPrice(product.price)}</p>
-                            <p className="text-on-surface-variant line-through font-manrope text-sm">Gốc ${formatPrice(rrpPrice)}</p>
+                            <p className="text-3xl font-manrope font-light text-on-background">{formatPrice(product.price)}</p>
+                            <p className="text-on-surface-variant line-through font-manrope text-sm">Gốc {formatPrice(rrpPrice)}</p>
                             <span className="text-primary text-xs font-bold bg-primary-fixed px-2 py-0.5 rounded">RẺ HƠN {savePercent}%</span>
                         </div>
 
@@ -373,23 +373,23 @@ const ProductDetail = () => {
                         </div>
 
                         <div className="flex-1 bg-primary/20 rounded-t-lg h-[40%] relative group">
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">${formatPrice(pastPrice1)}</div>
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{formatPrice(pastPrice1)}</div>
                             <div className="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant">2021</div>
                         </div>
                         <div className="flex-1 bg-primary/30 rounded-t-lg h-[55%] relative group">
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">${formatPrice(pastPrice2)}</div>
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{formatPrice(pastPrice2)}</div>
                             <div className="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant">2022</div>
                         </div>
                         <div className="flex-1 bg-primary/50 rounded-t-lg h-[70%] relative group">
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">${formatPrice(product.price - 15)}</div>
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{formatPrice(Math.round(product.price * 0.99))}</div>
                             <div className="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant">2023</div>
                         </div>
                         <div className="flex-1 bg-primary rounded-t-lg h-[85%] relative group ring-4 ring-primary/10">
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-2 py-1 rounded z-10">${formatPrice(product.price)}</div>
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-2 py-1 rounded z-10">{formatPrice(product.price)}</div>
                             <div className="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter font-bold text-primary">Hiện nay</div>
                         </div>
                         <div className="flex-1 bg-surface-container-high border-t border-dashed border-primary-container h-[90%] relative group">
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Ước tính ${formatPrice(product.price + 50)}</div>
+                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-background text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">Ước tính {formatPrice(Math.round(product.price * 1.1))}</div>
                             <div className="absolute bottom-[-30px] left-1/2 -translate-x-1/2 text-[9px] uppercase tracking-tighter text-on-surface-variant italic">2026</div>
                         </div>
                     </div>

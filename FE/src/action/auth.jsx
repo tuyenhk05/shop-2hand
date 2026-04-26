@@ -2,6 +2,8 @@ export const checkLogin = (data) => {
     return {
         type: "LOGIN",
         userId: data.id,
+        fullName: data.fullName,
+        email: data.email,
         token: data.token,
         role: data.role
     }

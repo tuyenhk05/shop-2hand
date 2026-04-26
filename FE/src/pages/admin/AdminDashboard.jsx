@@ -113,7 +113,7 @@ const AdminDashboard = () => {
                             <circle cx="850" cy="140" fill="#4c6545" r="5"></circle>
                         </svg>
                         <div className="flex justify-between mt-4 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest px-2">
-                            <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
+                            <span>Th1</span><span>Th3</span><span>Th5</span><span>Th7</span><span>Th9</span><span>Th11</span>
                         </div>
                     </div>
                 </div>
@@ -122,14 +122,14 @@ const AdminDashboard = () => {
                 <div className="bg-surface-container-low rounded-xl p-8 flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-tertiary-container/20 text-tertiary rounded-full mb-6 relative z-10">
                         <span className="material-symbols-outlined text-[16px]" style={{fontVariationSettings: "'FILL' 1"}}>eco</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Sustainability Milestone</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Cột mốc Bền vững</span>
                     </div>
-                    <h2 className="font-notoSerif text-3xl font-bold text-on-surface mb-4 leading-tight relative z-10">Circular <span className="italic text-primary">movement.</span></h2>
-                    <p className="text-on-surface-variant text-sm mb-6 relative z-10">You have prevented {stats.totalProducts * 3.5 || 120}kg of textile waste from reaching landfills.</p>
+                    <h2 className="font-notoSerif text-3xl font-bold text-on-surface mb-4 leading-tight relative z-10">Kinh tế <span className="italic text-primary">tuần hoàn.</span></h2>
+                    <p className="text-on-surface-variant text-sm mb-6 relative z-10">Bạn đã ngăn chặn {stats.totalProducts * 3.5 || 120}kg rác thải dệt may xả ra môi trường.</p>
                     
                     <div className="w-full space-y-2 relative z-10">
                         <div className="flex justify-between items-end mb-1">
-                            <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Progress</span>
+                            <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Tiến độ</span>
                             <span className="font-notoSerif text-lg font-bold text-primary">82%</span>
                         </div>
                         <div className="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">

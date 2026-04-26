@@ -1,8 +1,9 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { message } from 'antd';
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import useScrollToTop from "../../hooks/useScrollToTop";
+import { forgotPassword, resetPassword } from '../../services/client/changePassword';
 
 const ForgotPassword = () => {
     useScrollToTop();
@@ -32,12 +33,7 @@ const ForgotPassword = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${apiUrl}/auth/forgot-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: formData.email })
-            });
-            const data = await response.json();
+            const data = await forgotPassword({ email: formData.email });
 
             if (data.success) {
                 message.success('Đã gửi mã OTP đến email của bạn!');
@@ -60,16 +56,11 @@ const ForgotPassword = () => {
 
         setLoading(true);
         try {
-            const response = await fetch(`${apiUrl}/auth/reset-password`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: formData.email,
-                    otp: formData.otp,
-                    newPassword: formData.newPassword
-                })
+            const data = await resetPassword({
+                email: formData.email,
+                otp: formData.otp,
+                newPassword: formData.newPassword
             });
-            const data = await response.json();
 
             if (data.success) {
                 message.success('Đổi mật khẩu thành công! Vui lòng đăng nhập lại.');

@@ -1,5 +1,6 @@
 import React from 'react';
 import GlobalSearch from './GlobalSearch';
+import Chatbot from '../chatbot/Chatbot';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { deleteCookie, getCookie } from '../../helpers/cookie';
 import { useDispatch } from 'react-redux';
@@ -37,6 +38,9 @@ const ClientLayout = () => {
 
     return (
         <div className="min-h-screen bg-[#fef9f7] text-on-surface font-body flex flex-col selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+
+            {/* AI Chatbot */}
+            <Chatbot />
 
             {/* ================= HEADER ================= */}
             <header className="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-4 bg-[#fef9f7]/80 backdrop-blur-xl border-b border-outline-variant/20 z-50 transition-all duration-300">

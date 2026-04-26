@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Select, message, Tag, Descriptions, Popconfirm, Badge, DatePicker } from 'antd';
-import { EyeOutlined, EditOutlined, StopOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, StopOutlined, PrinterOutlined } from '@ant-design/icons';
 import { getAllOrders, updateOrderStatus, cancelOrder } from '../../services/admin/orders.service.jsx';
 
 const { RangePicker } = DatePicker;
-const API = 'http://localhost:3001';
 
 const STATUS_CONFIG = {
     pending_payment: { color: 'orange',  label: 'Chờ thanh toán' },
@@ -36,6 +36,7 @@ const OrdersManagement = () => {
     const [isEditModalVisible, setIsEditModalVisible] = useState(false);
     const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [printOrder, setPrintOrder] = useState(null);
     const [form] = Form.useForm();
 
     // ─── Filter State ──────────────────────────────────────────
@@ -113,8 +114,23 @@ const OrdersManagement = () => {
         }
     };
 
+    // ─── In hóa đơn ───────────────────────────────────────────
+    const handlePrintInvoice = (record) => {
+        setPrintOrder(record);
+        setTimeout(() => {
+            window.print();
+        }, 300); // Đợi DOM render xong mới gọi lệnh in
+    };
+
     // ─── Columns ──────────────────────────────────────────────
     const columns = [
+        {
+            title: 'Mã Đơn',
+            key: 'orderCode',
+            render: (_, r) => (
+                <span className="font-bold text-primary text-xs">{r.orderCode || `#${r._id.slice(-6).toUpperCase()}`}</span>
+            )
+        },
         {
             title: 'Khách hàng',
             key: 'buyer',
@@ -223,6 +239,16 @@ const OrdersManagement = () => {
                             />
                         </Popconfirm>
                     )}
+                    {hasPerm('orders_view') && ['paid', 'processing', 'shipped', 'delivered'].includes(record.status) && (
+                        <Button
+                            type="link"
+                            size="small"
+                            icon={<PrinterOutlined />}
+                            onClick={() => handlePrintInvoice(record)}
+                            className="p-1 text-teal-600 hover:text-teal-800"
+                            title="In hóa đơn"
+                        />
+                    )}
                 </div>
             ),
         },
@@ -296,7 +322,7 @@ const OrdersManagement = () => {
                     <div>
                         <p className="font-notoSerif font-bold text-lg">Cập nhật trạng thái</p>
                         <p className="text-xs text-on-surface-variant font-normal">
-                            Đơn #{selectedOrder?._id?.slice(-6).toUpperCase()}
+                            Đơn {selectedOrder?.orderCode ? `#${selectedOrder.orderCode}` : `#${selectedOrder?._id?.slice(-6).toUpperCase()}`}
                         </p>
                     </div>
                 }
@@ -326,7 +352,7 @@ const OrdersManagement = () => {
             <Modal
                 title={
                     <p className="font-notoSerif font-bold text-lg">
-                        Chi tiết đơn hàng #{selectedOrder?._id?.slice(-6).toUpperCase()}
+                        Chi tiết đơn hàng {selectedOrder?.orderCode ? `#${selectedOrder.orderCode}` : `#${selectedOrder?._id?.slice(-6).toUpperCase()}`}
                     </p>
                 }
                 open={isDetailModalVisible}
@@ -398,6 +424,117 @@ const OrdersManagement = () => {
                     </div>
                 )}
             </Modal>
+
+            {/* Template Hóa đơn (Chỉ hiển thị khi in) */}
+            <style>
+                {`
+                    @media print {
+                        body * { visibility: hidden; }
+                        #printable-invoice, #printable-invoice * { visibility: visible; }
+                        #printable-invoice {
+                            position: absolute; left: 0; top: 0; width: 100%;
+                            padding: 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                            color: #000; background: #fff;
+                        }
+                        .print-hide { display: none !important; }
+                        /* Xóa margin/padding mặc định khi in */
+                        @page { margin: 15mm; }
+                    }
+                    /* Ẩn trên màn hình thường */
+                    @media screen {
+                        #printable-invoice { display: none; }
+                    }
+                `}
+            </style>
+
+            {printOrder && createPortal(
+                <div id="printable-invoice">
+                    <div className="flex justify-between items-start mb-8 border-b-2 border-black pb-6">
+                        <div>
+                            <h1 className="text-4xl font-bold font-serif mb-2">ATELIER</h1>
+                            <p className="text-sm">123 Đường Sư Vạn Hạnh, Phường 12, Quận 10</p>
+                            <p className="text-sm">TP. Hồ Chí Minh, Việt Nam</p>
+                            <p className="text-sm">SĐT: 090 123 4567</p>
+                        </div>
+                        <div className="text-right">
+                            <h2 className="text-2xl font-bold mb-2 uppercase tracking-widest text-gray-800">Hóa Đơn</h2>
+                            <p className="text-sm"><strong>Số HD:</strong> {printOrder.orderCode || `#${printOrder._id?.slice(-8).toUpperCase()}`}</p>
+                            <p className="text-sm"><strong>Ngày:</strong> {new Date().toLocaleDateString('vi-VN')}</p>
+                        </div>
+                    </div>
+
+                    <div className="mb-8 flex justify-between">
+                        <div>
+                            <h3 className="font-bold uppercase tracking-wider text-sm mb-2 border-b border-gray-300 pb-1">Thông tin Khách hàng</h3>
+                            <p className="text-sm"><strong>Họ Tên:</strong> {printOrder.buyerId?.fullName || printOrder.buyerName}</p>
+                            <p className="text-sm"><strong>Điện thoại:</strong> {printOrder.buyerId?.phone || printOrder.buyerPhone}</p>
+                            <p className="text-sm"><strong>Email:</strong> {printOrder.buyerId?.email || 'Không cung cấp'}</p>
+                            <p className="text-sm mt-2 max-w-xs"><strong>Địa chỉ giao:</strong><br/>{printOrder.shippingAddress}</p>
+                        </div>
+                        <div className="text-right">
+                            <h3 className="font-bold uppercase tracking-wider text-sm mb-2 border-b border-gray-300 pb-1 text-right">Chi tiết Thanh toán</h3>
+                            <p className="text-sm"><strong>Phương thức:</strong> {PAYMENT_CONFIG[printOrder.paymentMethod]?.label || printOrder.paymentMethod}</p>
+                            <p className="text-sm"><strong>Trạng thái ĐH:</strong> {STATUS_CONFIG[printOrder.status]?.label || printOrder.status}</p>
+                            <p className="text-sm mt-2">Đơn hàng đã được thanh toán.</p>
+                        </div>
+                    </div>
+
+                    <table className="w-full mb-8 border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100 border-y border-black">
+                                <th className="py-2 px-2 text-left text-sm font-bold w-12">STT</th>
+                                <th className="py-2 px-2 text-left text-sm font-bold">Tên sản phẩm</th>
+                                <th className="py-2 px-2 text-center text-sm font-bold w-20">SL</th>
+                                <th className="py-2 px-2 text-right text-sm font-bold w-32">Đơn giá</th>
+                                <th className="py-2 px-2 text-right text-sm font-bold w-32">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {printOrder.items?.map((item, idx) => (
+                                <tr key={idx} className="border-b border-gray-200">
+                                    <td className="py-3 px-2 text-sm">{idx + 1}</td>
+                                    <td className="py-3 px-2 text-sm">
+                                        <p className="font-medium">{item.productId?.title || 'Sản phẩm ' + (idx + 1)}</p>
+                                        {(item.productId?.size || item.productId?.color) && (
+                                            <p className="text-xs text-gray-500">
+                                                {item.productId?.size && `Size: ${item.productId.size} `}
+                                                {item.productId?.color && `Màu: ${item.productId.color}`}
+                                            </p>
+                                        )}
+                                    </td>
+                                    <td className="py-3 px-2 text-center text-sm">{item.quantity}</td>
+                                    <td className="py-3 px-2 text-right text-sm">{formatMoney(item.priceAtSale)}</td>
+                                    <td className="py-3 px-2 text-right text-sm">{formatMoney(item.quantity * item.priceAtSale)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+
+                    <div className="flex justify-end mb-16">
+                        <div className="w-64 space-y-2">
+                            <div className="flex justify-between text-sm">
+                                <span>Tạm tính:</span>
+                                <span>{formatMoney(printOrder.totalAmount - (printOrder.shippingFee || 0))}</span>
+                            </div>
+                            <div className="flex justify-between text-sm border-b border-gray-300 pb-2">
+                                <span>Phí giao hàng:</span>
+                                <span>{formatMoney(printOrder.shippingFee || 0)}</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-lg pt-2">
+                                <span>Tổng Thanh Toán:</span>
+                                <span>{formatMoney(printOrder.totalAmount)}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="text-center mt-12 pt-8 border-t border-dashed border-gray-400">
+                        <p className="font-bold italic mb-1">Cảm ơn Quý khách đã mua sắm tại Atelier!</p>
+                        <p className="text-xs text-gray-600">Việc bạn lựa chọn thời trang tái sinh là một đóng góp tuyệt vời cho hành tinh của chúng ta.</p>
+                        <p className="text-xs text-gray-600 mt-2">Hỗ trợ khách hàng: atelier.support@example.com</p>
+                    </div>
+                </div>,
+                document.body
+            )}
         </div>
     );
 };

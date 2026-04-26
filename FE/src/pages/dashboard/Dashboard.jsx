@@ -309,7 +309,7 @@ const Dashboard = () => {
                                                             <h3 className="font-bold text-lg text-on-surface tracking-tight line-clamp-1">{order.items?.[0]?.productId?.title || 'Đơn hàng mới'}</h3>
                                                             <span className="text-primary font-extrabold text-lg shrink-0 pl-2">{formatPrice(order.totalAmount)}</span>
                                                         </div>
-                                                        <p className="text-sm font-medium text-on-surface-variant/80 mb-4">Đơn hàng #{order._id?.slice(-6).toUpperCase()} • {translateStatus(order.status)}</p>
+                                                        <p className="text-sm font-medium text-on-surface-variant/80 mb-4">{order.orderCode || `#${order._id?.slice(-6).toUpperCase()}`} • {translateStatus(order.status)}</p>
                                                         <div className="flex gap-2">
                                                             <span className="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant text-[9px] uppercase font-extrabold tracking-wider rounded-md">Đã xác minh</span>
                                                         </div>
@@ -415,21 +415,37 @@ const Dashboard = () => {
                     {/* Right Column */}
                     <div className="lg:col-span-4 space-y-10">
                         <AnimateWhenVisible direction="fadeInUp" className="bg-surface-container-low p-8 rounded-3xl border border-outline-variant/10">
-                            <h3 className="font-notoSerif text-2xl font-bold mb-7 tracking-tight">Doanh thu Ký gửi</h3>
+                            <h3 className="font-notoSerif text-2xl font-bold mb-7 tracking-tight">Thống kê Ký gửi</h3>
                             <div className="space-y-8">
                                 <div>
                                     <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-3">
-                                        <span>Tổng doanh thu</span>
-                                        <span className="text-primary font-extrabold text-sm border-b border-primary/20">{formatPrice(consignments.filter(c => c.status === 'Đã hoàn thành').reduce((a, b) => a + b.expectedPrice, 0))}</span>
+                                        <span>Số đơn đã gửi</span>
+                                        <span className="text-primary font-extrabold text-sm border-b border-primary/20">{consignments.length} Đơn</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mt-4 mb-3">
+                                        <span>Đã được duyệt/Nhận</span>
+                                        <span className="text-primary font-extrabold text-sm">{consignments.filter(c => ['valued', 'approved', 'received', 'completed'].includes(c.status)).length} Đơn</span>
                                     </div>
                                     <div className="h-1.5 w-full bg-surface-variant/50 rounded-full overflow-hidden">
-                                        <div className="h-full bg-primary rounded-full w-[35%]"></div>
+                                        <div className="h-full bg-primary rounded-full" style={{ width: consignments.length > 0 ? `${(consignments.filter(c => ['valued', 'approved', 'received', 'completed'].includes(c.status)).length / consignments.length) * 100}%` : '0%' }}></div>
                                     </div>
                                 </div>
                                 <div className="mt-8 pt-8 border-t border-outline-variant/20">
-                                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-2">Số dư Sẵn sàng thanh toán</p>
+                                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-surface-variant/60 mb-4">Đóng góp Môi trường (Ước tính)</p>
+                                    <div className="grid grid-cols-2 gap-4 mb-6">
+                                        <div className="bg-surface-container-highest p-4 rounded-xl border border-outline-variant/10 text-center">
+                                            <span className="material-symbols-outlined text-primary text-2xl mb-1">water_drop</span>
+                                            <p className="text-xl font-notoSerif font-bold text-on-background">{consignments.filter(c => c.status !== 'rejected').length * 1200}</p>
+                                            <p className="text-[9px] uppercase tracking-widest text-on-surface-variant mt-1">Lít Nước</p>
+                                        </div>
+                                        <div className="bg-surface-container-highest p-4 rounded-xl border border-outline-variant/10 text-center">
+                                            <span className="material-symbols-outlined text-primary text-2xl mb-1">co2</span>
+                                            <p className="text-xl font-notoSerif font-bold text-on-background">{consignments.filter(c => c.status !== 'rejected').length * 2.5}</p>
+                                            <p className="text-[9px] uppercase tracking-widest text-on-surface-variant mt-1">Kg CO2</p>
+                                        </div>
+                                    </div>
                                     <div className="flex justify-between items-center">
-                                        <span className="text-2xl font-notoSerif font-bold text-on-background tracking-tight">{formatPrice(consignments.filter(c => c.status === 'Đã hoàn thành').reduce((a, b) => a + b.expectedPrice, 0))}</span>
+                                        <span className="text-xs font-medium text-on-surface-variant">Tiếp tục vòng tuần hoàn</span>
                                         <button onClick={() => navigate('/consignment')} className="px-4 py-2 bg-primary text-white text-[11px] font-bold uppercase tracking-widest rounded-lg hover:shadow-lg transition-all active:scale-95">KÝ GỬI THÊM</button>
                                     </div>
                                 </div>

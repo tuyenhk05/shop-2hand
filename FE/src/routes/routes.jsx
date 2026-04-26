@@ -25,6 +25,7 @@ import CategoriesManagement from "../pages/admin/CategoriesManagement";
 import ProductsManagement from "../pages/admin/ProductsManagement";
 import ConsignmentsManagement from "../pages/admin/ConsignmentsManagement";
 import OrdersManagement from "../pages/admin/OrdersManagement";
+import AdminSettings from "../pages/admin/AdminSettings";
 import { Navigate } from "react-router-dom";
 
 export const routes = [
@@ -140,6 +141,10 @@ export const routes = [
                     {
                         path: "orders",
                         element: <OrdersManagement />
+                    },
+                    {
+                        path: "settings",
+                        element: <AdminSettings />
                     }
                 ]
             }

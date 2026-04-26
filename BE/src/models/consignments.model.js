@@ -6,6 +6,10 @@ const consignmentSchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'User ID is required']
     },
+    consignmentCode: {
+        type: String,
+        unique: true
+    },
     title: {
         type: String,
         required: [true, 'Title is required'],
@@ -81,5 +85,25 @@ const consignmentSchema = new mongoose.Schema({
         default: null
     }
 }, { collection: 'consignments' });
+
+// Hàm sinh mã Ký gửi (VD: KG-260426-9B21)
+consignmentSchema.pre('save', async function(next) {
+    if (!this.consignmentCode) {
+        let isUnique = false;
+        while (!isUnique) {
+            const date = new Date();
+            const dateStr = `${String(date.getFullYear()).slice(-2)}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+            const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+            const newCode = `KG-${dateStr}-${randomStr}`;
+            
+            // Kiểm tra trùng lặp
+            const existing = await mongoose.models.Consignment.findOne({ consignmentCode: newCode });
+            if (!existing) {
+                this.consignmentCode = newCode;
+                isUnique = true;
+            }
+        }
+    }
+});
 
 module.exports = mongoose.model('Consignment', consignmentSchema, 'consignments');

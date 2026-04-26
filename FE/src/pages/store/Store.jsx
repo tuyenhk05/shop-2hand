@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { message } from 'antd';
+import { message, TreeSelect } from 'antd';
 import { getAllProducts } from '../../services/products';
+import { getAllCategories } from '../../services/category.service';
 import { addToCartApi } from '../../services/cart.service';
 import { addToWishlistApi, getWishlistApi, removeFromWishlistApi } from '../../services/wishlist.service';
 import { getCookie } from '../../helpers/cookie';
@@ -16,31 +17,34 @@ const Store = () => {
     console.log(isLoggedIn);
     const [searchParams, setSearchParams] = useSearchParams();
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]); // New state for backend categories
     const [wishlistIds, setWishlistIds] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const userId = useSelector((state) => state.auth.userId);
 
     // Filtering states
-    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || undefined);
     const [selectedCondition, setSelectedCondition] = useState('');
     const [selectedListingType, setSelectedListingType] = useState('');
     const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
-    // Đồng bộ URL parameter 'q' vào state cục bộ
+    // Đồng bộ URL parameter vào state cục bộ
     useEffect(() => {
-        const q = searchParams.get('q') || '';
-        setSearchQuery(q);
+        const q = searchParams.get('q');
+        const cat = searchParams.get('category');
+        if (q !== null) setSearchQuery(q);
+        if (cat !== null) setSelectedCategory(cat);
     }, [searchParams]);
 
     const handleSearchChange = (e) => {
         const val = e.target.value;
         setSearchQuery(val);
-        if (val) {
-            setSearchParams({ q: val });
-        } else {
-            setSearchParams({});
-        }
+        setSearchParams(prev => {
+            if (val) prev.set('q', val);
+            else prev.delete('q');
+            return prev;
+        });
     };
 
     // Advanced Filter Modal
@@ -57,16 +61,22 @@ const Store = () => {
     }, [selectedCategory, selectedCondition, selectedListingType, searchQuery, minPrice, maxPrice, sortBy]);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchProductsAndCategories = async () => {
             try {
-                const res = await getAllProducts();
-                if (res && res.data) {
-                    setProducts(res.data);
-                } else if (res && res.success && Array.isArray(res.data)) {
-                    setProducts(res.data);
+                const [productRes, categoryRes] = await Promise.all([
+                    getAllProducts(),
+                    getAllCategories()
+                ]);
+                
+                if (productRes && (productRes.data || productRes.success)) {
+                    setProducts(productRes.data || productRes);
+                }
+                
+                if (categoryRes && categoryRes.success) {
+                    setCategories(categoryRes.data);
                 }
             } catch (error) {
-                console.error("Fetch products error:", error);
+                console.error("Fetch data error:", error);
             } finally {
                 setLoading(false);
             }
@@ -91,9 +101,57 @@ const Store = () => {
             }
         };
 
-        fetchProducts();
+        fetchProductsAndCategories();
         fetchWishlist();
     }, [userId]);
+
+    // Build tree data for TreeSelect
+    const categoryTreeData = useMemo(() => {
+        if (!categories || categories.length === 0) return [];
+        
+        const map = {};
+        const roots = [];
+        
+        // 1. Initialize map
+        categories.forEach(cat => {
+            map[cat._id] = {
+                title: cat.name,
+                value: cat._id,
+                key: cat._id,
+                children: []
+            };
+        });
+        
+        // 2. Build tree
+        categories.forEach(cat => {
+            const parentId = cat.parent_id?._id || cat.parent_id;
+            
+            if (parentId && map[parentId]) {
+                map[parentId].children.push(map[cat._id]);
+            } else {
+                roots.push(map[cat._id]);
+            }
+        });
+        
+        return roots;
+    }, [categories]);
+
+    // Recursive helper to get all descendant IDs of a category
+    const getAllDescendantIds = (categoryId, allCategories) => {
+        let descendantIds = [];
+        const children = allCategories.filter(cat => {
+            const pid = cat.parent_id?._id || cat.parent_id;
+            return pid === categoryId;
+        });
+        
+        children.forEach(child => {
+            descendantIds.push(child._id);
+            // recursive call
+            descendantIds = descendantIds.concat(getAllDescendantIds(child._id, allCategories));
+        });
+        
+        return descendantIds;
+    };
 
     const handleAddToCart = async (e, productId) => {
         e.stopPropagation();
@@ -152,8 +210,8 @@ const Store = () => {
 
     // Helper format price
     const formatPrice = (price) => {
-        if (!price) return '$0';
-        return '$' + price.toLocaleString();
+        if (!price) return '0 ₫';
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
     }
 
     // Helper get image
@@ -179,7 +237,16 @@ const Store = () => {
 
     // ---- FILTERING LOGIC ----
     let filteredProducts = products.filter(p => {
-        if (selectedCategory && p.categoryId?.name !== selectedCategory) return false;
+        if (selectedCategory) {
+            const productCatId = String(p.categoryId?._id || p.categoryId || '');
+            const selectedCatStr = String(selectedCategory);
+            const validIds = [selectedCatStr, ...getAllDescendantIds(selectedCatStr, categories).map(String)];
+            
+            if (!validIds.includes(productCatId)) {
+                return false;
+            }
+        }
+        
         if (selectedCondition && p.condition !== selectedCondition) return false;
         if (selectedListingType && p.listingType !== selectedListingType) return false;
         if (searchQuery && !p.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -246,22 +313,25 @@ const Store = () => {
                     <div className="flex flex-wrap items-center gap-4 overflow-x-auto hide-scrollbar pb-2">
 
                         {/* Category */}
-                        <div className="flex items-center gap-2 pr-4 border-r border-outline-variant/30">
-                            <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Danh mục</span>
-                            <div className="flex gap-2">
-                                <span
-                                    onClick={() => setSelectedCategory('')}
-                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap ${selectedCategory === '' ? 'bg-primary-fixed text-on-primary-fixed-variant' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}`}>
-                                    Tất cả
-                                </span>
-                                {uniqueCategories.length > 0 && uniqueCategories.map((cat, idx) => (
-                                    <span key={idx}
-                                        onClick={() => setSelectedCategory(cat)}
-                                        className={`px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap ${selectedCategory === cat ? 'bg-primary-fixed text-on-primary-fixed-variant' : 'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest'}`}>
-                                        {cat}
-                                    </span>
-                                ))}
-                            </div>
+                        <div className="flex items-center gap-2 pr-4 border-r border-outline-variant/30 min-w-[250px]">
+                            <span className="text-xs font-bold uppercase tracking-widest text-on-surface-variant flex-shrink-0">Danh mục</span>
+                            <TreeSelect
+                                style={{ width: '100%', minWidth: '200px' }}
+                                dropdownStyle={{ maxHeight: 400, overflow: 'auto', zIndex: 1000 }}
+                                treeData={categoryTreeData}
+                                placeholder="Tất cả danh mục"
+                                treeDefaultExpandAll
+                                allowClear
+                                value={selectedCategory}
+                                onChange={(newValue) => {
+                                    setSelectedCategory(newValue || undefined);
+                                    setSearchParams(prev => {
+                                        if (newValue) prev.set('category', newValue);
+                                        else prev.delete('category');
+                                        return prev;
+                                    });
+                                }}
+                            />
                         </div>
 
                         {/* Condition */}
@@ -395,7 +465,7 @@ const Store = () => {
                                                 src={getMainImage(item)}
                                                 onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500/eeeeee/aaaaaa?text=Image+Loading+Failed' }}
                                             />
-                                            <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
+                                            <div className="absolute top-4 right-4 flex flex-col gap-2 items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                 <button
                                                     onClick={(e) => handleAddToWishlist(e, item._id || item.slug)}
                                                     className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all ${isWishlisted(item)

@@ -92,6 +92,52 @@ exports.createOrder = async (req, res) => {
     try {
         const { buyerId, items, totalAmount, shippingAddress, buyerName, buyerPhone, paymentMethod } = req.body;
 
+        // --- 1. Atomic Concurrency Check (Chống mua trùng thời gian thực) ---
+        const reservedProducts = [];
+        let hasConcurrencyError = false;
+        let errorMessage = '';
+
+        for (let item of items) {
+            // Cố gắng update atomic: Chỉ update thành 'sold' nếu hiện tại KHÁC 'sold'
+            const updatedProduct = await Product.findOneAndUpdate(
+                { _id: item.productId, status: { $ne: 'sold' } },
+                { $set: { status: 'sold' } },
+                { new: true }
+            );
+
+            if (!updatedProduct) {
+                // Thất bại: Sản phẩm đã bị người khác mua trước 1% giây
+                hasConcurrencyError = true;
+                const productInfo = await Product.findById(item.productId);
+                errorMessage = `Sản phẩm "${productInfo ? productInfo.title : 'trong giỏ'}" vừa được người khác thanh toán thành công. Vui lòng tải lại giỏ hàng.`;
+                break;
+            } else {
+                reservedProducts.push(item.productId);
+            }
+        }
+
+        // Nếu có lỗi mua trùng, rollback những món đã "giữ" thành công trước đó
+        if (hasConcurrencyError) {
+            if (reservedProducts.length > 0) {
+                await Product.updateMany(
+                    { _id: { $in: reservedProducts } },
+                    { $set: { status: 'active' } }
+                );
+            }
+            return res.status(400).json({ success: false, message: errorMessage });
+        }
+
+        // --- 2. Cập nhật Số điện thoại cho User nếu chưa có ---
+        const User = require('../../models/users.model');
+        if (buyerId && buyerPhone) {
+            const user = await User.findById(buyerId);
+            if (user && (!user.phone || user.phone.trim() === '')) {
+                user.phone = buyerPhone.trim();
+                await user.save();
+            }
+        }
+
+        // --- 3. Tạo đơn hàng ---
         const newOrder = new Order({
             buyerId, 
             items, 
@@ -105,11 +151,6 @@ exports.createOrder = async (req, res) => {
 
         // Xoá giỏ hàng sau khi đặt thành công
         await Cart.findOneAndUpdate({ userId: buyerId }, { items: [] });
-        
-        // Đổi trạng thái các sản phẩm thành "sold" (nếu thiết kế kho chỉ có 1)
-        for (let item of items) {
-             await Product.findByIdAndUpdate(item.productId, { status: 'sold' });
-        }
 
         res.status(201).json({ success: true, order: newOrder });
     } catch (error) {
