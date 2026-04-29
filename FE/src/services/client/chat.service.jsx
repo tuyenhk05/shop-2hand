@@ -11,7 +11,7 @@ export const chatWithAI = async (message, history, sessionId) => {
         });
         return response.data;
     } catch (error) {
-        return error.response?.data || { success: false, message: 'Lỗi kết nối AI' };
+        return error.response?.data || { success: false, message: 'Lá»—i káº¿t ná»‘i AI' };
     }
 };
 
@@ -20,6 +20,6 @@ export const getChatHistory = async (sessionId) => {
         const response = await axios.get(`${API_URL}/chat/history/${sessionId}`);
         return response.data;
     } catch (error) {
-        return { success: false, message: 'Lỗi tải lịch sử' };
+        return { success: false, message: 'Lá»—i táº£i lá»‹ch sá»­' };
     }
 };

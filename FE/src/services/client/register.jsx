@@ -8,7 +8,7 @@ export const postRegister = async (body) => {
         console.error('Register service error:', error);
         return {
             success: false,
-            message: 'L?i k?t n?i. Vui lòng th? l?i.'
+            message: 'L?i k?t n?i. Vui lÃ²ng th? l?i.'
         };
     }
 };

@@ -9,7 +9,7 @@ export const getAllProducts = async () => {
         console.error('Get products service error:', error);
         return {
             success: false,
-            message: 'L?i k?t n?i. Vui lòng th? l?i.'
+            message: 'L?i k?t n?i. Vui lÃ²ng th? l?i.'
         }
 
     }
@@ -23,7 +23,7 @@ export const getProductById = async (id) => {
         console.error('Get product by id service error:', error);
         return {
             success: false,
-            message: 'L?i k?t n?i. Vui lòng th? l?i.'
+            message: 'L?i k?t n?i. Vui lÃ²ng th? l?i.'
         }
     }
 };
