@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import GlobalSearch from './GlobalSearch';
 import Chatbot from '../chatbot/Chatbot';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
@@ -10,6 +10,33 @@ const ClientLayout = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    // ─── Ẩn/hiện header khi scroll ─────────────────────────────
+    const [headerVisible, setHeaderVisible] = useState(true);
+    const lastScrollY = useRef(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentY = window.scrollY;
+            const diff = currentY - lastScrollY.current;
+
+            if (currentY < 60) {
+                // Luôn hiện khi gần đầu trang
+                setHeaderVisible(true);
+            } else if (diff > 6) {
+                // Cuộn xuống đủ nhiều → ẩn
+                setHeaderVisible(false);
+            } else if (diff < -6) {
+                // Cuộn lên đủ nhiều → hiện
+                setHeaderVisible(true);
+            }
+
+            lastScrollY.current = currentY;
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Kiểm tra trạng thái đăng nhập dựa vào token (chuẩn xác thực)
     const token = getCookie('token') || localStorage.getItem('token');
@@ -43,7 +70,11 @@ const ClientLayout = () => {
             <Chatbot />
 
             {/* ================= HEADER ================= */}
-            <header className="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-4 bg-[#fef9f7]/80 backdrop-blur-xl border-b border-outline-variant/20 z-50 transition-all duration-300">
+            <header
+                className={`fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-4 bg-[#fef9f7]/80 backdrop-blur-xl border-b border-outline-variant/20 z-50 transition-all duration-300 ${
+                    headerVisible ? 'translate-y-0 shadow-sm' : '-translate-y-full shadow-none'
+                }`}
+            >
                 <div className="flex items-center gap-10">
                     <Link to="/" className="text-2xl font-bold font-headline text-primary-fixed-variant tracking-tighter italic">
                         Atelier.
@@ -92,6 +123,10 @@ const ClientLayout = () => {
                                     <Link to="/history" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
                                         <span className="material-symbols-outlined text-[18px]">inventory_2</span>
                                         Lịch sử Mua hàng
+                                    </Link>
+                                    <Link to="/chat" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
+                                        <span className="material-symbols-outlined text-[18px]">support_agent</span>
+                                        Chat với Shop
                                     </Link>
                                     <Link to="/consignment" className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface hover:text-primary hover:bg-surface-container-low rounded-lg transition-colors">
                                         <span className="material-symbols-outlined text-[18px]">storefront</span>

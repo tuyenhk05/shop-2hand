@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --inspect index.js"
+    "start": "nodemon index.js",
+    "seed:roles": "node src/scripts/seedRoles.js",
+    "test:models": "node src/scripts/test_models.js"
   },
   "author": "",
   "license": "ISC",
@@ -31,6 +33,7 @@
     "pug": "^3.0.3",
     "qs": "^6.15.1",
     "slug": "^11.0.1",
+    "socket.io": "^4.8.3",
     "streamifier": "^0.1.1",
     "tinymce": "^8.3.1"
   },

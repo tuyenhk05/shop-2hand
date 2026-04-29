@@ -126,7 +126,7 @@ const Sustain = () => {
                     <h3 className="font-notoSerif text-3xl font-bold mb-8">Sẵn sàng xây dựng tủ đồ bền vững của bạn?</h3>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <button onClick={() => navigate('/products')} className="bg-primary text-white font-manrope font-bold py-4 px-10 rounded-md transition-all active:scale-95 hover:bg-on-primary-fixed-variant">Xem Kho lưu trữ đã xác minh</button>
-                        <button className="bg-secondary-container text-on-secondary-container font-manrope font-bold py-4 px-10 rounded-md transition-all active:scale-95">Bán cùng Atelier</button>
+                        <button onClick={() => navigate('/consignment')} className="bg-secondary-container text-on-secondary-container font-manrope font-bold py-4 px-10 rounded-md transition-all active:scale-95">Bán cùng Atelier</button>
                     </div>
                 </section>
             </AnimateWhenVisible>

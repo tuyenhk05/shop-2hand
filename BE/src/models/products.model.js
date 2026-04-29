@@ -83,6 +83,9 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    position: {
+        type: Number
+    },
 
     slug: {
         type: String,

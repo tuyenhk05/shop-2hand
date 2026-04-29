@@ -6,22 +6,22 @@ import { motion } from 'framer-motion';
 const variants = {
   // "Fade in từ dưới lên" (Mặc định)
   fadeInUp: {
-    initial: { opacity: 0, y: 50 },
+    initial: { opacity: 0, y: 24 },
     whileInView: { opacity: 1, y: 0 }
   },
   // "Fade in từ trên xuống"
   fadeInDown: {
-    initial: { opacity: 0, y: -50 },
+    initial: { opacity: 0, y: -24 },
     whileInView: { opacity: 1, y: 0 }
   },
   // "Trượt từ trái sang phải"
   slideFromLeft: {
-    initial: { opacity: 0, x: -100 },
+    initial: { opacity: 0, x: -48 },
     whileInView: { opacity: 1, x: 0 }
   },
   // "Trượt từ phải sang trái"
   slideFromRight: {
-    initial: { opacity: 0, x: 100 },
+    initial: { opacity: 0, x: 48 },
     whileInView: { opacity: 1, x: 0 }
   },
   // "Chỉ mờ dần"
@@ -34,8 +34,8 @@ const variants = {
 function AnimateWhenVisible({
   children,
   direction = 'fadeInUp',
-  transition = { duration: 1, ease: "easeInOut" },
-  viewport = { once: true },
+  transition = { duration: 0.5, ease: 'easeOut' },
+  viewport = { once: true, amount: 0.1 },
   className = '',
   ...rest
 }) {

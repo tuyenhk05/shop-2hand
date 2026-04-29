@@ -40,7 +40,7 @@ exports.getAllProducts = async (req, res) => {
         const products = await Product.find(query)
             .populate('categoryId', 'name')
             .populate('brandId', 'name')
-            .sort({ createdAt: -1 });
+            .sort({ position: 1 });
 
         // Lấy ảnh primary cho từng sản phẩm từ bảng product_images
         const productIds = products.map(p => p._id);
@@ -86,8 +86,9 @@ exports.getProductById = async (req, res) => {
 exports.createProduct = async (req, res) => {
     try {
         console.log('--- START CREATE PRODUCT ---');
+        console.log('req.body raw:', req.body);
+        console.log('req.body.position:', req.body.position, '| type:', typeof req.body.position);
         const productData = { ...req.body };
-        console.log('Body data:', productData);
 
         // ✅ Xử lý Brand mới nếu brandId không phải ObjectId hợp lệ
         if (productData.brandId && !mongoose.Types.ObjectId.isValid(productData.brandId)) {
@@ -105,6 +106,21 @@ exports.createProduct = async (req, res) => {
                 console.log('Created new brand:', brand.name, 'ID:', brand._id);
             }
             productData.brandId = brand._id;
+        }
+
+        // ✅ Xử lý position
+        const posVal = productData.position;
+        console.log('[CREATE] raw position from req.body:', posVal, '| type:', typeof posVal);
+        
+        if (posVal !== undefined && posVal !== null && posVal !== '' && !isNaN(parseInt(posVal))) {
+            productData.position = parseInt(posVal);
+            console.log('[CREATE] Using provided position:', productData.position);
+        } else {
+            // Tìm max position hiện tại
+            const agg = await Product.aggregate([{ $group: { _id: null, maxPos: { $max: '$position' } } }]);
+            const maxPos = (agg.length > 0 && agg[0].maxPos !== null) ? agg[0].maxPos : 0;
+            productData.position = maxPos + 1;
+            console.log('[CREATE] Auto-assigned position:', productData.position, '(maxPos was:', maxPos, ')');
         }
 
         // Tạo sản phẩm
@@ -156,7 +172,24 @@ exports.updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
         console.log('--- START UPDATE PRODUCT ---', id);
+        console.log('req.body raw:', req.body);
+        console.log('req.body.position:', req.body.position, '| type:', typeof req.body.position);
         const updateData = { ...req.body, updatedAt: new Date() };
+        
+        // Kiểm tra xem position có được gửi lên không
+        const posVal = updateData.position;
+        console.log('[UPDATE] raw position from req.body:', posVal, '| type:', typeof posVal);
+        
+        if (posVal !== undefined && posVal !== null && posVal !== '' && !isNaN(parseInt(posVal))) {
+            updateData.position = parseInt(posVal);
+            console.log('[UPDATE] Updating position to:', updateData.position);
+        } else {
+            // Không gửi position: giữ nguyên, không overwrite
+            delete updateData.position;
+            console.log('[UPDATE] No position sent, keeping existing value');
+        }
+
+        console.log('[UPDATE] Final updateData keys:', Object.keys(updateData));
 
         // ✅ Xử lý Brand mới nếu brandId không phải ObjectId hợp lệ
         if (updateData.brandId && !mongoose.Types.ObjectId.isValid(updateData.brandId)) {

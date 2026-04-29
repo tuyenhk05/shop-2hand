@@ -1,10 +1,14 @@
 const mongoose = require('mongoose');
-require('dotenv').config();
-const Role = require('./src/models/roles.model');
-const User = require('./src/models/users.model');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+const Role = require('../models/roles.model');
+const User = require('../models/users.model');
 
 async function seed() {
     try {
+        if (!process.env.MONGODB_URI) {
+            throw new Error('MONGODB_URI is not defined in .env');
+        }
         await mongoose.connect(process.env.MONGODB_URI);
         console.log('Connected to DB');
 

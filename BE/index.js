@@ -1,20 +1,23 @@
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
+const { Server } = require('socket.io');
 const database = require('./src/configs/database.js');
 const systemconfig = require('./src/configs/system');
 const methodOverride = require('method-override');
-// router and adminRoutes are required below
 const { cleanupExpiredOrders } = require('./src/controllers/client/order.controller');
+const SupportConversation = require('./src/models/support_conversations.model');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3001';
 
 // ✅ Security & CORS
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3001',
+  origin: CLIENT_URL,
   credentials: true
 }));
 
@@ -51,13 +54,97 @@ app.use((err, req, res, next) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not foun'
+    message: 'Route not found'
+  });
+});
+
+// ✅ Tạo HTTP server và Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: CLIENT_URL,
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// ✅ Đính io vào app để dùng trong controllers
+app.set('io', io);
+
+// ✅ Socket.IO namespace /support — real-time chat hỗ trợ khách hàng
+const supportNS = io.of('/support');
+
+supportNS.on('connection', (socket) => {
+  console.log(`🔌 Socket connected: ${socket.id}`);
+
+  // Khách hàng / Admin join vào room của conversation
+  socket.on('join_conversation', (conversationId) => {
+    socket.join(conversationId);
+    console.log(`Socket ${socket.id} joined room: ${conversationId}`);
+  });
+
+  // Admin join tất cả để nhận notification
+  socket.on('admin_join', () => {
+    socket.join('admin_room');
+    console.log(`Admin socket ${socket.id} joined admin_room`);
+  });
+
+  // Gửi tin nhắn
+  socket.on('send_message', async (data) => {
+    try {
+      const { conversationId, sender, content } = data;
+      if (!conversationId || !sender || !content?.trim()) return;
+
+      const conversation = await SupportConversation.findById(conversationId);
+      if (!conversation || conversation.status === 'closed') return;
+
+      const newMsg = {
+        sender,
+        content: content.trim(),
+        createdAt: new Date()
+      };
+
+      conversation.messages.push(newMsg);
+      conversation.lastMessageAt = new Date();
+
+      // Cập nhật unread counter
+      if (sender === 'customer') {
+        conversation.unreadByAdmin += 1;
+        if (conversation.status === 'open') conversation.status = 'in_progress';
+      } else {
+        conversation.unreadByCustomer += 1;
+      }
+
+      await conversation.save();
+
+      const savedMsg = conversation.messages[conversation.messages.length - 1];
+
+      // Emit tin nhắn tới tất cả trong room
+      supportNS.to(conversationId).emit('new_message', {
+        conversationId,
+        message: savedMsg
+      });
+
+      // Notify admin room về unread count mới
+      supportNS.to('admin_room').emit('unread_update', {
+        conversationId,
+        unreadByAdmin: conversation.unreadByAdmin
+      });
+
+    } catch (error) {
+      console.error('Socket send_message error:', error);
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`🔌 Socket disconnected: ${socket.id}`);
   });
 });
 
 // ✅ Start server
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`🚀 Backend API running at http://localhost:${port}`);
+  console.log(`🔌 Socket.IO /support namespace ready`);
 
   // ✅ Chạy task kiểm tra đơn hàng hết hạn mỗi phút
   setInterval(() => {

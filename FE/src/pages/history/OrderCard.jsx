@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createConversationApi } from '../../services/client/support.service';
+import { message } from 'antd';
 
 const OrderCard = ({ order, formatPrice }) => {
+    const navigate = useNavigate();
+    const [isOpeningSupport, setIsOpeningSupport] = useState(false);
+
     // Dịch trạng thái từ DB sang tiếng Việt
     const translateStatus = (status) => {
         switch (status) {
@@ -26,6 +32,27 @@ const OrderCard = ({ order, formatPrice }) => {
             case 'returned':        return 'bg-orange-100 text-orange-700';
             case 'pending_payment': return 'bg-yellow-100 text-yellow-800';
             default:                return 'bg-gray-100 text-gray-600';
+        }
+    };
+
+    const handleOpenSupport = async (e) => {
+        e.stopPropagation(); // Ngăn sự kiện nổi bọt nếu sau này card có click
+        if (!order) return;
+        try {
+            setIsOpeningSupport(true);
+            const orderCode = order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`;
+            const res = await createConversationApi({
+                orderId: order._id,
+                orderCode,
+                subject: `Hỗ trợ đơn hàng ${orderCode}`
+            });
+            if (res.success) {
+                navigate(`/chat?conversationId=${res.data._id}`);
+            }
+        } catch {
+            message.error('Không thể mở hội thoại hỗ trợ. Vui lòng thử lại.');
+        } finally {
+            setIsOpeningSupport(false);
         }
     };
 
@@ -85,8 +112,15 @@ const OrderCard = ({ order, formatPrice }) => {
             </div>
             
             <div className="mt-6 flex justify-end gap-3">
-                <button className="text-primary text-xs font-bold hover:underline transition-all px-3 py-2">Hỗ trợ</button>
-                <button onClick={() => window.location.href = `/history/${order._id}`} className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-xs font-bold active:scale-95 hover:bg-primary hover:text-white transition-all">Chi tiết</button>
+                <button 
+                    onClick={handleOpenSupport}
+                    disabled={isOpeningSupport}
+                    className="text-primary text-xs font-bold hover:underline transition-all px-3 py-2 flex items-center gap-1 disabled:opacity-50"
+                >
+                    {isOpeningSupport ? <span className="material-symbols-outlined animate-spin text-sm">sync</span> : null}
+                    Hỗ trợ
+                </button>
+                <button onClick={() => navigate(`/history/${order._id}`)} className="bg-primary/10 text-primary px-5 py-2 rounded-lg text-xs font-bold active:scale-95 hover:bg-primary hover:text-white transition-all">Chi tiết</button>
             </div>
         </div>
     );

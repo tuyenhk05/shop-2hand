@@ -26,6 +26,8 @@ import ProductsManagement from "../pages/admin/ProductsManagement";
 import ConsignmentsManagement from "../pages/admin/ConsignmentsManagement";
 import OrdersManagement from "../pages/admin/OrdersManagement";
 import AdminSettings from "../pages/admin/AdminSettings";
+import CustomerSupport from "../pages/admin/CustomerSupport";
+import ChatWithShop from "../pages/chat/ChatWithShop";
 import { Navigate } from "react-router-dom";
 
 export const routes = [
@@ -80,6 +82,10 @@ export const routes = [
             {
                 path: "/history/:orderId",
                 element: <OrderDetail />
+            },
+            {
+                path: "/chat",
+                element: <ChatWithShop />
             }
         ]
     },
@@ -141,6 +147,10 @@ export const routes = [
                     {
                         path: "orders",
                         element: <OrdersManagement />
+                    },
+                    {
+                        path: "support",
+                        element: <CustomerSupport />
                     },
                     {
                         path: "settings",

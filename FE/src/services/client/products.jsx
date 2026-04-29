@@ -1,4 +1,4 @@
-﻿import { get } from "../untils/request";
+import { get } from "../../untils/request";
 
 export const getAllProducts = async () => {
     try {
@@ -9,7 +9,7 @@ export const getAllProducts = async () => {
         console.error('Get products service error:', error);
         return {
             success: false,
-            message: 'Lỗi kết nối. Vui lòng thử lại.'
+            message: 'L?i k?t n?i. Vui l�ng th? l?i.'
         }
 
     }
@@ -23,7 +23,7 @@ export const getProductById = async (id) => {
         console.error('Get product by id service error:', error);
         return {
             success: false,
-            message: 'Lỗi kết nối. Vui lòng thử lại.'
+            message: 'L?i k?t n?i. Vui l�ng th? l?i.'
         }
     }
 };

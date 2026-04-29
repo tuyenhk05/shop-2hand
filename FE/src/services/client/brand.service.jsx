@@ -1,4 +1,4 @@
-import { get } from "../untils/request";
+import { get } from "../../untils/request";
 
 export const getAllBrands = async () => {
     try {

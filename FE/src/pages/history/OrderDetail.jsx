@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOrderByIdApi } from '../../services/order.service';
-import { createPaymentUrlApi } from '../../services/payment.service';
+import { getOrderByIdApi } from '../../services/client/order.service';
+import { createPaymentUrlApi } from '../../services/client/payment.service';
+import { createConversationApi } from '../../services/client/support.service';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import Loading from '../../components/loading/loading';
 import useScrollToTop from '../../hooks/useScrollToTop';
@@ -16,6 +17,7 @@ const OrderDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [timeLeft, setTimeLeft] = useState(null);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    const [isOpeningSupport, setIsOpeningSupport] = useState(false);
 
     useEffect(() => {
         const fetchOrderDetail = async () => {
@@ -85,6 +87,26 @@ const OrderDetail = () => {
             message.error('Đã xảy ra lỗi khi kết nối với cổng thanh toán.');
         } finally {
             setIsProcessingPayment(false);
+        }
+    };
+
+    const handleOpenSupport = async () => {
+        if (!order) return;
+        try {
+            setIsOpeningSupport(true);
+            const orderCode = order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`;
+            const res = await createConversationApi({
+                orderId: order._id,
+                orderCode,
+                subject: `Hỗ trợ đơn hàng ${orderCode}`
+            });
+            if (res.success) {
+                navigate(`/chat?conversationId=${res.data._id}`);
+            }
+        } catch {
+            message.error('Không thể mở hội thoại hỗ trợ. Vui lòng thử lại.');
+        } finally {
+            setIsOpeningSupport(false);
         }
     };
 
@@ -239,12 +261,26 @@ const OrderDetail = () => {
                             </div>
 
                             <h2 className="font-bold text-lg mb-4 tracking-tight mt-6">Trạng thái đơn</h2>
-                            <div className="flex items-center gap-3 bg-surface-container p-4 rounded-xl">
-                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
-                                    <span className="material-symbols-outlined text-sm">{order.status === 'Đang xử lý' ? 'pending_actions' : 'check_circle'}</span>
+                                <div className="flex items-center gap-3 bg-surface-container p-4 rounded-xl">
+                                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
+                                        <span className="material-symbols-outlined text-sm">{order.status === 'Đang xử lý' ? 'pending_actions' : 'check_circle'}</span>
+                                    </div>
+                                    <span className="font-bold text-sm tracking-wide text-on-surface flex-1">{translateStatus(order.status)}</span>
                                 </div>
-                                <span className="font-bold text-sm tracking-wide text-on-surface flex-1">{translateStatus(order.status)}</span>
-                            </div>
+
+                                {/* Nút yêu cầu hỗ trợ */}
+                                <button
+                                    onClick={handleOpenSupport}
+                                    disabled={isOpeningSupport}
+                                    className="mt-4 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-2 border-primary/20 text-primary font-bold text-sm hover:bg-primary/5 hover:border-primary/40 transition-all active:scale-[0.98] disabled:opacity-60"
+                                >
+                                    {isOpeningSupport ? (
+                                        <span className="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                                    ) : (
+                                        <span className="material-symbols-outlined text-[18px]">support_agent</span>
+                                    )}
+                                    Yêu cầu hỗ trợ đơn này
+                                </button>
                         </div>
                     </AnimateWhenVisible>
                 </div>

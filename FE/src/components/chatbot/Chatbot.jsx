@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button, Input, Avatar, Card, Space, message } from 'antd';
 import { SendOutlined, CloseOutlined, UserOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import { chatWithAI } from '../../services/chat.service';
+import { chatWithAI } from '../../services/client/chat.service';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import logo from '../../assets/images/logo.png';

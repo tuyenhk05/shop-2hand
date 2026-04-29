@@ -6,6 +6,7 @@ const { requireAdmin, requirePermission } = require('../../middlewares/adminAuth
 router.use(requireAdmin);
 
 router.get('/', requirePermission('orders_view'), ordersController.getAllOrders);
+router.get('/:id', requirePermission('orders_view'), ordersController.getOrderById);
 router.put('/:id', requirePermission('orders_edit'), ordersController.updateOrderStatus);
 router.delete('/:id', requirePermission('orders_delete'), ordersController.deleteOrder);
 

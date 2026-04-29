@@ -89,3 +89,34 @@ exports.deleteOrder = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// ✅ Lấy chi tiết 1 đơn hàng
+exports.getOrderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const order = await Order.findById(id)
+            .populate('buyerId', 'fullName email phone')
+            .populate({
+                path: 'items.productId',
+                select: 'title price'
+            });
+
+        if (!order) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+
+        // Gắn ảnh
+        const productIds = order.items.map(i => i.productId?._id?.toString()).filter(Boolean);
+        const images = await ProductImage.find({ productId: { $in: productIds }, isPrimary: true });
+        const imageMap = {};
+        images.forEach(img => { imageMap[img.productId.toString()] = img.imageUrl; });
+
+        const obj = order.toObject();
+        obj.items = obj.items.map(item => ({
+            ...item,
+            productImage: item.productId ? imageMap[item.productId._id?.toString()] || null : null
+        }));
+
+        res.status(200).json({ success: true, data: obj });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

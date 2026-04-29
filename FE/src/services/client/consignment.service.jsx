@@ -1,4 +1,4 @@
-import { get, post, postFormData, patch } from "../untils/request";
+import { get, post, postFormData, patch } from "../../untils/request";
 
 export const getConsignmentsApi = async (userId) => {
     return await get(`/consignments/${userId}`);

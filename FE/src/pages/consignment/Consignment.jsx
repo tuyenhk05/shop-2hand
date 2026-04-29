@@ -7,9 +7,9 @@ import ProtectedRoute from '../../components/checkLogin/ProtectedRoute';
 // Removed local mock useNavigate to use the one from react-router-dom
 import useScrollToTop from '../../hooks/useScrollToTop';
 import AnimateWhenVisible from '../../helpers/animationScroll';
-import { createConsignmentApi } from '../../services/consignment.service';
-import { getAllCategories } from '../../services/category.service';
-import { getAllBrands } from '../../services/brand.service';
+import { createConsignmentApi } from '../../services/client/consignment.service';
+import { getAllCategories } from '../../services/client/category.service';
+import { getAllBrands } from '../../services/client/brand.service';
 import { getCookie } from '../../helpers/cookie';
 
 const Consignment = () => {
@@ -22,7 +22,7 @@ const Consignment = () => {
     // States lưu trữ thông tin thực tế từ người dùng
     const [uploadedFiles, setUploadedFiles] = useState([]); // Lưu file thật để gửi API
     const [previewUrls, setPreviewUrls] = useState([]); // Lưu URL tạm để hiển thị trên UI
-    
+
     // Detailed fields
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -125,7 +125,7 @@ const Consignment = () => {
             formData.append('size', size);
             formData.append('color', color);
             formData.append('material', material);
-            
+
             uploadedFiles.forEach(file => {
                 formData.append('images', file);
             });
@@ -239,11 +239,11 @@ const Consignment = () => {
                             <AnimateWhenVisible direction="fadeInUp">
                                 <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10 space-y-6">
                                     <h2 className="font-notoSerif text-2xl font-bold mb-6">Thông tin chi tiết</h2>
-                                    
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-bold text-on-surface mb-2">Tên sản phẩm *</label>
-                                            <input 
+                                            <input
                                                 type="text"
                                                 value={title}
                                                 onChange={(e) => setTitle(e.target.value)}
@@ -254,7 +254,7 @@ const Consignment = () => {
 
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-bold text-on-surface mb-2">Mô tả sản phẩm *</label>
-                                            <textarea 
+                                            <textarea
                                                 rows={4}
                                                 value={description}
                                                 onChange={(e) => setDescription(e.target.value)}
@@ -265,7 +265,7 @@ const Consignment = () => {
 
                                         <div>
                                             <label className="block text-sm font-bold text-on-surface mb-2">Danh mục *</label>
-                                            <select 
+                                            <select
                                                 value={categoryId}
                                                 onChange={(e) => setCategoryId(e.target.value)}
                                                 className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
@@ -279,7 +279,7 @@ const Consignment = () => {
 
                                         <div>
                                             <label className="block text-sm font-bold text-on-surface mb-2">Thương hiệu</label>
-                                            <select 
+                                            <select
                                                 value={brandId}
                                                 onChange={(e) => setBrandId(e.target.value)}
                                                 className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
@@ -293,7 +293,7 @@ const Consignment = () => {
 
                                         <div>
                                             <label className="block text-sm font-bold text-on-surface mb-2">Giới tính</label>
-                                            <select 
+                                            <select
                                                 value={gender}
                                                 onChange={(e) => setGender(e.target.value)}
                                                 className="w-full bg-surface-container-highest border-none rounded-xl py-4 px-5 text-on-surface focus:ring-1 focus:ring-primary/50 outline-none transition-all"
@@ -307,7 +307,7 @@ const Consignment = () => {
 
                                         <div>
                                             <label className="block text-sm font-bold text-on-surface mb-2">Kích cỡ (Size)</label>
-                                            <input 
+                                            <input
                                                 type="text"
                                                 value={size}
                                                 onChange={(e) => setSize(e.target.value)}
@@ -318,7 +318,7 @@ const Consignment = () => {
 
                                         <div>
                                             <label className="block text-sm font-bold text-on-surface mb-2">Màu sắc</label>
-                                            <input 
+                                            <input
                                                 type="text"
                                                 value={color}
                                                 onChange={(e) => setColor(e.target.value)}
@@ -329,7 +329,7 @@ const Consignment = () => {
 
                                         <div>
                                             <label className="block text-sm font-bold text-on-surface mb-2">Chất liệu</label>
-                                            <input 
+                                            <input
                                                 type="text"
                                                 value={material}
                                                 onChange={(e) => setMaterial(e.target.value)}
@@ -340,7 +340,7 @@ const Consignment = () => {
 
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-bold text-on-surface mb-2">Giá bạn kỳ vọng (VNĐ) *</label>
-                                            <input 
+                                            <input
                                                 type="number"
                                                 value={expectedPrice}
                                                 onChange={(e) => setExpectedPrice(e.target.value)}
@@ -358,7 +358,7 @@ const Consignment = () => {
                             <AnimateWhenVisible direction="fadeInUp">
                                 <div className="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-outline-variant/10">
                                     <h2 className="font-notoSerif text-2xl font-bold mb-6 text-center">Xác nhận thông tin</h2>
-                                    
+
                                     <div className="space-y-6">
                                         <div className="flex gap-4 p-4 bg-surface-container-low rounded-xl">
                                             <img src={previewUrls[0]} className="w-20 h-24 object-cover rounded-lg shadow-sm" alt="main" />

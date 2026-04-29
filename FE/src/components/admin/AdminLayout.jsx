@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../action/auth';
 import { message } from 'antd';
+import { getUnreadCountApi, connectSupportSocket } from '../../services/client/support.service';
 
 const AdminLayout = () => {
     const navigate = useNavigate();
@@ -10,6 +11,38 @@ const AdminLayout = () => {
     const { fullName, role } = useSelector((state) => state.auth);
 
     const hasPerm = (perm) => role?.permissions?.includes('all') || role?.permissions?.includes(perm);
+
+    const [unreadCount, setUnreadCount] = useState(0);
+    const socketRef = useRef(null);
+
+    // Load unread count and listen for socket updates
+    useEffect(() => {
+        if (!hasPerm('support_view')) return;
+
+        const fetchUnread = async () => {
+            try {
+                const res = await getUnreadCountApi();
+                if (res.success) setUnreadCount(res.count);
+            } catch { /* silent */ }
+        };
+
+        fetchUnread();
+        const interval = setInterval(fetchUnread, 30000);
+
+        // Socket real-time badge
+        const socket = connectSupportSocket();
+        socketRef.current = socket;
+        socket.on('connect', () => socket.emit('admin_join'));
+        if (socket.connected) socket.emit('admin_join');
+        socket.on('unread_update', () => fetchUnread());
+
+        return () => {
+            clearInterval(interval);
+            socket.off('unread_update');
+            socket.off('connect');
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -52,6 +85,17 @@ const AdminLayout = () => {
                         <NavLink to="/admin/orders" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-primary/10 hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold bg-primary/10 border-r-4 border-primary' : 'text-on-surface-variant'}`}>
                             <span className="material-symbols-outlined">receipt_long</span>
                             Đơn hàng
+                        </NavLink>
+                    )}
+                    {hasPerm('support_view') && (
+                        <NavLink to="/admin/support" className={({ isActive }) => `flex items-center gap-3 py-3 px-4 transition-all duration-200 ease-in-out hover:bg-primary/10 hover:text-primary rounded-xl ${isActive ? 'text-primary font-bold bg-primary/10 border-r-4 border-primary' : 'text-on-surface-variant'}`}>
+                            <span className="material-symbols-outlined">support_agent</span>
+                            <span className="flex-1">Chăm sóc KH</span>
+                            {unreadCount > 0 && (
+                                <span className="bg-primary text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                                    {unreadCount}
+                                </span>
+                            )}
                         </NavLink>
                     )}
                     {hasPerm('consignments_view') && (

@@ -1,4 +1,4 @@
-import { get, post } from "../untils/request";
+import { get, post } from "../../untils/request";
 
 export const getWishlistApi = async (userId) => {
     return await get(`/wishlists/${userId}`);

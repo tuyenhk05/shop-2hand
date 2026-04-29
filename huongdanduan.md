@@ -39,6 +39,7 @@ BE/
 │   ├── middleware/   # Các tầng trung gian (Auth, Upload)
 │   ├── models/       # Định nghĩa Schema MongoDB
 │   ├── routes/       # Định nghĩa các API endpoints
+│   ├── scripts/      # Các script tiện ích (Seed data, Testing)
 │   ├── services/     # Logic dịch vụ bên thứ 3 (OTP, Payment)
 │   ├── utils/        # Tiện ích dùng chung (JWT, Format)
 │   └── validations/  # Kiểm tra dữ liệu đầu vào

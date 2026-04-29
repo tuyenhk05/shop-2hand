@@ -41,6 +41,9 @@ const RolesManagement = () => {
         { label: 'Tạo Phân quyền', value: 'roles_create' },
         { label: 'Sửa Phân quyền', value: 'roles_edit' },
         { label: 'Xóa Phân quyền', value: 'roles_delete' },
+
+        { label: 'Xem Chat Hỗ trợ KH', value: 'support_view' },
+        { label: 'Trả lời Chat Hỗ trợ KH', value: 'support_reply' },
     ];
 
     const fetchRoles = async () => {

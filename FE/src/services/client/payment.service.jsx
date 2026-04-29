@@ -1,4 +1,4 @@
-import { post } from "../untils/request";
+import { post } from "../../untils/request";
 
 // Yêu cầu lấy URL VNPAY
 export const createPaymentUrlApi = async (paymentData) => {

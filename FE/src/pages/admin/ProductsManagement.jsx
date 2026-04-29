@@ -3,10 +3,11 @@ import { useSelector } from 'react-redux';
 import {
     Table, Button, Modal, Form, Input, Select, message, Tag, InputNumber, Upload, Space, Popconfirm
 } from 'antd';
-import { UploadOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { UploadOutlined, PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { getAllProducts, getProductById, createProduct, updateProduct, updateProductStatus, deleteProduct, deleteProductImage } from '../../services/admin/products.service.jsx';
 import { getAllCategories } from '../../services/admin/categories.service.jsx';
 import { adminGet } from '../../untils/adminRequest.jsx';
+import { exportToCSV } from '../../untils/exportCSV';
 
 const { TextArea, Search } = Input;
 
@@ -55,7 +56,7 @@ const ProductsManagement = () => {
     const fetchData = async (currentFilters = filters) => {
         try {
             setLoading(true);
-            
+
             // Lọc bỏ các filter undefined/empty để gửi lên API
             const params = {};
             if (currentFilters.q) params.q = currentFilters.q;
@@ -147,6 +148,7 @@ const ProductsManagement = () => {
                     listingType: editingProduct.listingType,
                     categoryId: editingProduct.categoryId?._id || editingProduct.categoryId,
                     brandId: editingProduct.brandId?._id || editingProduct.brandId,
+                    position: editingProduct.position,
                 });
             } else {
                 form.resetFields();
@@ -186,7 +188,8 @@ const ProductsManagement = () => {
             setSubmitting(true);
             const formData = new FormData();
 
-            // Thêm các trường dữ liệu
+            console.log('=== SUBMIT VALUES ===', values);
+
             Object.entries(values).forEach(([key, val]) => {
                 if (val !== undefined && val !== null && val !== '') {
                     // Nếu là brandId và đang dùng mode="tags", lấy phần tử đầu tiên
@@ -198,10 +201,21 @@ const ProductsManagement = () => {
                 }
             });
 
+            // ─── Luôn gửi position (kể cả khi để trống) ──────────
+            // Để backend auto-assign nếu trống, hoặc dùng giá trị nhập vào
+            if (values.position !== undefined && values.position !== null) {
+                formData.set('position', String(values.position));
+            }
+
             // Thêm ảnh mới
             uploadedImages.forEach(({ file }) => {
                 formData.append('images', file);
             });
+
+            // Debug: in ra các field gửi đi
+            for (let [key, val] of formData.entries()) {
+                console.log(`FormData field: ${key} =`, val);
+            }
 
             let res;
             if (editingProduct) {
@@ -215,15 +229,15 @@ const ProductsManagement = () => {
                 setUploadedImages([]);
                 setExistingImages([]);
                 setIsModalVisible(false);
+                setSubmitting(false);
                 fetchData();
             } else {
                 message.error(res.message || 'Có lỗi xảy ra khi lưu sản phẩm');
+                setSubmitting(false);
             }
         } catch (error) {
             console.error('Submit error:', error);
             message.error('Lỗi kết nối server');
-        } finally {
-            setSubmitting(false);
         }
     };
 
@@ -252,24 +266,26 @@ const ProductsManagement = () => {
     // ─── Columns ──────────────────────────────────────────────
     const columns = [
         {
-            title: 'Sản phẩm',
-            key: 'product',
+            title: 'Tên sản phẩm',
+            dataIndex: 'title',
+            key: 'title',
             width: 280,
             render: (_, record) => (
                 <div className="flex items-center gap-3">
                     {record.mainImage ? (
-                        <img src={record.mainImage} alt={record.title} className="w-12 h-14 object-cover rounded-lg shadow-sm flex-shrink-0" />
+                        <img src={record.mainImage} alt="" className="w-10 h-12 object-cover rounded shadow-sm border border-outline-variant/10 flex-shrink-0" />
                     ) : (
-                        <div className="w-12 h-14 bg-surface-container rounded-lg flex items-center justify-center text-outline flex-shrink-0">
-                            <span className="material-symbols-outlined text-sm">image</span>
+                        <div className="w-10 h-12 bg-surface-container-highest rounded flex items-center justify-center text-outline flex-shrink-0">
+                            <PlusOutlined />
                         </div>
                     )}
                     <div className="min-w-0">
-                        <p className="font-semibold text-on-surface text-sm line-clamp-2 leading-tight">{record.title}</p>
-                        <p className="text-xs text-on-surface-variant mt-0.5">{record.condition && CONDITION_OPTIONS.find(c => c.value === record.condition)?.label}</p>
+                        <p className="font-bold text-sm text-on-surface truncate">{record.title}</p>
+                        <p className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">----</p>
                     </div>
                 </div>
-            )
+            ),
+            renderText: (val, record) => record.title
         },
         {
             title: 'Danh mục',
@@ -280,6 +296,13 @@ const ProductsManagement = () => {
             title: 'Thương hiệu',
             key: 'brand',
             render: (_, r) => r.brandId?.name || 'N/A'
+        },
+        {
+            title: 'Vị trí',
+            dataIndex: 'position',
+            key: 'position',
+            width: 80,
+            sorter: (a, b) => (a.position || 0) - (b.position || 0),
         },
         {
             title: 'Giá bán',
@@ -428,6 +451,15 @@ const ProductsManagement = () => {
                 </div>
 
                 <Button onClick={handleResetFilters} className="mb-0.5">Đặt lại</Button>
+
+                <Button
+                    type="primary"
+                    icon={<DownloadOutlined />}
+                    onClick={() => exportToCSV(products, columns.filter(c => c.key !== 'action' && c.key !== 'product'), 'DanhSachSanPham')}
+                    className="mb-0.5 bg-green-600 hover:bg-green-700"
+                >
+                    Xuất CSV
+                </Button>
             </div>
 
             {/* Table */}
@@ -504,12 +536,12 @@ const ProductsManagement = () => {
 
                         {/* Thương hiệu */}
                         <Form.Item label="Thương hiệu" name="brandId">
-                            <Select 
-                                placeholder="Chọn hoặc nhập thương hiệu mới" 
-                                showSearch 
+                            <Select
+                                placeholder="Chọn hoặc nhập thương hiệu mới"
+                                showSearch
                                 mode="tags"
                                 maxCount={1}
-                                optionFilterProp="children" 
+                                optionFilterProp="children"
                                 allowClear
                             >
                                 {brands.map(b => <Select.Option key={b._id} value={b._id}>{b.name}</Select.Option>)}
@@ -569,6 +601,11 @@ const ProductsManagement = () => {
                                     <Select.Option key={val} value={val}>{cfg.label}</Select.Option>
                                 ))}
                             </Select>
+                        </Form.Item>
+
+                        {/* Vị trí */}
+                        <Form.Item label="Vị trí hiển thị" name="position" extra="Để trống để tự động tăng">
+                            <InputNumber className="w-full" min={1} placeholder="1, 2, 3..." />
                         </Form.Item>
                     </div>
 

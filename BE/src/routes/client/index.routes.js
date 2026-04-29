@@ -9,6 +9,7 @@ const orderRoutes = require('./order.routes');
 const consignmentRoutes = require('./consignment.routes');
 const paymentRoutes = require('./payment.routes');
 const chatRoutes = require('./chat.routes');
+const supportRoutes = require('./support.route');
 
 module.exports = (app) => {
     const router = express.Router();
@@ -24,6 +25,7 @@ module.exports = (app) => {
     router.use('/consignments', consignmentRoutes);
     router.use('/payment', paymentRoutes);
     router.use('/chat', chatRoutes);
+    router.use('/support', supportRoutes);
     // ✅ Thêm routes khác ở đây
     // router.use('/products', require('../products.routes'));
     // router.use('/users', require('../users.routes'));

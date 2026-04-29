@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import OrderCard from './OrderCard';
-import { getOrdersApi } from '../../services/order.service';
+import { getOrdersApi } from '../../services/client/order.service';
 import { getCookie } from '../../helpers/cookie';
 import useScrollToTop from '../../hooks/useScrollToTop';
 import Loading from '../../components/loading/loading';

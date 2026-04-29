@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
-import { postRegister } from "../../services/register";
+import { postRegister } from "../../services/client/register";
 import useScrollToTop from "../../hooks/useScrollToTop";
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import imageRegister from "../../assets/images/image_register.png";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import { socialLogin, handleGoogleLogin } from '../../services/social';
+import { socialLogin, handleGoogleLogin } from '../../services/client/social';
 import { checkLogin } from "../../action/auth";
 
 

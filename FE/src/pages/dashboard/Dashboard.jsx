@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import AnimateWhenVisible from '../../helpers/animationScroll';
-import { getOrdersApi } from '../../services/order.service';
-import { getConsignmentsApi, updateUserConsignmentStatusApi } from '../../services/consignment.service';
-import { getWishlistApi } from '../../services/wishlist.service';
+import { getOrdersApi } from '../../services/client/order.service';
+import { getConsignmentsApi, updateUserConsignmentStatusApi } from '../../services/client/consignment.service';
+import { getWishlistApi } from '../../services/client/wishlist.service';
 import { Modal, message } from 'antd';
 
 import { getCookie } from '../../helpers/cookie';

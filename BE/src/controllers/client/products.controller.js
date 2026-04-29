@@ -10,6 +10,7 @@ module.exports.getAllProducts = async (req, res) => {
         const products = await Product.find({ status: 'active' })
             .populate('brandId', 'name logoUrl')
             .populate('categoryId', 'name')
+            .sort({ position: 1 })
             .lean();
 
         // 2. Lấy ra danh sách tất cả ID của các sản phẩm vừa tìm được

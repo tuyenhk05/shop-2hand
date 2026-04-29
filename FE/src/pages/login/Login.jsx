@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { message } from 'antd';
-import { postLogin } from "../../services/login";
+import { postLogin } from "../../services/client/login";
 import AnimateWhenVisible from "../../helpers/animationScroll";
 import useScrollToTop from "../../hooks/useScrollToTop";
 import imageLogin from "../../assets/images/image_login.png";
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import { socialLogin, handleGoogleLogin } from '../../services/social';
+import { socialLogin, handleGoogleLogin } from '../../services/client/social';
 import { checkLogin } from "../../action/auth";
 
 const Login = () => {

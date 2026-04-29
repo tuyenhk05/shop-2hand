@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Select, message, Tag, Descriptions, Popconfirm, Badge, DatePicker } from 'antd';
-import { EyeOutlined, EditOutlined, StopOutlined, PrinterOutlined } from '@ant-design/icons';
+import { EyeOutlined, EditOutlined, StopOutlined, PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
 import { getAllOrders, updateOrderStatus, cancelOrder } from '../../services/admin/orders.service.jsx';
+import { exportToCSV } from '../../untils/exportCSV';
 
 const { RangePicker } = DatePicker;
 
@@ -129,7 +130,8 @@ const OrdersManagement = () => {
             key: 'orderCode',
             render: (_, r) => (
                 <span className="font-bold text-primary text-xs">{r.orderCode || `#${r._id.slice(-6).toUpperCase()}`}</span>
-            )
+            ),
+            renderText: (_, r) => r.orderCode || r._id.slice(-6).toUpperCase()
         },
         {
             title: 'Khách hàng',
@@ -140,35 +142,20 @@ const OrdersManagement = () => {
                     <p className="text-xs text-on-surface-variant">{r.buyerId?.email || '—'}</p>
                     <p className="text-xs text-on-surface-variant">{r.buyerId?.phone || r.buyerPhone || ''}</p>
                 </div>
-            )
+            ),
+            renderText: (_, r) => r.buyerId?.fullName || r.buyerName || '—'
         },
         {
-            title: 'Sản phẩm',
-            key: 'items',
-            render: (_, r) => (
-                <div className="space-y-1">
-                    {r.items?.slice(0, 2).map((item, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                            {item.productImage && (
-                                <img src={item.productImage} alt="" className="w-8 h-10 object-cover rounded flex-shrink-0" />
-                            )}
-                            <div className="min-w-0">
-                                <p className="text-xs font-medium line-clamp-1">{item.productId?.title || 'Sản phẩm'}</p>
-                                <p className="text-xs text-on-surface-variant">x{item.quantity} · {formatMoney(item.priceAtSale)}</p>
-                            </div>
-                        </div>
-                    ))}
-                    {r.items?.length > 2 && (
-                        <p className="text-xs text-primary font-medium">+{r.items.length - 2} sản phẩm khác</p>
-                    )}
-                </div>
-            )
+            title: 'Số điện thoại',
+            key: 'phone',
+            renderText: (_, r) => r.buyerId?.phone || r.buyerPhone || '—'
         },
         {
             title: 'Tổng tiền',
             dataIndex: 'totalAmount',
             key: 'total',
-            render: (v) => <span className="text-primary font-bold text-sm">{formatMoney(v)}</span>
+            render: (v) => <span className="text-primary font-bold text-sm">{formatMoney(v)}</span>,
+            renderText: (v) => v
         },
         {
             title: 'Thanh toán',
@@ -177,7 +164,8 @@ const OrdersManagement = () => {
             render: (m) => {
                 const cfg = PAYMENT_CONFIG[m] || { color: 'default', label: m };
                 return <Tag color={cfg.color}>{cfg.label}</Tag>;
-            }
+            },
+            renderText: (m) => PAYMENT_CONFIG[m]?.label || m
         },
         {
             title: 'Trạng thái',
@@ -186,13 +174,15 @@ const OrdersManagement = () => {
             render: (s) => {
                 const cfg = STATUS_CONFIG[s] || { color: 'default', label: s };
                 return <Badge color={cfg.color} text={<span className="text-xs font-medium">{cfg.label}</span>} />;
-            }
+            },
+            renderText: (s) => STATUS_CONFIG[s]?.label || s
         },
         {
             title: 'Ngày đặt',
             dataIndex: 'createdAt',
             key: 'date',
-            render: (d) => <span className="text-xs">{d ? new Date(d).toLocaleDateString('vi-VN') : '—'}</span>
+            render: (d) => <span className="text-xs">{d ? new Date(d).toLocaleDateString('vi-VN') : '—'}</span>,
+            renderText: (d) => new Date(d).toLocaleDateString('vi-VN')
         },
         {
             title: 'Thao tác',
@@ -306,6 +296,15 @@ const OrdersManagement = () => {
                 </div>
 
                 <Button onClick={resetFilters} className="mb-0.5">Đặt lại</Button>
+                
+                <Button 
+                    type="primary" 
+                    icon={<DownloadOutlined />} 
+                    onClick={() => exportToCSV(orders, columns.filter(c => c.key !== 'action' && c.key !== 'items'), 'DanhSachDonHang')} 
+                    className="mb-0.5 bg-green-600 hover:bg-green-700"
+                >
+                    Xuất CSV
+                </Button>
             </div>
 
             <Table

@@ -1,14 +1,108 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { message, TreeSelect } from 'antd';
-import { getAllProducts } from '../../services/products';
-import { getAllCategories } from '../../services/category.service';
-import { addToCartApi } from '../../services/cart.service';
-import { addToWishlistApi, getWishlistApi, removeFromWishlistApi } from '../../services/wishlist.service';
+import { getAllProducts } from '../../services/client/products';
+import { getAllCategories } from '../../services/client/category.service';
+import { addToCartApi } from '../../services/client/cart.service';
+import { addToWishlistApi, getWishlistApi, removeFromWishlistApi } from '../../services/client/wishlist.service';
 import { getCookie } from '../../helpers/cookie';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import useScrollToTop from "../../hooks/useScrollToTop";
 import { useSelector } from 'react-redux';
+
+// ─── Helper ───────────────────────────────────────────────────
+const conditionLabel = (c) => ({ new: 'Mới', like_new: 'Như mới', good: 'Tốt', fair: 'Khá', poor: 'Cũ' }[c] || c);
+
+const getMainImageHelper = (product) => {
+    if (product.images && product.images.length > 0) {
+        const primary = product.images.find(img => img.isPrimary);
+        if (primary && primary.imageUrl) return primary.imageUrl;
+        return product.images[0].imageUrl;
+    }
+    return 'https://placehold.co/400x500?text=No+Image';
+};
+
+const formatPriceHelper = (price) => {
+    if (!price) return '0 ₫';
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+};
+
+// ─── ProductCard tách riêng để tránh re-mount khi state thay đổi ───
+const ProductCard = memo(({ item, isLarge, wishlisted, onWishlist, onCart, onNavigate }) => {
+    const isMuseumQuality = item.condition === 'like_new' || item.price > 1000;
+    return (
+        <AnimateWhenVisible direction="fadeInUp" className="group cursor-pointer h-full">
+            <div onClick={() => onNavigate(`/products/${item.slug || item._id}`)} className="h-full flex flex-col">
+                {/* Ảnh */}
+                <div className={`relative overflow-hidden rounded-2xl bg-surface-container-low flex-shrink-0 ${isLarge ? 'aspect-[4/3]' : 'aspect-[3/4]'}`}>
+                    <img
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                        src={getMainImageHelper(item)}
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500/eeeeee/aaaaaa?text=No+Image'; }}
+                    />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                    {/* Badge */}
+                    {isMuseumQuality && (
+                        <div className="absolute top-3.5 left-3.5">
+                            <span className="bg-white/95 backdrop-blur-sm text-on-surface text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full shadow-sm">✦ Chọn lọc</span>
+                        </div>
+                    )}
+
+                    {/* Buttons */}
+                    <div className="absolute top-3.5 right-3.5 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-y-1 group-hover:translate-y-0">
+                        <button
+                            onClick={(e) => onWishlist(e, item._id || item.slug)}
+                            className={`w-9 h-9 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all ${wishlisted ? 'bg-primary text-white' : 'bg-white/90 text-primary hover:bg-primary hover:text-white'}`}
+                            title={wishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}
+                        >
+                            <span className="material-symbols-outlined text-[17px]" style={{ fontVariationSettings: wishlisted ? "'FILL' 1" : "'FILL' 0" }}>favorite</span>
+                        </button>
+                        <button
+                            onClick={(e) => onCart(e, item._id || item.slug)}
+                            className="w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-lg active:scale-90 transition-all hover:bg-primary hover:text-white"
+                            title="Thêm vào giỏ"
+                        >
+                            <span className="material-symbols-outlined text-[17px]">add_shopping_cart</span>
+                        </button>
+                    </div>
+
+                    {/* Giá nổi khi hover */}
+                    <div className="absolute bottom-0 left-0 right-0 px-5 py-4 opacity-0 group-hover:opacity-100 transition-all duration-400 translate-y-1 group-hover:translate-y-0 pointer-events-none">
+                        <span className="text-white font-manrope font-bold text-xl drop-shadow-lg">{formatPriceHelper(item.price)}</span>
+                    </div>
+                </div>
+
+                {/* Info */}
+                <div className="mt-4 px-0.5 flex-1">
+                    <h3 className={`font-notoSerif font-bold text-on-surface leading-snug mb-1.5 line-clamp-2 ${isLarge ? 'text-xl md:text-2xl' : 'text-base md:text-xl'}`}>
+                        {item.title}
+                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                        <span className="text-xs text-on-surface-variant">{item.categoryId?.name || 'Thời trang'}</span>
+                        <span className="w-1 h-1 rounded-full bg-outline-variant/60 inline-block" />
+                        <span className="text-xs text-on-surface-variant">{conditionLabel(item.condition)}</span>
+                        {item.brandId?.name && (
+                            <>
+                                <span className="w-1 h-1 rounded-full bg-outline-variant/60 inline-block" />
+                                <span className="text-xs font-semibold text-primary">{item.brandId.name}</span>
+                            </>
+                        )}
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-primary font-manrope font-bold text-lg">{formatPriceHelper(item.price)}</span>
+                        {item.originalPrice && item.originalPrice > item.price && (
+                            <span className="text-xs text-on-surface-variant line-through">{formatPriceHelper(item.originalPrice)}</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </AnimateWhenVisible>
+    );
+});
+
 
 const Store = () => {
     useScrollToTop();
@@ -262,8 +356,13 @@ const Store = () => {
     } else if (sortBy === 'price_desc') {
         filteredProducts.sort((a, b) => b.price - a.price);
     } else {
-        // latest: do nothing, assumed default sorting from DB or we can sort by createdAt
-        filteredProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Mặc định: Sắp xếp theo position tăng dần, sau đó đến ngày tạo giảm dần
+        filteredProducts.sort((a, b) => {
+            const posA = a.position || 0;
+            const posB = b.position || 0;
+            if (posA !== posB) return posA - posB;
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
     }
 
 
@@ -423,126 +522,105 @@ const Store = () => {
                 </div>
             )}
 
-            {/* Product Grid (Breathing Grid from Backend API) */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-12">
+            {/* Product Grid – bố cục 2 cột xen kẽ (7+5 / 5+7) */}
+            <div className="space-y-6">
                 {loading ? (
-                    <div className="col-span-12 text-center py-20 text-on-surface-variant font-bold">
+                    <div className="text-center py-20 text-on-surface-variant font-bold">
                         Đang lấy dữ liệu từ kho lưu trữ...
                     </div>
                 ) : filteredProducts.length === 0 ? (
-                    <div className="col-span-12 text-center py-20 text-on-surface-variant">
+                    <div className="text-center py-20 text-on-surface-variant">
                         Không tìm thấy sản phẩm nào phù hợp với bộ lọc.
                     </div>
-                ) : (
-                    filteredProducts.slice(0, visibleCount).map((item, index) => {
-                        const i = index % 5;
-                        let colClass = "md:col-span-4 group cursor-pointer";
-                        let aspectClass = "aspect-[4/5]";
-                        let mtClass = "";
+                ) : (() => {
+                    // Gom sản phẩm thành từng hàng 2 SP
+                    const visible = filteredProducts.slice(0, visibleCount);
+                    const rows = [];
+                    for (let r = 0; r < visible.length; r += 2) {
+                        rows.push(visible.slice(r, r + 2));
+                    }
 
-                        // Define breathing matrix structure
-                        if (i === 0) {
-                            colClass = "md:col-span-8 group cursor-pointer";
-                            aspectClass = "aspect-[16/9]";
-                        } else if (i === 1) {
-                            mtClass = "md:mt-24";
-                        } else if (i === 3) {
-                            colClass = "md:col-span-8 group cursor-pointer";
-                            aspectClass = "aspect-[16/10]";
-                            mtClass = "md:-mt-12";
-                        }
-
-                        const isMuseumQuality = item.condition === 'like_new' || item.price > 1000;
+                    return rows.map((row, rowIdx) => {
+                        const isEvenRow = rowIdx % 2 === 0;
+                        const [left, right] = row;
 
                         return (
-                            <React.Fragment key={item._id || index}>
-                                <AnimateWhenVisible direction="fadeInUp" className={`${colClass} ${mtClass}`}>
-                                    <div onClick={() => navigate(`/products/${item.slug || item._id}`)}>
-                                        <div className={`relative overflow-hidden rounded-xl bg-surface-container-low mb-6 ${aspectClass}`}>
-                                            <img
-                                                alt={item.title}
-                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                src={getMainImage(item)}
-                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/400x500/eeeeee/aaaaaa?text=Image+Loading+Failed' }}
-                                            />
-                                            <div className="absolute top-4 right-4 flex flex-col gap-2 items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                <button
-                                                    onClick={(e) => handleAddToWishlist(e, item._id || item.slug)}
-                                                    className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center shadow-sm active:scale-90 transition-all ${isWishlisted(item)
-                                                            ? 'bg-primary text-white'
-                                                            : 'bg-white/90 text-primary hover:bg-primary hover:text-white'
-                                                        }`}
-                                                    title={isWishlisted(item) ? "Bỏ yêu thích" : "Thêm vào yêu thích"}
-                                                >
-                                                    <span
-                                                        className="material-symbols-outlined"
-                                                        style={{ fontVariationSettings: isWishlisted(item) ? "'FILL' 1" : "'FILL' 0" }}
-                                                    >favorite</span>
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleAddToCart(e, item._id || item.slug)}
-                                                    className="w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-sm active:scale-90 transition-all hover:bg-primary hover:text-white"
-                                                    title="Thêm vào bộ sưu tập"
-                                                >
-                                                    <span className="material-symbols-outlined" data-icon="add_shopping_cart">add_shopping_cart</span>
-                                                </button>
-                                                {isMuseumQuality && (
-                                                    <div className="bg-tertiary-container text-on-tertiary-container text-[10px] font-bold uppercase tracking-tighter px-3 py-1 rounded-full text-center whitespace-nowrap">
-                                                        Chất lượng Bảo tàng
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="flex justify-between items-start px-2">
-                                            <div className="flex-1 pr-4 min-w-0">
-                                                <h3 className="text-xl md:text-2xl font-notoSerif font-bold text-on-surface mb-1 truncate">{item.title}</h3>
-                                                <p className="text-on-surface-variant text-sm line-clamp-1 truncate">
-                                                    Danh mục: {item.categoryId?.name || 'Vô danh'} • Tình trạng: {item.condition}
-                                                </p>
-                                            </div>
-                                            <div className="text-right flex-shrink-0 flex flex-col items-end">
-                                                <span className="text-lg md:text-xl font-manrope font-semibold text-primary">{formatPrice(item.price)}</span>
-                                                {i === 0 && (
-                                                    <div className="mt-2 flex items-center gap-1.5 text-[10px] font-bold text-tertiary uppercase tracking-widest justify-end whitespace-nowrap">
-                                                        <span className="material-symbols-outlined text-sm" data-icon="eco">eco</span> Tiết kiệm CO2
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
+                            <React.Fragment key={rowIdx}>
+                                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-start">
+                                    <div className={`${isEvenRow ? 'md:col-span-7' : 'md:col-span-5'} ${isEvenRow ? '' : 'md:mt-16'}`}>
+                                        <ProductCard
+                                            item={left}
+                                            isLarge={isEvenRow}
+                                            wishlisted={wishlistIds.includes(String(left._id || ''))}
+                                            onWishlist={handleAddToWishlist}
+                                            onCart={handleAddToCart}
+                                            onNavigate={navigate}
+                                        />
                                     </div>
-                                </AnimateWhenVisible>
 
-                                {/* Banner Interstitial injected statically after the 2nd item */}
-                                {index === 1 && (
-                                    <div className="md:col-span-4 flex items-center mb-6">
-                                        <div className="bg-primary-container/10 border border-primary/20 p-8 rounded-3xl relative overflow-hidden group h-full flex flex-col justify-center w-full min-h-[300px]">
-                                            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors"></div>
-                                            <span className="material-symbols-outlined text-primary text-4xl mb-6" data-icon="auto_awesome">auto_awesome</span>
-                                            <h4 className="text-xl font-notoSerif font-bold text-primary mb-3">Sự thật về Bền vững</h4>
-                                            <p className="text-on-primary-fixed-variant/80 text-sm leading-relaxed mb-6 italic">
-                                                "Kéo dài vòng đời của một sản phẩm may mặc chỉ thêm 9 tháng sẽ giảm lượng khí thải carbon, nước và chất thải khoảng 20-30%."
+                                    {right ? (
+                                        <div className={`${isEvenRow ? 'md:col-span-5' : 'md:col-span-7'} ${isEvenRow ? 'md:mt-16' : ''}`}>
+                                            <ProductCard
+                                                item={right}
+                                                isLarge={!isEvenRow}
+                                                wishlisted={wishlistIds.includes(String(right._id || ''))}
+                                                onWishlist={handleAddToWishlist}
+                                                onCart={handleAddToCart}
+                                                onNavigate={navigate}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className={isEvenRow ? 'md:col-span-5' : 'md:col-span-7'} />
+                                    )}
+                                </div>
+
+                                {/* Banner sau hàng đầu tiên */}
+                                {rowIdx === 0 && (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-2">
+                                        <div className="md:col-span-1 bg-gradient-to-br from-primary/8 to-tertiary/5 border border-primary/15 p-7 rounded-3xl relative overflow-hidden group flex flex-col justify-center min-h-[180px]">
+                                            <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500" />
+                                            <span className="material-symbols-outlined text-primary text-2xl mb-3">eco</span>
+                                            <h4 className="text-base font-notoSerif font-bold text-primary mb-1.5">Thời trang Bền vững</h4>
+                                            <p className="text-on-surface-variant text-xs leading-relaxed italic">
+                                                "9 tháng thêm vòng đời giúp giảm 20–30% khí thải carbon."
                                             </p>
-                                            <a className="text-xs font-bold uppercase tracking-widest text-primary border-b border-primary/30 pb-1 w-fit" href="#">Tìm hiểu thêm</a>
+                                        </div>
+                                        <div className="md:col-span-1 bg-surface-container-low border border-outline-variant/20 p-7 rounded-3xl flex flex-col justify-center min-h-[180px]">
+                                            <span className="material-symbols-outlined text-tertiary text-2xl mb-3">verified</span>
+                                            <h4 className="text-base font-notoSerif font-bold text-on-surface mb-1.5">Kiểm định Chất lượng</h4>
+                                            <p className="text-on-surface-variant text-xs leading-relaxed">
+                                                Mỗi sản phẩm đều qua quy trình kiểm định nghiêm ngặt.
+                                            </p>
+                                        </div>
+                                        <div className="md:col-span-1 bg-surface-container-low border border-outline-variant/20 p-7 rounded-3xl flex flex-col justify-center min-h-[180px]">
+                                            <span className="material-symbols-outlined text-secondary text-2xl mb-3">local_shipping</span>
+                                            <h4 className="text-base font-notoSerif font-bold text-on-surface mb-1.5">Giao hàng Toàn quốc</h4>
+                                            <p className="text-on-surface-variant text-xs leading-relaxed">
+                                                Đóng gói cẩn thận, bảo vệ từng chi tiết sản phẩm.
+                                            </p>
                                         </div>
                                     </div>
                                 )}
                             </React.Fragment>
                         );
-                    })
-                )}
+                    });
+                })()}
 
-                {/* Load More Button */}
+                {/* Load More */}
                 {!loading && visibleCount < filteredProducts.length && (
-                    <div className="col-span-1 md:col-span-12 flex justify-center mt-12 mb-8">
+                    <div className="flex justify-center pt-8 pb-4">
                         <button
                             onClick={() => setVisibleCount(prev => prev + 10)}
-                            className="px-8 py-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant font-bold uppercase tracking-widest text-xs rounded-xl transition-colors shadow-sm"
+                            className="group flex items-center gap-2 px-10 py-3.5 border border-outline-variant/40 hover:border-primary text-on-surface-variant hover:text-primary font-bold uppercase tracking-widest text-xs rounded-full transition-all duration-300 hover:shadow-md"
                         >
-                            Tải thêm tác phẩm lưu trữ
+                            <span>Xem thêm tác phẩm</span>
+                            <span className="material-symbols-outlined text-sm group-hover:translate-y-0.5 transition-transform">expand_more</span>
                         </button>
                     </div>
                 )}
             </div>
+
+
 
             {/* Recently Viewed Section (Dynamic API Data) */}
             <AnimateWhenVisible direction="slideFromLeft" className="mt-32">

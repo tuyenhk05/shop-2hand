@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Table, Tag, Button, Modal, Form, Input, Select, message, Space, Typography, Image } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 import { getAllConsignments, updateConsignmentStatus, convertToProductApi } from '../../services/admin/consignments.service.jsx';
+import { exportToCSV } from '../../untils/exportCSV';
 
 const { Title, Text } = Typography;
 
@@ -63,7 +65,8 @@ const ConsignmentsManagement = () => {
         {
             title: 'Mã Ký Gửi',
             key: 'code',
-            render: (_, r) => <span className="font-mono text-xs font-bold text-primary">{r.consignmentCode || r._id.slice(-6).toUpperCase()}</span>
+            render: (_, r) => <span className="font-mono text-xs font-bold text-primary">{r.consignmentCode || r._id.slice(-6).toUpperCase()}</span>,
+            renderText: (_, r) => r.consignmentCode || r._id.slice(-6).toUpperCase()
         },
         {
             title: 'Khách hàng',
@@ -74,11 +77,12 @@ const ConsignmentsManagement = () => {
                     <p className="font-bold">{user?.fullName}</p>
                     <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
-            )
+            ),
+            renderText: (user) => user?.fullName || '—'
         },
         {
             title: 'Sản phẩm',
-            key: 'product',
+            key: 'productName',
             render: (_, record) => (
                 <div>
                     <p className="font-semibold">{record.title}</p>
@@ -86,7 +90,19 @@ const ConsignmentsManagement = () => {
                     <p className="text-xs">Tình trạng: {record.condition}</p>
                     <p className="text-xs text-primary font-bold">Kỳ vọng: {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.expectedPrice)}</p>
                 </div>
-            )
+            ),
+            renderText: (_, record) => record.title
+        },
+        {
+            title: 'Danh mục',
+            key: 'category',
+            renderText: (_, record) => record.categoryId?.name || 'N/A'
+        },
+        {
+            title: 'Giá kỳ vọng',
+            dataIndex: 'expectedPrice',
+            key: 'price',
+            renderText: (v) => v
         },
         {
             title: 'Hình ảnh',
@@ -101,14 +117,27 @@ const ConsignmentsManagement = () => {
             dataIndex: 'status',
             key: 'status',
             render: (status) => {
-                let color = 'gold';
-                let text = 'Chờ xử lý';
-                if (status === 'valued') { color = 'blue'; text = 'Đã báo giá'; }
-                if (status === 'approved') { color = 'orange'; text = 'Chờ nhận hàng'; }
-                if (status === 'received') { color = 'green'; text = 'Đã nhận & QC OK'; }
-                if (status === 'rejected') { color = 'red'; text = 'Đã hủy'; }
-                if (status === 'completed') { color = 'cyan'; text = 'Đã lên kệ'; }
-                return <Tag color={color}>{text}</Tag>;
+                const config = {
+                    valued: { color: 'blue', text: 'Đã báo giá' },
+                    approved: { color: 'orange', text: 'Chờ nhận hàng' },
+                    received: { color: 'green', text: 'Đã nhận & QC OK' },
+                    rejected: { color: 'red', text: 'Đã hủy' },
+                    completed: { color: 'cyan', text: 'Đã lên kệ' },
+                    pending: { color: 'gold', text: 'Chờ xử lý' }
+                };
+                const cfg = config[status] || config.pending;
+                return <Tag color={cfg.color}>{cfg.text}</Tag>;
+            },
+            renderText: (status) => {
+                const texts = {
+                    valued: 'Đã báo giá',
+                    approved: 'Chờ nhận hàng',
+                    received: 'Đã nhận & QC OK',
+                    rejected: 'Đã hủy',
+                    completed: 'Đã lên kệ',
+                    pending: 'Chờ xử lý'
+                };
+                return texts[status] || 'Chờ xử lý';
             }
         },
         {
@@ -146,6 +175,14 @@ const ConsignmentsManagement = () => {
                     <h2 className="font-notoSerif text-2xl font-bold text-on-surface">Quản lý Yêu cầu Ký gửi</h2>
                     <p className="text-sm text-on-surface-variant">Xử lý các đề xuất ký gửi từ người dùng</p>
                 </div>
+                <Button 
+                    type="primary" 
+                    icon={<DownloadOutlined />} 
+                    onClick={() => exportToCSV(consignments, columns.filter(c => c.key !== 'action' && c.key !== 'photos'), 'DanhSachKyGui')} 
+                    className="bg-green-600 hover:bg-green-700"
+                >
+                    Xuất CSV
+                </Button>
             </div>
 
             <Table 
