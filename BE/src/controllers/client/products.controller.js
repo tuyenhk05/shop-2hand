@@ -1,6 +1,8 @@
 const Product = require('../../models/products.model');
 const ProductImage = require('../../models/productImages.model');
 const Brand = require('../../models/brands.model');
+const Order = require('../../models/orders.model');
+const Wishlist = require('../../models/wishlists.model');
 
 module.exports.getAllProducts = async (req, res) => {
     try {
@@ -295,3 +297,85 @@ exports.deleteProductImage = async (req, res) => {
         });
     }
 };
+
+// 5. Gợi ý sản phẩm cá nhân hóa
+exports.getRecommendations = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // 1. Lấy lịch sử mua hàng và wishlist
+        const [orders, wishlistItems] = await Promise.all([
+            Order.find({ buyerId: userId, status: { $ne: 'cancelled' } }).lean(),
+            Wishlist.find({ userId: userId }).lean()
+        ]);
+
+        // 2. Thu thập tất cả Product ID đã tương tác
+        const interactedProductIds = new Set();
+        orders.forEach(order => {
+            order.items.forEach(item => interactedProductIds.add(item.productId.toString()));
+        });
+        wishlistItems.forEach(item => interactedProductIds.add(item.productId.toString()));
+
+        // 3. Lấy chi tiết các sản phẩm đã tương tác để tìm Category/Brand
+        const interactedProducts = await Product.find({ 
+            _id: { $in: Array.from(interactedProductIds) } 
+        }).select('categoryId brandId').lean();
+
+        const categoryIds = new Set(interactedProducts.map(p => p.categoryId.toString()));
+        const brandIds = new Set(interactedProducts.map(p => p.brandId?.toString()).filter(id => id));
+
+        // 4. Tìm sản phẩm gợi ý (cùng Category hoặc Brand)
+        // Loại trừ những sản phẩm đã tương tác
+        const recommendations = await Product.find({
+            status: 'active',
+            _id: { $nin: Array.from(interactedProductIds) },
+            $or: [
+                { categoryId: { $in: Array.from(categoryIds) } },
+                { brandId: { $in: Array.from(brandIds) } }
+            ]
+        })
+        .populate('brandId', 'name logoUrl')
+        .populate('categoryId', 'name')
+        .limit(4)
+        .lean();
+
+        // 5. Nếu chưa có tương tác hoặc ít sản phẩm gợi ý quá, lấy sản phẩm mới nhất làm fallback
+        if (recommendations.length < 4) {
+            const fallback = await Product.find({
+                status: 'active',
+                _id: { $nin: Array.from(interactedProductIds) }
+            })
+            .populate('brandId', 'name logoUrl')
+            .populate('categoryId', 'name')
+            .sort({ createdAt: -1 })
+            .limit(4 - recommendations.length)
+            .lean();
+            
+            recommendations.push(...fallback);
+        }
+
+        // 6. Lấy ảnh bìa cho các sản phẩm gợi ý
+        const recProductIds = recommendations.map(p => p._id);
+        const primaryImages = await ProductImage.find({ 
+            productId: { $in: recProductIds },
+            isPrimary: true
+        }).lean();
+
+        const data = recommendations.map(p => ({
+            ...p,
+            images: primaryImages.filter(img => img.productId.toString() === p._id.toString())
+        }));
+
+        res.status(200).json({
+            success: true,
+            data: data
+        });
+
+    } catch (error) {
+        console.error('Lỗi gợi ý sản phẩm:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Không thể lấy dữ liệu gợi ý'
+        });
+    }
+};

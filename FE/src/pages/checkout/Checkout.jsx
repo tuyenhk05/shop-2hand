@@ -17,6 +17,7 @@ const Checkout = () => {
     useScrollToTop();
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
+    const [selectedItemIds, setSelectedItemIds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [formErrors, setFormErrors] = useState({});
 
@@ -51,7 +52,12 @@ const Checkout = () => {
             setIsLoading(true);
             const response = await getCartApi(userId);
             if (response && response.success) {
-                setCartItems(response.cart || []);
+                const items = response.cart || [];
+                setCartItems(items);
+                setSelectedItemIds(items.map(item => {
+                    const product = item.productId || item;
+                    return String(product._id || product);
+                }));
             }
         } catch (error) {
             console.error('Lỗi khi tải giỏ hàng', error);
@@ -100,12 +106,24 @@ const Checkout = () => {
         return (price || 0).toLocaleString('vi-VN') + 'đ';
     };
 
+    const handleToggleItem = (id) => {
+        const pid = String(id);
+        setSelectedItemIds(prev =>
+            prev.includes(pid) ? prev.filter(itemPid => itemPid !== pid) : [...prev, pid]
+        );
+    };
+
     // Logic tính tổng tiền
-    const subtotal = cartItems.reduce((acc, item) => {
+    const checkedItems = cartItems.filter(item => {
+        const product = item.productId || item;
+        return selectedItemIds.includes(String(product._id || product));
+    });
+
+    const subtotal = checkedItems.reduce((acc, item) => {
         const product = item.productId || item;
         return acc + (product.price || 0) * (item.quantity || 1);
     }, 0);
-    const shippingFee = 30000;
+    const shippingFee = checkedItems.length > 0 ? 30000 : 0;
     const total = subtotal + shippingFee;
 
     const validateForm = () => {
@@ -121,8 +139,8 @@ const Checkout = () => {
     };
 
     const handleCheckout = async () => {
-        if (cartItems.length === 0) {
-            message.warning('Giỏ hàng của bạn đang trống.');
+        if (checkedItems.length === 0) {
+            message.warning('Vui lòng chọn ít nhất một sản phẩm để thanh toán.');
             return;
         }
         if (!validateForm()) {
@@ -138,7 +156,7 @@ const Checkout = () => {
             // 1. Tạo order draft trên DB
             const orderRes = await createOrderApi({
                 buyerId: userId,
-                items: cartItems.map(i => {
+                items: checkedItems.map(i => {
                     const product = i.productId || i;
                     return {
                         productId: product._id || product,
@@ -356,7 +374,14 @@ const Checkout = () => {
                                 ) : (
                                     <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2">
                                         {cartItems.map((item, idx) => (
-                                            <CartItem key={idx} item={item} formatPrice={formatPrice} onRemove={handleRemove} />
+                                            <CartItem 
+                                                key={idx} 
+                                                item={item} 
+                                                formatPrice={formatPrice} 
+                                                onRemove={handleRemove} 
+                                                isChecked={selectedItemIds.includes(String(item.productId?._id || item.productId || ''))}
+                                                onToggle={handleToggleItem}
+                                            />
                                         ))}
                                     </div>
                                 )}

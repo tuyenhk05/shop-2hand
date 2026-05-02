@@ -90,7 +90,23 @@ exports.getOrderById = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
     try {
+        await cleanupExpiredOrders();
         const { buyerId, items, totalAmount, shippingAddress, buyerName, buyerPhone, paymentMethod } = req.body;
+
+        // --- Kiểm tra spam đơn hàng ---
+        if (buyerId) {
+            const recentPendingCount = await Order.countDocuments({
+                buyerId,
+                status: 'pending_payment',
+                createdAt: { $gte: new Date(Date.now() - 10 * 60 * 1000) }
+            });
+            if (recentPendingCount >= 3) {
+                return res.status(429).json({
+                    success: false,
+                    message: 'Bạn đang có quá nhiều đơn hàng chưa thanh toán. Vui lòng thanh toán các đơn hàng cũ trước hoặc thử lại sau 10 phút.'
+                });
+            }
+        }
 
         // --- 1. Atomic Concurrency Check (Chống mua trùng thời gian thực) ---
         const reservedProducts = [];
@@ -149,8 +165,12 @@ exports.createOrder = async (req, res) => {
         });
         await newOrder.save();
 
-        // Xoá giỏ hàng sau khi đặt thành công
-        await Cart.findOneAndUpdate({ userId: buyerId }, { items: [] });
+        // Xoá các sản phẩm đã thanh toán khỏi giỏ hàng
+        const purchasedProductIds = items.map(item => item.productId.toString());
+        await Cart.findOneAndUpdate(
+            { userId: buyerId },
+            { $pull: { items: { productId: { $in: purchasedProductIds } } } }
+        );
 
         res.status(201).json({ success: true, order: newOrder });
     } catch (error) {

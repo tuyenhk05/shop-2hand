@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .noto-serif { font-family: 'Noto Serif', serif; }
+        .manrope { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #fcf9f4;
+            color: #1c1c19;
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Custom scrollbar suppression */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#231a0a",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#f0ddc3",
+                        "primary-fixed-dim": "#b3cea7",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#849887",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c6c8b8",
+                        "surface-tint": "#4c6545",
+                        "background": "#fcf9f4",
+                        "primary-fixed": "#ceebc2",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "surface": "#fcf9f4",
+                        "inverse-surface": "#31302d",
+                        "on-primary-container": "#1b3116",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "tertiary-fixed": "#d3e8d5",
+                        "primary": "#4c6545",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-tertiary-container": "#1e3023",
+                        "on-surface-variant": "#46483c",
+                        "inverse-primary": "#b3cea7",
+                        "surface-dim": "#dcdad5",
+                        "tertiary": "#506354",
+                        "on-secondary-fixed-variant": "#514532",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f3f0eb",
+                        "primary-container": "#809b77",
+                        "on-surface": "#1c1c19",
+                        "on-error": "#ffffff",
+                        "secondary": "#6a5c48",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-primary-fixed": "#0a2007",
+                        "secondary-fixed": "#f3e0c6",
+                        "surface-bright": "#fcf9f4",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "on-secondary-container": "#6e614c",
+                        "surface-variant": "#e5e2dd",
+                        "outline": "#76786b",
+                        "surface-container-low": "#f6f3ee",
+                        "surface-container-high": "#ebe8e3",
+                        "surface-container": "#f0ede8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface selection:bg-primary-fixed">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 z-50 w-full flex justify-between items-center px-6 h-16 bg-[#fcf9f4]/80 backdrop-blur-xl shadow-sm shadow-black/5">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[#4c6545] cursor-pointer" data-icon="menu">menu</span>
+</div>
+<h1 class="text-2xl font-bold tracking-widest text-[#4c6545] noto-serif">Atelier</h1>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[#4c6545] cursor-pointer" data-icon="shopping_bag">shopping_bag</span>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-20 pb-32 px-5 max-w-screen-xl mx-auto">
+<!-- Editorial Header Section -->
+<section class="mb-10">
+<span class="manrope text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/70 mb-2 block font-semibold">Lưu trữ Di sản</span>
+<h2 class="noto-serif text-4xl font-bold tracking-tighter text-on-surface leading-tight">Tuyển tập<br/>Đồ hiệu Lưu trữ</h2>
+</section>
+<!-- Search & Photo Input Area -->
+<section class="mb-8 relative">
+<div class="flex gap-3 items-center">
+<div class="relative flex-1 group">
+<input class="w-full bg-surface-container-highest border-none rounded-xl py-4 pl-12 pr-4 focus:ring-0 focus:bg-surface-container-lowest transition-all placeholder:text-on-surface-variant/50 manrope text-sm" placeholder="Tìm kiếm báu vật..." type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/60" data-icon="search">search</span>
+</div>
+<button class="bg-primary text-on-primary p-4 rounded-xl flex items-center justify-center shadow-lg shadow-primary/10 active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="add_a_photo">add_a_photo</span>
+</button>
+</div>
+</section>
+<!-- Smart Filters Section -->
+<section class="mb-10 -mx-5 px-5 overflow-x-auto no-scrollbar">
+<div class="flex flex-col gap-5 min-w-max">
+<!-- Filter Category: Era -->
+<div class="flex items-center gap-3">
+<span class="manrope text-[11px] font-bold text-primary w-20">Kỷ nguyên</span>
+<div class="flex gap-2">
+<span class="px-4 py-1.5 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-[12px] font-semibold manrope cursor-pointer">Tất cả</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Thập niên 90</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Cổ điển (Pre-70s)</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Hiện đại</span>
+</div>
+</div>
+<!-- Filter Category: Condition -->
+<div class="flex items-center gap-3">
+<span class="manrope text-[11px] font-bold text-primary w-20">Tình trạng</span>
+<div class="flex gap-2">
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Mới với tag</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Xuất sắc</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Đã qua sử dụng tốt</span>
+</div>
+</div>
+<!-- Filter Category: Rarity -->
+<div class="flex items-center gap-3">
+<span class="manrope text-[11px] font-bold text-primary w-20">Độ hiếm</span>
+<div class="flex gap-2">
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Sưu tầm</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Cực hiếm</span>
+<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full text-[12px] manrope hover:bg-surface-container-high transition-colors cursor-pointer">Phổ thông</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Grid (Asymmetric) -->
+<div class="grid grid-cols-2 gap-x-4 gap-y-10">
+<!-- Product Card 1 -->
+<div class="flex flex-col group">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-4 aspect-[4/5]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A vintage luxury leather handbag sitting elegantly on a polished marble surface. The lighting is soft and warm, highlighting the fine stitching and aged patina of the brown leather. The overall aesthetic is high-end editorial with a focus on sustainable heritage. Subtle shadows give a sense of depth and quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuk7W4HaxtkXbUli3x9pdVAMsgzOY6VEs4O7VuQX2IV8MVEmcITy27Yjf47y9h6GYLkPwPCvlBC8Z7vKueVfvB9ylSlg4Tc_vs_o25Hn5O-le87_iQMqikwAI9r17ACePfDOHwFS8-G8xfV9Mb-JIGpVpO7oztmLJyGM3BecXURDjCq9EMNN2lk8yEonSbnqz8-lSH8E0Ta9dJkn7or4t3hn2V8PReOHkHo-X-62HqNwWvHY8iwXVA52qWTmbQw-UyEvVHnK9L_t9f"/>
+<div class="absolute top-3 left-3">
+<span class="bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded text-[10px] font-bold manrope tracking-wider uppercase">Sưu tầm</span>
+</div>
+<button class="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-md p-2 rounded-full text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<span class="manrope text-[11px] text-on-surface-variant/70 uppercase tracking-tighter mb-1">Hermès • 1992</span>
+<h3 class="noto-serif text-[15px] font-bold leading-tight mb-2">Túi Kelly Sellier 28 Vintage</h3>
+<div class="flex items-center justify-between">
+<span class="manrope text-[14px] font-bold text-primary">342.000.000đ</span>
+<span class="manrope text-[10px] text-on-surface-variant">Xuất sắc</span>
+</div>
+</div>
+<!-- Product Card 2 (Offset/Asymmetric) -->
+<div class="flex flex-col group mt-8">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-4 aspect-[4/6]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A close-up shot of an iconic vintage luxury watch featuring a gold bezel and a delicate leather strap. The watch rests on a piece of raw linen fabric, emphasizing a natural and organic luxury aesthetic. The scene is bathed in natural daylight, creating a clean and bright atmosphere that highlights the intricate details of the dial." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkkZ_LoNff1wTUsapLO_bEIgKPj-fXD7TZxEVGfAKYf1fcU9zyEwqoR-sR-6KPyrwEzIsPKq_WU8R9VOMBvGfZaHYhkhFgWY4a4cb_uj7cBNyhgE1ye2RxOWKYsgfU1xoVOu967X_cy0S9mEMH9nww85xvBZr9YH18JpieHDfj2DsFrFnn1BV9TyuC-FOjjdPh02HGDM01O7C82UyL6hc1CS55S8Lra1pl0uvJpPW7FNiUQacVgAZz7apJ71vmOt4o5ELBzh6NOoqF"/>
+<div class="absolute top-3 left-3">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 rounded text-[10px] font-bold manrope tracking-wider uppercase">Hiếm</span>
+</div>
+<button class="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-md p-2 rounded-full text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<span class="manrope text-[11px] text-on-surface-variant/70 uppercase tracking-tighter mb-1">Cartier • 1970s</span>
+<h3 class="noto-serif text-[15px] font-bold leading-tight mb-2">Đồng hồ Tank Louis Cartier</h3>
+<div class="flex items-center justify-between">
+<span class="manrope text-[14px] font-bold text-primary">185.500.000đ</span>
+<span class="manrope text-[10px] text-on-surface-variant">Rất tốt</span>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="flex flex-col group -mt-4">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-4 aspect-[4/5]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A pair of high-fashion designer loafers styled against a minimal concrete background. The lighting is directional, casting artistic shadows that emphasize the sleek silhouette and premium material. The composition is asymmetrical and modern, representing a curated archive of contemporary luxury fashion." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiHPjB3u1k967Xea87Sl9l91haUF3LS6OtGWbo647gKqegEhFnmBM9lu0M5t_np0UUUZdU2HTkSFTfyShCgx7jbVBM6yL26dWrmMyyVEPbjIlYu6UWd7ulmMobOeB68x5M8auiWEfRwL5aKQ04YosT4pCRVTh1-1q0NMDhJ-EWUYCEe0d13MI-z4_kQP1oc711FxbdCkm1uyYsJcLkSUUEM9TnoEXbzsi_qu1v6QxHclFoCQ63NYz1e9X5IEjI0QB9cK7p34IzrBsD"/>
+<button class="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-md p-2 rounded-full text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<span class="manrope text-[11px] text-on-surface-variant/70 uppercase tracking-tighter mb-1">Gucci • 2015</span>
+<h3 class="noto-serif text-[15px] font-bold leading-tight mb-2">Loafer Da Horsebit Cổ điển</h3>
+<div class="flex items-center justify-between">
+<span class="manrope text-[14px] font-bold text-primary">12.800.000đ</span>
+<span class="manrope text-[10px] text-on-surface-variant">Như mới</span>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col group mt-4">
+<div class="relative overflow-hidden rounded-xl bg-surface-container-low mb-4 aspect-[4/5]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A sophisticated silk scarf with intricate heritage patterns draped over a minimalist wooden chair. The colors are muted earth tones like sage and oatmeal, matching the eco-aesthetic. The lighting is diffused, giving the silk a soft, lustrous sheen that speaks to timeless quality and quiet luxury." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgr6H3v-Ee_1aE_5twmPNPCzBjgFoGrACRP3NOFy6QSXXx2b7w7PE632uS1Gk14oACs5db-Dm7inQHLMkmdKAWYxQkWXBN1IL-dmbO0pk4bfuQs7TXEucxM7C2AjAGHzSfHWwHnqnjbfF8k4oqGj-cp6SO6oaFfbIYuE1HI-FV3W3T_POesJYh_FLJFqh92plDpeF5lkSD3iesbNfpFDf2vmqAIhnR5n5odUwN_dNk-Hf9bTtwlhl2APZkkB1BXwKMwmmFyItYDe7w"/>
+<div class="absolute top-3 left-3">
+<span class="bg-tertiary-container text-on-tertiary-container px-2 py-0.5 rounded text-[10px] font-bold manrope tracking-wider uppercase">Di sản</span>
+</div>
+<button class="absolute bottom-3 right-3 bg-surface/90 backdrop-blur-md p-2 rounded-full text-on-surface shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="favorite">favorite</span>
+</button>
+</div>
+<span class="manrope text-[11px] text-on-surface-variant/70 uppercase tracking-tighter mb-1">Chanel • Archive</span>
+<h3 class="noto-serif text-[15px] font-bold leading-tight mb-2">Khăn Lụa Họa Tiết Baroque</h3>
+<div class="flex items-center justify-between">
+<span class="manrope text-[14px] font-bold text-primary">9.400.000đ</span>
+<span class="manrope text-[10px] text-on-surface-variant">Xuất sắc</span>
+</div>
+</div>
+</div>
+<!-- Pagination/Load More Footer -->
+<div class="mt-16 flex flex-col items-center gap-4">
+<button class="px-8 py-3 bg-surface-container-low text-on-surface-variant manrope text-xs font-bold tracking-widest uppercase rounded-full hover:bg-surface-container-high transition-colors">Xem thêm báu vật</button>
+<p class="manrope text-[11px] text-on-surface-variant/50">Đang hiển thị 4 trong số 128 sản phẩm lưu trữ</p>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-[#fcf9f4]/90 backdrop-blur-lg flex justify-around items-center px-4 pb-6 pt-3 shadow-[0_-4px_24px_0_rgba(0,0,0,0.04)] rounded-t-3xl">
+<div class="flex flex-col items-center justify-center text-[#46483c] opacity-60 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Trang chủ</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#4c6545] bg-[#f0ddc3]/30 rounded-full px-4 py-1 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="search_luxury">search</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Khám phá</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#46483c] opacity-60 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="favorite">favorite</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Yêu thích</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#46483c] opacity-60 hover:opacity-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Tài khoản</span>
+</div>
+</nav>
+<!-- Floating Eco Badge (Optional interaction) -->
+<div class="fixed bottom-24 right-5 z-40">
+<div class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-2xl shadow-primary/40">
+<span class="material-symbols-outlined" data-icon="eco">eco</span>
+</div>
+</div>
+</body></html>

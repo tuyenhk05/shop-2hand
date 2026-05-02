@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const productsController = require('../../controllers/client/products.controller');
 const authMiddleware = require('../../middleware/auth.middleware');
 
@@ -8,6 +8,7 @@ const router = express.Router();
 // 1. PUBLIC ROUTES
 // ==========================================
 router.get('/', productsController.getAllProducts);
+router.get('/recommendations', authMiddleware, productsController.getRecommendations);
 
 // 🟢 IMAGE ROUTES (Phải đặt TRÊN các route /:id)
 router.get('/:productId/images', productsController.getImagesByProductId);

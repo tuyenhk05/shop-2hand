@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CartItem = ({ item, formatPrice, onRemove }) => {
+const CartItem = ({ item, formatPrice, onRemove, isChecked, onToggle }) => {
     const product = item.productId || item;
 
     // Lấy ảnh từ mảng images[] — cùng logic với Store, Wishlist
@@ -14,7 +14,13 @@ const CartItem = ({ item, formatPrice, onRemove }) => {
     };
 
     return (
-        <div className="flex gap-4 group">
+        <div className="flex gap-4 group items-center">
+            <input 
+                type="checkbox" 
+                checked={isChecked} 
+                onChange={() => onToggle(product._id || product)}
+                className="w-5 h-5 accent-primary cursor-pointer shrink-0 rounded border-outline-variant focus:ring-primary/30"
+            />
             <div className="w-20 h-24 bg-surface-container-highest rounded-lg overflow-hidden flex-shrink-0 relative">
                 <img
                     alt={product.title || product.name}

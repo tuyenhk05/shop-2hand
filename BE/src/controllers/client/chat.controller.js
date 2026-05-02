@@ -44,8 +44,21 @@ const sanitizeInput = (text) => {
     return sanitized.trim();
 };
 
+// Tự động xóa các đoạn chat AI đã cũ quá 30 ngày
+const cleanupOldChats = async () => {
+    try {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        await Chat.deleteMany({
+            updatedAt: { $lt: thirtyDaysAgo }
+        });
+    } catch (error) {
+        console.error('Error during cleanupOldChats:', error);
+    }
+};
+
 module.exports.chatWithAI = async (req, res) => {
     try {
+        await cleanupOldChats();
         const { message, history, sessionId } = req.body;
         const userId = req.user ? req.user.id : null;
 
@@ -59,9 +72,9 @@ module.exports.chatWithAI = async (req, res) => {
 
         // --- SMART CONTEXT INJECTION (TÌM KIẾM THEO TỪ KHÓA) ---
         let query = { status: 'active' };
-        
+
         // 1. Loại bỏ các từ khóa giao tiếp thông thường để trích xuất từ khóa sản phẩm
-        const stopWords = ['mình','muốn','tìm','mua','xem','cái','chiếc','bạn','ơi','shop','có','không','cho','hỏi','tư','vấn','giúp','chào','ạ','nhé','nha','với','đang','cần','gì','nào','đâu'];
+        const stopWords = ['mình', 'muốn', 'tìm', 'mua', 'xem', 'cái', 'chiếc', 'bạn', 'ơi', 'shop', 'có', 'không', 'cho', 'hỏi', 'tư', 'vấn', 'giúp', 'chào', 'ạ', 'nhé', 'nha', 'với', 'đang', 'cần', 'gì', 'nào', 'đâu'];
         const cleanStr = cleanMessage.replace(/[^\w\s\u00C0-\u1EF9]/g, ' ').toLowerCase();
         const words = cleanStr.split(/\s+/);
         const keywords = words.filter(w => !stopWords.includes(w) && w.trim() !== '');
@@ -80,24 +93,24 @@ module.exports.chatWithAI = async (req, res) => {
 
         // 3. Tìm sản phẩm theo từ khóa
         let activeProducts = await Product.find(query)
-                                          .limit(15)
-                                          .select('title price condition size color slug _id');
-        
+            .limit(15)
+            .select('title price condition size color slug _id');
+
         // 4. Nếu không tìm thấy sản phẩm nào khớp, fallback về 15 sản phẩm mới nhất
         if (activeProducts.length === 0) {
             console.log("No matching products found. Falling back to latest products.");
             activeProducts = await Product.find({ status: 'active' })
-                                          .sort({ createdAt: -1 }) // Lấy mới nhất
-                                          .limit(15)
-                                          .select('title price condition size color slug _id');
+                .sort({ createdAt: -1 }) // Lấy mới nhất
+                .limit(15)
+                .select('title price condition size color slug _id');
         }
-        
+
         let productsContext = `\n\n--- SẢN PHẨM HIỆN CÓ TẠI SHOP ---\n`;
         if (activeProducts.length > 0) {
             // Fetch primary images for these products
             const productIds = activeProducts.map(p => p._id);
             const images = await ProductImage.find({ productId: { $in: productIds }, isPrimary: true });
-            
+
             productsContext += activeProducts.map(p => {
                 const img = images.find(i => i.productId.toString() === p._id.toString());
                 const imgUrl = img ? img.imageUrl : 'https://placehold.co/400?text=No+Image';
@@ -156,7 +169,7 @@ module.exports.chatWithAI = async (req, res) => {
                 }
             });
         }
-        
+
         chat.messages.push({ role: 'user', content: cleanMessage });
         chat.messages.push({ role: 'model', content: botResponse });
         await chat.save();
@@ -168,8 +181,8 @@ module.exports.chatWithAI = async (req, res) => {
 
     } catch (error) {
         console.error("Gemini Controller Error Details:", error);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: "AI đang bận một chút, bạn thử lại sau nhé! 😅",
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });

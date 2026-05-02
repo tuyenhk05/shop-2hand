@@ -27,3 +27,16 @@ export const getProductById = async (id) => {
         }
     }
 };
+export const getRecommendationsApi = async () => {
+    try {
+        const result = await get(`/products/recommendations`);
+        return result;
+    }
+    catch (error) {
+        console.error('Get recommendations service error:', error);
+        return {
+            success: false,
+            message: 'Lỗi kết nối. Vui lòng thử lại.'
+        }
+    }
+};

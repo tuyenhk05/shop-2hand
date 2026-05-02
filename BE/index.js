@@ -17,7 +17,7 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3001';
 // ✅ Security & CORS
 app.use(helmet());
 app.use(cors({
-  origin: CLIENT_URL,
+  origin: true, // Allow any origin to connect (fixes CORS for Expo Web)
   credentials: true
 }));
 
@@ -62,7 +62,7 @@ app.use((req, res) => {
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true
   }

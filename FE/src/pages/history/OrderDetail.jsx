@@ -130,7 +130,13 @@ const OrderDetail = () => {
     if (isLoading) return <Loading fullScreen={false} text="Đang tải chi tiết đơn hàng..." />;
     if (!order) return <div className="pt-32 pb-20 text-center font-bold text-lg">Không tìm thấy đơn hàng.</div>;
 
-    const co2Saved = order.co2Saved || '12.5'; // hardcode fallback like standard page
+    let itemCount = 0;
+    if (order && order.items && Array.isArray(order.items)) {
+        order.items.forEach(item => {
+            itemCount += (item.quantity || 1);
+        });
+    }
+    const co2Saved = itemCount * 14;
 
     return (
         <main className="pt-32 pb-20 max-w-5xl mx-auto px-6 font-manrope">

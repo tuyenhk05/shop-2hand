@@ -142,7 +142,7 @@ const ProductDetail = () => {
     // Calculate dynamic fake metrics
     const rrpPrice = product ? Math.round(product.price * 2.2 / 1000) * 1000 : 0;
     const savePercent = product ? Math.round(((rrpPrice - product.price) / rrpPrice) * 100) : 0;
-    const co2Saved = product ? (product.price / 100000).toFixed(1) : 0;
+    const co2Saved = 14;
     const waterSaved = product ? Math.round(product.price / 500) : 0;
     const pastPrice1 = product ? Math.round(product.price * 0.75) : 0;
     const pastPrice2 = product ? Math.round(product.price * 0.88) : 0;

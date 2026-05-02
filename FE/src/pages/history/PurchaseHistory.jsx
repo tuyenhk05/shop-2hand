@@ -21,8 +21,13 @@ const PurchaseHistory = () => {
     const totalCarbonSaved = React.useMemo(() => {
         return orders.reduce((total, order) => {
             if (order.status !== 'cancelled' && order.status !== 'returned') {
-                const itemCount = order.items?.length || 1;
-                return total + (itemCount * 1.5);
+                let itemCount = 0;
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        itemCount += (item.quantity || 1);
+                    });
+                }
+                return total + (itemCount * 14);
             }
             return total;
         }, 0);

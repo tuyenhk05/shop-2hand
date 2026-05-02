@@ -1,11 +1,45 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import useScrollToTop from '../../hooks/useScrollToTop';
+import { getOrdersApi } from '../../services/client/order.service';
 
 const Sustain = () => {
     useScrollToTop();
     const navigate = useNavigate();
+    const userId = useSelector((state) => state.auth.userId);
+    const [userPurchasedItems, setUserPurchasedItems] = useState(0);
+
+    useEffect(() => {
+        const fetchOrderHistory = async () => {
+            if (!userId) {
+                setUserPurchasedItems(0);
+                return;
+            }
+            try {
+                const res = await getOrdersApi(userId);
+                if (res && res.success && res.orders) {
+                    const validOrders = res.orders.filter(ord => ord.status !== 'cancelled');
+                    let itemsCount = 0;
+                    validOrders.forEach(order => {
+                        if (order.items && Array.isArray(order.items)) {
+                            order.items.forEach(item => {
+                                itemsCount += (item.quantity || 1);
+                            });
+                        }
+                    });
+                    setUserPurchasedItems(itemsCount);
+                }
+            } catch (error) {
+                console.error("Fetch orders error:", error);
+            }
+        };
+        fetchOrderHistory();
+    }, [userId]);
+
+    const totalCO2Saved = userPurchasedItems * 14;
+    const carbonOffsetPercent = userPurchasedItems > 0 ? Math.min((userPurchasedItems / 10) * 100, 100) : 0;
 
     return (
         <main className="pt-10 md:pt-24 pb-32">
@@ -104,13 +138,13 @@ const Sustain = () => {
                             <div className="flex justify-between items-end mb-8">
                                 <div>
                                     <span className="text-[10px] uppercase tracking-widest opacity-70 block mb-1">Tác động của bạn</span>
-                                    <span className="font-notoSerif text-3xl font-bold">Đã tiết kiệm 12.4kg CO2</span>
+                                    <span className="font-notoSerif text-3xl font-bold">Đã tiết kiệm {totalCO2Saved}kg CO2</span>
                                 </div>
                                 <span className="material-symbols-outlined text-primary-fixed text-4xl" data-icon="psychology_alt">psychology_alt</span>
                             </div>
                             <div className="h-1.5 w-full bg-on-primary/20 rounded-full relative mb-4">
-                                <div className="absolute top-0 left-0 h-full w-3/4 bg-primary-fixed rounded-full"></div>
-                                <div className="absolute top-1/2 left-3/4 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-lg border-4 border-primary"></div>
+                                <div className="absolute top-0 left-0 h-full bg-primary-fixed rounded-full" style={{ width: `${carbonOffsetPercent}%` }}></div>
+                                <div className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-lg border-4 border-primary" style={{ left: `${carbonOffsetPercent}%` }}></div>
                             </div>
                             <p className="text-[10px] uppercase tracking-widest text-center opacity-60">Xác thực đảm bảo chất lượng bền lâu.</p>
                         </div>

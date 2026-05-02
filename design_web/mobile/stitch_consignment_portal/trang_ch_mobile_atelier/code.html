@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed": "#231a0a",
+                    "error": "#ba1a1a",
+                    "secondary-container": "#f0ddc3",
+                    "primary-fixed-dim": "#b3cea7",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1c1c19",
+                    "on-tertiary-fixed-variant": "#394b3d",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#849887",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#c6c8b8",
+                    "surface-tint": "#4c6545",
+                    "background": "#fcf9f4",
+                    "primary-fixed": "#ceebc2",
+                    "tertiary-fixed-dim": "#b7ccb9",
+                    "surface": "#fcf9f4",
+                    "inverse-surface": "#31302d",
+                    "on-primary-container": "#1b3116",
+                    "on-tertiary-fixed": "#0e1f13",
+                    "tertiary-fixed": "#d3e8d5",
+                    "primary": "#4c6545",
+                    "surface-container-highest": "#e5e2dd",
+                    "on-tertiary-container": "#1e3023",
+                    "on-surface-variant": "#46483c",
+                    "inverse-primary": "#b3cea7",
+                    "surface-dim": "#dcdad5",
+                    "tertiary": "#506354",
+                    "on-secondary-fixed-variant": "#514532",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#f3f0eb",
+                    "primary-container": "#809b77",
+                    "on-surface": "#1c1c19",
+                    "on-error": "#ffffff",
+                    "secondary": "#6a5c48",
+                    "on-primary-fixed-variant": "#354d2f",
+                    "on-primary-fixed": "#0a2007",
+                    "secondary-fixed": "#f3e0c6",
+                    "surface-bright": "#fcf9f4",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#d6c4ab",
+                    "on-secondary-container": "#6e614c",
+                    "surface-variant": "#e5e2dd",
+                    "outline": "#76786b",
+                    "surface-container-low": "#f6f3ee",
+                    "surface-container-high": "#ebe8e3",
+                    "surface-container": "#f0ede8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Noto Serif"],
+                    "display": ["Noto Serif"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .noto-serif { font-family: 'Noto Serif', serif; }
+        .manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface manrope selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top App Bar -->
+<header class="bg-[#fcf9f4]/80 backdrop-blur-xl dark:bg-stone-900/80 fixed top-0 z-50 w-full flex justify-between items-center px-6 h-16 shadow-sm shadow-black/5">
+<button class="text-[#4c6545] hover:bg-[#f6f3ee] transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-2xl font-bold tracking-widest text-[#4c6545] noto-serif">Atelier</h1>
+<button class="text-[#4c6545] hover:bg-[#f6f3ee] transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+</header>
+<main class="pt-16 pb-32">
+<!-- Hero Section -->
+<section class="relative px-6 pt-8 overflow-hidden">
+<div class="grid grid-cols-12 gap-4 items-end">
+<div class="col-span-8">
+<h2 class="text-5xl font-display font-bold leading-tight tracking-tighter text-on-surface">
+                        Sự Cổ điển <br/> <span class="italic font-normal">Mới</span>
+</h2>
+<p class="mt-4 text-on-surface-variant text-sm max-w-[200px] leading-relaxed">
+                        Khám phá bộ sưu tập thời trang bền vững được tuyển chọn với tâm hồn nghệ sĩ.
+                    </p>
+</div>
+<div class="col-span-4 aspect-[3/4] rounded-xl bg-surface-container-high overflow-hidden shadow-sm">
+<img alt="Sự Cổ điển Mới" class="w-full h-full object-cover" data-alt="A sophisticated editorial fashion photograph of a woman wearing a high-end vintage oversized wool blazer in earthy olive tones. She stands against a minimalist, warm oatmeal-colored studio wall with soft natural shadows. The lighting is bright and airy, reflecting a modern eco-aesthetic. The mood is serene, focused on the quality and texture of the sustainable fabric." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArKhoDo0DH7Y1CXwFSndwpGqVaAVfXgqeC218Do-L4y0iVmkOFI91jZjqp7CP-7Y1BC5HA40npd_QhcRFPegdIswDPiQRCEgQ4cOdXVAdWerwEmJZllmXGr8sNYVdoxMeXkxDYO7j5AsYBeZFm0j9utmqEqjhgt7GFLFDcLiVWgS7CrlT-ogAho9_2Uf2owSYuHM16_jd5HAETrTzHCdOeKfEwQVVW7VdU3ICAFREkPT1xZNvnvZYyNjpks52FnxjeYtScSkd_NBgn"/>
+</div>
+</div>
+<div class="mt-8 flex gap-4">
+<button class="bg-primary text-on-primary px-6 py-3 rounded-md font-label font-semibold text-sm flex items-center gap-2 shadow-sm active:scale-95 transition-transform">
+                    Mua ngay
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-3 rounded-md font-label font-semibold text-sm active:scale-95 transition-transform">
+                    Xem lookbook
+                </button>
+</div>
+</section>
+<!-- Eco Impact Section -->
+<section class="mt-12 px-6">
+<div class="bg-surface-container-low rounded-3xl p-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="eco" style="font-variation-settings: 'FILL' 1;">eco</span>
+                        Dấu chân Sinh thái
+                    </h3>
+<span class="text-xs font-bold bg-tertiary-container text-on-tertiary-container px-2 py-1 rounded-full uppercase tracking-wider">Provenance</span>
+</div>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between text-xs font-medium mb-2">
+<span class="text-on-surface-variant">CO2 Tiết kiệm</span>
+<span class="text-primary font-bold">12.5 kg</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[65%]"></div>
+</div>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                        Dựa trên lịch sử mua sắm đồ cũ của bạn, bạn đã giúp giảm thiểu lượng khí thải tương đương với việc trồng 2 cây xanh.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Smart Wardrobe Assistant Widget (Bento Style) -->
+<section class="mt-10 px-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2 bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm">
+<div class="flex items-start justify-between mb-4">
+<div>
+<h3 class="font-bold text-on-surface text-base">Trợ lý Tủ đồ Thông minh</h3>
+<p class="text-xs text-on-surface-variant">Phối đồ cho hôm nay • 24°C Nắng nhẹ</p>
+</div>
+<span class="material-symbols-outlined text-primary-container" data-icon="magic_button" style="font-variation-settings: 'FILL' 1;">magic_button</span>
+</div>
+<div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+<div class="flex-shrink-0 w-20 h-24 rounded-xl bg-surface-container-low border border-outline-variant/10 overflow-hidden">
+<img alt="Item 1" class="w-full h-full object-cover grayscale-[30%]" data-alt="A close-up studio shot of a high-quality beige linen shirt folded neatly on a flat wooden surface. The lighting is soft and even, highlighting the organic texture of the fabric. The color palette is composed of soft neutrals and warm wood tones, maintaining a clean, minimalist, and eco-friendly aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHJgsZViKvirMzLuzrCIPkQKJjx_LAiWRI6qNgc7jcTroeg710HGKnncs_kgh4D8dpByKcHmZHIy_ibDsI1yV13qE7odcKyALPFCaI3TjXhRVijt1TrmA_PmY-frk948kJSuOckjYAD8tf_iRwqDZ5fPPP3W9uf0sODCXYIm8sJ3G8OTKCEwzv05N5f6ny_VBccWupE95KstwNF6EZlk0fNn3VVpD6Enttf_3bxxHY4AeLhcaF_yGEB1oCEkkw406CkIaqeCeosE0-"/>
+</div>
+<div class="flex-shrink-0 w-20 h-24 rounded-xl bg-surface-container-low border border-outline-variant/10 overflow-hidden">
+<img alt="Item 2" class="w-full h-full object-cover" data-alt="A pairs of dark indigo raw denim jeans laid out on a light-colored stone floor. The lighting is natural and directional, creating soft depth. The image captures the authentic and durable quality of sustainable denim, consistent with a high-end vintage marketplace aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiVL6w6kuPTgwudoqd38YJrzC688CDC3lTxxtVHncZGrCzHkfYOAenCmGhM_q-BXwVQD42K0ujGqzY3PppQNVavYZH8eeF2hHrTrWFTaZ9XKibQug91DtNLq4FvvDfcOqPgUV80W3UodHRGAAu6teYAYDrtK3ik8OMY_UKMuraR0vCrv3kUOeKlogH7Xy-_iiwK8rt9tcARDMoO5fUOq17MXGX-R10dWfSDxSBDzsmijCtcN9l5--fxfSt16iDDCfg9BYKIz7zyi52"/>
+</div>
+<div class="flex-shrink-0 w-24 h-24 rounded-xl bg-primary-fixed-dim/30 border border-primary/10 flex flex-col items-center justify-center text-primary italic text-[10px] px-2 text-center">
+<span class="material-symbols-outlined mb-1" data-icon="add_circle">add_circle</span>
+                            Gợi ý phụ kiện
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- New Arrivals Grid -->
+<section class="mt-12 px-6">
+<div class="flex justify-between items-end mb-6">
+<h3 class="font-headline font-bold text-2xl text-on-surface">Hàng mới về</h3>
+<a class="text-xs font-bold text-primary border-b border-primary/30 pb-0.5" href="#">Tất cả</a>
+</div>
+<div class="grid grid-cols-2 gap-x-4 gap-y-10">
+<!-- Product Card 1 -->
+<div class="group">
+<div class="relative aspect-[4/5] rounded-2xl bg-surface-container-high overflow-hidden mb-3">
+<img alt="Wool Coat" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A full-length fashion shot of a model wearing a tailored charcoal grey wool coat from a premium second-hand collection. The setting is a quiet, cobblestone street at dusk with soft golden hour light. The overall mood is sophisticated and timeless, emphasizing high-end sustainable fashion choices." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWIqWpEn5fTUJmOAx-3qmeTVOKf47H_V8kULBykKAeqWR1jIqKtdbJwrwXrgM4JUX5Taw6-pGKAcS72DM6Cbh6SthVYuEPkYjmuWJV_L9DUjD-SnGlZ0meCz7Q7yoa-EQJnPh3OC00sU9la8b0MLWcPfsBB1_Ub_UQzQSbdYfkAgB8SPHKFoZRu5gK23_OR8VL8gBhU_jhuHFdTQOY434Q-H_rTEnWlx9yQlSIvDrgIueK_-MzU9teu759XSaMxlOVR-vFsirHvYj4"/>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="favorite">favorite</span>
+</button>
+<div class="absolute bottom-3 left-3 bg-primary text-on-primary text-[10px] px-2 py-0.5 rounded-full font-bold">
+                            Rare Find
+                        </div>
+</div>
+<h4 class="font-bold text-sm text-on-surface">Áo khoác Wool Dạ</h4>
+<p class="text-xs text-on-surface-variant mt-1">Atelier Archive • 2.450.000đ</p>
+</div>
+<!-- Product Card 2 -->
+<div class="group pt-6"> <!-- Asymmetric Offset -->
+<div class="relative aspect-[4/5] rounded-2xl bg-surface-container-high overflow-hidden mb-3">
+<img alt="Cashmere Sweater" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A minimalist studio photography shot of a high-neck cream-colored cashmere sweater draped elegantly on a sculptural mannequin. The background is a soft, warm beige with subtle textures. The lighting is diffuse and soft, creating a luxurious and clean eco-minimalist visual style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCu1Zj3DULiyspYDDeKH09wFh3JV-gaR3FqPwqW59EvfONe59_QOEI3UTJTIb3r8eajiJCDBufYTfLBNgHEhiFQKJZ3yiWkq0PVyFuI1itO6RHchvc_MVV-KKxBK4A0Ug-6ObKqlA5bEPbUchqM9u0nbiEGlDNP40G8b4Tey972V83fuKQy_AWvl3JNy4NHC0_J1Fx_a9lGF7fbXm5d0svuQaBuEsxFSmqIfQW4FIlkWftyRfqC7O56XvBcskQLaRG3Yp_9KDNAwyIC"/>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="favorite">favorite</span>
+</button>
+</div>
+<h4 class="font-bold text-sm text-on-surface">Cashmere Sweater</h4>
+<p class="text-xs text-on-surface-variant mt-1">Vintage 90s • 1.800.000đ</p>
+</div>
+<!-- Product Card 3 -->
+<div class="group">
+<div class="relative aspect-[4/5] rounded-2xl bg-surface-container-high overflow-hidden mb-3">
+<img alt="T-shirt" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="A close-up image of a high-quality black organic cotton t-shirt with a subtle embroidered logo on the chest. The fabric texture is clearly visible, illuminated by soft side-lighting in a modern minimalist interior. The aesthetic is clean and focused on essential, high-durability wardrobe staples." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxccSNZh02x4l7Mn2VXvF7Vm1Njf-QaIzmWbmUSNY0bmL_-4VSKRi-cxoE2PVAZT_1eDMmMso0jzzPC4JHEgaWnhoUnLpmttnB2H6ne2R4nRowM-zrXiId6KHt91kGBxnk34qKdjvGHyijPyAdzyhjsrnehcZatF6w9bF9ophLTx9RlbE2W0GpXfOVQU2uB8T-ANg56wTRHCtvAZ9fgkSxwC7kRrsXRHIUlxMnmD44UgvLNZyfBxkljyPCn5RQjp4jpZLdMws10NQB"/>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="favorite">favorite</span>
+</button>
+</div>
+<h4 class="font-bold text-sm text-on-surface">Cotton Essential Tee</h4>
+<p class="text-xs text-on-surface-variant mt-1">New Collection • 450.000đ</p>
+</div>
+<!-- Product Card 4 -->
+<div class="group pt-6"> <!-- Asymmetric Offset -->
+<div class="relative aspect-[4/5] rounded-2xl bg-surface-container-high overflow-hidden mb-3">
+<img alt="Accessories" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="An artistic flat-lay photograph featuring a pair of well-crafted tan leather boots alongside a vintage leather camera bag on a light oak wooden floor. The composition is airy and balanced, lit by morning sunlight through a window. The mood is nostalgic yet premium, emphasizing long-lasting quality materials." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmK81XcluJSog0txvz4oshenf2Xs9PRZ2J6LjdJ48N2GQzQ5SABr_Jf24JoQ3UzIA8rkGGaRobIkys2J83-m6TQEV6wz64pqFmpDPg6Alv7m-tVHzu6oWV5ZPcF7Ez0uUki2w0QXvGsGBM23r74MG8xpeP0lKdWqHFWjsDumbZWVhUq1SpTVunUeuitjTEYAxLJHXeu-E4t-LS5_2-ofvTXZeNXUI7kRWFIH_oDPG22O6LYvvMVdfwHQ0Nhei24Crs8T5nWO3P9vCD"/>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="favorite">favorite</span>
+</button>
+</div>
+<h4 class="font-bold text-sm text-on-surface">Heritage Boots</h4>
+<p class="text-xs text-on-surface-variant mt-1">Reconditioned • 3.200.000đ</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#fcf9f4]/90 backdrop-blur-lg rounded-t-3xl shadow-[0_-4px_24px_0_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-[#4c6545] bg-[#f0ddc3]/30 rounded-full px-4 py-1 active:scale-90 duration-300 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Trang chủ</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#46483c] opacity-60 hover:opacity-100 active:scale-90 duration-300 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="search_luxury">search</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Khám phá</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#46483c] opacity-60 hover:opacity-100 active:scale-90 duration-300 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Yêu thích</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#46483c] opacity-60 hover:opacity-100 active:scale-90 duration-300 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-sans text-[11px] font-medium tracking-wide manrope">Tài khoản</span>
+</a>
+</nav>
+</body></html>

@@ -168,17 +168,17 @@ const ClientLayout = () => {
                             Atelier.
                         </h2>
                         <p className="text-on-surface-variant font-body mb-6 max-w-sm leading-relaxed">
-                            Tham gia cộng đồng của chúng tôi để nhận đặc quyền truy cập sớm vào các bộ sưu tập archive, và theo dõi báo cáo tác động bền vững.
+                            Cùng Atelier lan tỏa thông điệp thời trang bền vững và tiêu dùng có ý thức vì một tương lai tốt đẹp hơn.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <input
-                                type="email"
-                                placeholder="Địa chỉ email của bạn"
-                                className="bg-surface border border-outline-variant/30 rounded-xl px-5 py-3 focus:ring-2 focus:ring-primary/30 outline-none w-full max-w-xs placeholder:text-outline/50 transition-colors"
-                            />
-                            <button className="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-sm hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-primary/10 w-fit">
-                                Đăng ký
-                            </button>
+                        <div className="flex flex-wrap gap-4 items-center">
+                            <span className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-xl border border-primary/20 text-xs font-bold uppercase tracking-widest">
+                                <span className="material-symbols-outlined text-sm">eco</span>
+                                Thời trang tuần hoàn
+                            </span>
+                            <span className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-xl border border-primary/20 text-xs font-bold uppercase tracking-widest">
+                                <span className="material-symbols-outlined text-sm">verified_user</span>
+                                100% Chính hãng
+                            </span>
                         </div>
                     </div>
 

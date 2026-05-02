@@ -46,9 +46,23 @@ const createConversation = async (req, res) => {
     }
 };
 
+// Tự động xóa các hội thoại đã đóng quá 30 ngày
+const cleanupClosedConversations = async () => {
+    try {
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        await SupportConversation.deleteMany({
+            status: 'closed',
+            updatedAt: { $lt: thirtyDaysAgo }
+        });
+    } catch (error) {
+        console.error('Error during cleanupClosedConversations:', error);
+    }
+};
+
 // Lấy danh sách hội thoại của khách hàng
 const getMyConversations = async (req, res) => {
     try {
+        await cleanupClosedConversations();
         const customerId = req.user.id;
         const conversations = await SupportConversation.find({ customerId })
             .sort({ lastMessageAt: -1 })

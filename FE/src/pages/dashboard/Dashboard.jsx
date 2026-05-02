@@ -148,11 +148,15 @@ const Dashboard = () => {
     }, [orders]);
 
     const totalCarbonSaved = useMemo(() => {
-        // Ước tính: Mỗi món đồ trong đơn hàng hợp lệ tiết kiệm được khoảng 1.5kg CO2
         return orders.reduce((total, order) => {
             if (order.status !== 'cancelled' && order.status !== 'returned') {
-                const itemCount = order.items?.length || 1;
-                return total + (itemCount * 1.5);
+                let itemCount = 0;
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => {
+                        itemCount += (item.quantity || 1);
+                    });
+                }
+                return total + (itemCount * 14);
             }
             return total;
         }, 0);
@@ -440,7 +444,7 @@ const Dashboard = () => {
                                         </div>
                                         <div className="bg-surface-container-highest p-4 rounded-xl border border-outline-variant/10 text-center">
                                             <span className="material-symbols-outlined text-primary text-2xl mb-1">co2</span>
-                                            <p className="text-xl font-notoSerif font-bold text-on-background">{consignments.filter(c => c.status !== 'rejected').length * 2.5}</p>
+                                            <p className="text-xl font-notoSerif font-bold text-on-background">{consignments.filter(c => c.status !== 'rejected').length * 14}</p>
                                             <p className="text-[9px] uppercase tracking-widest text-on-surface-variant mt-1">Kg CO2</p>
                                         </div>
                                     </div>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#231a0a",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#f0ddc3",
+                        "primary-fixed-dim": "#b3cea7",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1c19",
+                        "on-tertiary-fixed-variant": "#394b3d",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#849887",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c6c8b8",
+                        "surface-tint": "#4c6545",
+                        "background": "#fcf9f4",
+                        "primary-fixed": "#ceebc2",
+                        "tertiary-fixed-dim": "#b7ccb9",
+                        "surface": "#fcf9f4",
+                        "inverse-surface": "#31302d",
+                        "on-primary-container": "#1b3116",
+                        "on-tertiary-fixed": "#0e1f13",
+                        "tertiary-fixed": "#d3e8d5",
+                        "primary": "#4c6545",
+                        "surface-container-highest": "#e5e2dd",
+                        "on-tertiary-container": "#1e3023",
+                        "on-surface-variant": "#46483c",
+                        "inverse-primary": "#b3cea7",
+                        "surface-dim": "#dcdad5",
+                        "tertiary": "#506354",
+                        "on-secondary-fixed-variant": "#514532",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f3f0eb",
+                        "primary-container": "#809b77",
+                        "on-surface": "#1c1c19",
+                        "on-error": "#ffffff",
+                        "secondary": "#6a5c48",
+                        "on-primary-fixed-variant": "#354d2f",
+                        "on-primary-fixed": "#0a2007",
+                        "secondary-fixed": "#f3e0c6",
+                        "surface-bright": "#fcf9f4",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#d6c4ab",
+                        "on-secondary-container": "#6e614c",
+                        "surface-variant": "#e5e2dd",
+                        "outline": "#76786b",
+                        "surface-container-low": "#f6f3ee",
+                        "surface-container-high": "#ebe8e3",
+                        "surface-container": "#f0ede8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif"],
+                        "display": ["Noto Serif"],
+                        "body": ["Manrope"],
+                        "label": ["Manrope"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #fcf9f4; color: #1c1c19; }
+        .noto-serif { font-family: 'Noto Serif', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface selection:bg-primary-fixed">
+<!-- TopAppBar -->
+<header class="bg-[#fcf9f4]/80 backdrop-blur-xl dark:bg-stone-900/80 fixed top-0 z-50 w-full flex justify-between items-center px-6 h-16 shadow-sm shadow-black/5">
+<div class="flex items-center gap-4">
+<button class="text-[#4c6545] dark:text-[#ceebc2] hover:bg-[#f6f3ee] dark:hover:bg-stone-800 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+</div>
+<div class="noto-serif text-2xl font-bold tracking-widest text-[#4c6545] dark:text-[#ceebc2]">Atelier</div>
+<div class="flex items-center gap-2">
+<button class="text-[#4c6545] dark:text-[#ceebc2] hover:bg-[#f6f3ee] dark:hover:bg-stone-800 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</button>
+</div>
+</header>
+<main class="pt-16 pb-32">
+<!-- Hero Image Gallery -->
+<section class="relative">
+<div class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar aspect-[4/5]">
+<div class="snap-start min-w-full h-full bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="A luxurious vintage designer leather handbag presented against a soft, muted oatmeal background. The lighting is editorial and high-key, casting gentle shadows that emphasize the rich texture of the weathered leather. The overall aesthetic is minimalist and sophisticated, mirroring a high-end digital atelier. Deep forest green accents are subtly reflected in the polished brass hardware." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDknJodi3LZmkiTfjO88R3MRMY2ybrMS0yWPL3K_VK6mcYzw_IBIqDv3pq43yceCkO3NfMij9KpXeNFonXK1Pb7cAns77crxNW-GGL9HtIF28wc3XVFRTG-N5tcVHBMmzw4IWydF81vK7Iiq5KeJgdp2XK1dpfS28GhomcngbY6C_sVZcU8eN628wueUjCvvGq8hmaP-yXGjIJ1ZI2WkrG4UX7W34bPmJ59lr6TzslyhrRxywyehccwi_2xs_kQvnSo_rsWzUD_tPw2"/>
+</div>
+<div class="snap-start min-w-full h-full bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="Close-up detail of high-quality stitching on a premium vintage leather bag. The shot is a macro view emphasizing the craftsmanship and historical patina of the material. The lighting is soft and diffused, creating a serene, museum-like atmosphere. The color palette features warm earthy browns and sage green tones, maintaining the project's eco-conscious and luxury identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC78KwkyD1DUHeuBj1CqMyDv9FjzWymnDWAha41rz0sOSQUskO77PUr43Axr1LQm3e2MLiMc2s53G6zJ8Z2vBGhnUbz9yxNhF1p7gqrGovf8qIJhGaOSspI-oXhTOoYBTJwuZuHlggURyuBGnYepGf9GRR4RRcrx-jmn6kgGNrRwPAuF2ywlicD65dUW1osiXjotX24XbBUhyB3iz3PQaKgo7x-0jAvgNi_0ctMGEUNffOqWH7Wlzwf3FbeUz46gXh7sx6XVLI6CoqX"/>
+</div>
+</div>
+<!-- Provenance Badge -->
+<div class="absolute bottom-6 left-6">
+<span class="bg-tertiary-container text-on-tertiary-container text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
+                    Đã xác minh
+                </span>
+</div>
+<!-- Indicator Dots -->
+<div class="absolute bottom-6 right-6 flex gap-1.5">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface/20"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-on-surface/20"></div>
+</div>
+</section>
+<!-- Product Title & Basic Info -->
+<section class="px-6 pt-8">
+<div class="flex justify-between items-start mb-2">
+<h1 class="noto-serif text-3xl font-bold tracking-tight text-on-surface leading-tight max-w-[80%]">Túi Cầm Tay Hermès Vintage 1994</h1>
+<span class="material-symbols-outlined text-primary" data-icon="favorite">favorite</span>
+</div>
+<div class="flex items-baseline gap-3 mb-6">
+<span class="text-2xl font-semibold text-primary">42.500.000₫</span>
+<span class="text-on-surface-variant text-sm line-through opacity-60">58.000.000₫</span>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed font-light mb-8">
+                Một tác phẩm di sản từ năm 1994, được chế tác thủ công tại Paris. Da bê nguyên tấm với lớp patina tự nhiên, mang dấu ấn của thời gian và sự sang trọng bền vững.
+            </p>
+</section>
+<!-- Environmental Impact -->
+<section class="px-6 mb-10">
+<div class="bg-primary-container/10 rounded-2xl p-6 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="eco">eco</span>
+<h3 class="text-sm font-bold uppercase tracking-widest text-on-primary-container">Tác động môi trường</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col">
+<span class="text-2xl font-bold text-primary">-12.5kg</span>
+<span class="text-[11px] text-on-surface-variant uppercase tracking-wider">Khí CO2 tiết kiệm</span>
+</div>
+<div class="flex flex-col">
+<span class="text-2xl font-bold text-primary">8.400L</span>
+<span class="text-[11px] text-on-surface-variant uppercase tracking-wider">Nước sạch bảo tồn</span>
+</div>
+</div>
+<!-- Eco Impact Slider (Custom Visualization) -->
+<div class="mt-2">
+<div class="h-1 w-full bg-outline-variant/30 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[75%]"></div>
+</div>
+<p class="text-[10px] mt-2 text-on-surface-variant italic">Bạn đang cứu sống 2 cây xanh bằng việc chọn sản phẩm này.</p>
+</div>
+</div>
+</section>
+<!-- Condition Report (Báo cáo Tình trạng) -->
+<section class="px-6 mb-10">
+<h3 class="noto-serif text-xl font-bold mb-5 text-on-surface">Báo cáo Tình trạng</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-4 bg-surface-container-low p-4 rounded-xl">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Macro detail of a small scratch on a vintage designer leather surface. The image is crisp, showing the organic texture of the high-grade leather with soft, ambient lighting that avoids harsh shadows. The color palette is consistent with the atelier brand's neutral oatmeal and sage aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSaM4y2IjU5pXuuvU4cfIVD-t2w1A9ClaI3ckbT9g1WUnnuohkLUdhqyaMVqFz3HygROLN3ldiHmrItAv5TLcK0OvEKN9Dv_5h1bd1o2hK-mJZOYsDsHcKJtMceKEtovDF-bdTEiXIX54Ifivqx4cJtvstoZLmriE0_cT5jQ18FxKEr_7dr7i3PHA4tTR1JdOTxgHqmsJ_ZD-ZlewXqZqDwUOx6HFIOfTxIInqLfxc6TtssqlyTKA9pLSFe5i6VOnt0rvQ0oVCh2zL"/>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Góc túi dưới bên trái</h4>
+<p class="text-xs text-on-surface-variant mt-1">Vết sờn nhẹ do sử dụng tự nhiên. Không ảnh hưởng đến cấu trúc.</p>
+</div>
+</div>
+<div class="flex items-start gap-4 bg-surface-container-low p-4 rounded-xl">
+<div class="w-12 h-12 rounded-lg bg-surface-container-highest overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Detailed view of a brass zipper on a luxury vintage bag, showing slight oxidation consistent with its age. The focus is sharp on the metallic texture, while the surrounding leather is softly blurred. The lighting is warm and golden, reinforcing the premium, heritage feel of the product." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArTww025Sjj9Z_9BGOMwviu1OQSMId6GSaM_XFDasvaYDKi1zu8tGjgFSCgTsK1f958kWqA3W2rNDqV6b0uLp-dPiNR1exQfohvCUtkQs7eSG0iMXql3F_YwPAlsPaPvft1YyLTe_VUKPcPFFB5HG2N3NUBiCElsW3NvZuG9WdcR61SvHHiBYpH6-RsJIOjjAyEI9LSI6rV_MiEqHzdxP7jNQNMmXZBSSmUsXqcZ8GQbuwEWSOoD8j08CRkQysSjXDVkQXzjP_ERYA"/>
+</div>
+<div>
+<h4 class="text-sm font-bold text-on-surface">Khóa đồng nguyên bản</h4>
+<p class="text-xs text-on-surface-variant mt-1">Có vết oxy hóa mờ đặc trưng của đồng thật sau 30 năm.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Market Trends (Biến động Thị trường) -->
+<section class="px-6 mb-10">
+<div class="flex justify-between items-end mb-4">
+<h3 class="noto-serif text-xl font-bold text-on-surface">Biến động Thị trường</h3>
+<span class="text-primary text-xs font-bold">+14.2% (12 tháng)</span>
+</div>
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/10">
+<div class="flex items-end gap-2 h-32 mb-4">
+<div class="flex-1 bg-primary/10 rounded-t-sm h-[40%]"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[55%]"></div>
+<div class="flex-1 bg-primary/30 rounded-t-sm h-[45%]"></div>
+<div class="flex-1 bg-primary/40 rounded-t-sm h-[65%]"></div>
+<div class="flex-1 bg-primary/60 rounded-t-sm h-[85%]"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[100%]"></div>
+</div>
+<div class="flex justify-between text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">
+<span>Th3 2023</span>
+<span>Hôm nay</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-4 italic text-center">Giá trị của dòng túi này tăng ổn định nhờ tính khan hiếm của mẫu năm 1994.</p>
+</div>
+</section>
+<!-- Authentic Detail Bento Grid -->
+<section class="px-6 mb-10">
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-secondary-container p-5 rounded-2xl flex flex-col justify-between aspect-square">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="verified_user">verified_user</span>
+<div>
+<h4 class="text-xs font-bold uppercase text-on-secondary-container">Chính chủ</h4>
+<p class="text-lg font-bold text-on-secondary-container leading-tight">Chứng nhận Entrupy</p>
+</div>
+</div>
+<div class="bg-tertiary-container/20 p-5 rounded-2xl flex flex-col justify-between aspect-square">
+<span class="material-symbols-outlined text-primary" data-icon="history_edu">history_edu</span>
+<div>
+<h4 class="text-xs font-bold uppercase text-on-surface-variant">Lịch sử</h4>
+<p class="text-lg font-bold text-on-surface leading-tight">Pháp, 1994</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full z-50 bg-[#fcf9f4]/95 backdrop-blur-lg px-6 pt-4 pb-8 border-t border-outline-variant/20">
+<div class="flex gap-4 items-center">
+<button class="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</button>
+<button class="flex-1 h-14 bg-primary text-on-primary rounded-xl font-bold tracking-wide shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                Mua Sản Phẩm
+            </button>
+</div>
+</div>
+<!-- Background Decoration -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-30">
+<div class="absolute top-[20%] -left-20 w-64 h-64 bg-primary-fixed-dim blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[10%] -right-20 w-64 h-64 bg-secondary-fixed blur-[120px] rounded-full"></div>
+</div>
+</body></html>

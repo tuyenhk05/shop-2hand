@@ -9,12 +9,17 @@ import { addToCartApi } from '../../services/client/cart.service';
 import { getCookie } from '../../helpers/cookie';
 import useScrollToTop from '../../hooks/useScrollToTop';
 import Loading from '../../components/loading/loading';
+import ProductCard from '../../components/ProductCard';
+import { getRecommendationsApi } from '../../services/client/products';
+import { addToWishlistApi } from '../../services/client/wishlist.service';
 
 const Wishlist = () => {
     useScrollToTop();
     const navigate = useNavigate();
     const [wishlistItems, setWishlistItems] = useState([]);
+    const [recommendations, setRecommendations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isRecLoading, setIsRecLoading] = useState(true);
     
     // Giả sử UserID được lưu ở cookie `userId` hoặc lấy từ token
     const userId = useSelector((state) => state.auth.userId);
@@ -22,10 +27,26 @@ const Wishlist = () => {
     useEffect(() => {
         if (!userId) {
             setIsLoading(false);
+            setIsRecLoading(false);
             return;
         }
         fetchWishlists();
+        fetchRecommendations();
     }, [userId]);
+
+    const fetchRecommendations = async () => {
+        try {
+            setIsRecLoading(true);
+            const res = await getRecommendationsApi();
+            if (res && res.success) {
+                setRecommendations(res.data);
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải gợi ý", error);
+        } finally {
+            setIsRecLoading(false);
+        }
+    };
 
     const fetchWishlists = async () => {
         try {
@@ -73,6 +94,29 @@ const Wishlist = () => {
         }
     };
 
+    const handleToggleWishlist = async (e, productId) => {
+        if (e) e.stopPropagation();
+        
+        const isCurrentlyFavorite = wishlistItems.some(item => {
+             const pid = item.productId?._id || item.productId;
+             return String(pid) === String(productId);
+        }) || recommendations.some(p => String(p._id) === String(productId) && p.isFavorite);
+
+        try {
+            if (isCurrentlyFavorite) {
+                await handleRemove(productId);
+            } else {
+                const res = await addToWishlistApi(userId, productId);
+                if (res && res.success) {
+                    message.success('Đã thêm vào danh sách yêu thích!');
+                    fetchWishlists(); // Refresh to update states
+                }
+            }
+        } catch (error) {
+            console.error("Lỗi thao tác wishlist", error);
+        }
+    };
+
     const formatPrice = (price) => {
         if (!price) return '0₫';
         return price.toLocaleString('vi-VN') + '₫';
@@ -115,15 +159,41 @@ const Wishlist = () => {
             <AnimateWhenVisible direction="fade" className="mt-32">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
                     <div className="max-w-xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed mb-4">
-                            <span className="material-symbols-outlined text-[16px] text-on-primary-fixed">auto_awesome</span>
-                            <span className="text-[10px] font-bold tracking-widest uppercase text-on-primary-fixed">Gợi ý từ Trợ lý AI</span>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 mb-4 border border-primary/20">
+                            <span className="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+                            <span className="text-[10px] font-bold tracking-widest uppercase text-primary">Gợi ý từ Trợ lý AI</span>
                         </div>
                         <h2 className="text-3xl md:text-4xl font-black text-on-background leading-tight font-notoSerif">Có thể bạn sẽ thích</h2>
-                        <p className="text-on-surface-variant mt-4">Dựa trên phong cách tối giản và lựa chọn bền vững của bạn tại Atelier.</p>
+                        <p className="text-on-surface-variant mt-4">Dựa trên phong cách và các sản phẩm bạn đã quan tâm tại Atelier.</p>
                     </div>
                 </div>
-                {/* Fixed recommended UI here. Can also be extracted later */}
+
+                {isRecLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                        {[1, 2, 4].map(i => (
+                             <div key={i} className="aspect-[3/4] bg-surface-container rounded-2xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : recommendations.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                        {recommendations.map((product, index) => (
+                            <ProductCard
+                                key={product._id}
+                                item={product}
+                                isLarge={false}
+                                wishlisted={wishlistItems.some(item => {
+                                    const pid = item.productId?._id || item.productId;
+                                    return String(pid) === String(product._id);
+                                })}
+                                onWishlist={(e) => handleToggleWishlist(e, product._id)}
+                                onCart={(e) => { e.stopPropagation(); handleAddToCart(product._id); }}
+                                onNavigate={navigate}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-on-surface-variant italic">Đang cập nhật thêm gợi ý mới cho bạn...</p>
+                )}
             </AnimateWhenVisible>
 
         </main>

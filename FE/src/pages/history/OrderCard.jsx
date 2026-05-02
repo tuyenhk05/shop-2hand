@@ -56,8 +56,13 @@ const OrderCard = ({ order, formatPrice }) => {
         }
     };
 
-    // Calculate total CO2 optionally if backend provides it
-    const co2Saved = order.co2Saved || 'N/A';
+    let itemCount = 0;
+    if (order && order.items && Array.isArray(order.items)) {
+        order.items.forEach(item => {
+            itemCount += (item.quantity || 1);
+        });
+    }
+    const co2Saved = itemCount * 14;
 
     return (
         <div className="bg-surface-container-lowest p-8 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md border border-transparent hover:border-outline-variant/20 h-full flex flex-col">

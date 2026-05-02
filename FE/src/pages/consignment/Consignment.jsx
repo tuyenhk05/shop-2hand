@@ -107,7 +107,7 @@ const Consignment = () => {
 
     const submitConsignment = async () => {
         if (!title || !description || !categoryId || uploadedFiles.length === 0) {
-            alert('Vui lòng điền đầy đủ thông tin (Tên, Mô tả, Danh mục) và tải ảnh.');
+            message.error('Vui lòng điền đầy đủ thông tin (Tên, Mô tả, Danh mục) và tải ảnh.');
             return;
         }
 
