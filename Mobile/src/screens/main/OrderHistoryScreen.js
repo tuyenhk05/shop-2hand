@@ -5,14 +5,19 @@ import { useSelector } from 'react-redux';
 import { Button, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getOrdersApi } from '../../services/client/order.service';
+import { createConversationApi } from '../../services/client/support.service';
+import { useToast } from '../../context/ToastContext';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 const OrderHistoryScreen = () => {
     const navigation = useNavigation();
     const isFocused = useIsFocused();
+    const { showToast } = useToast();
     const userId = useSelector((state) => state.auth.userId);
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // all, pending, completed
+    const [isOpeningSupport, setIsOpeningSupport] = useState(null); // stores orderId being opened
 
     const filteredOrders = orders.filter(order => {
         if (filter === 'all') return true;
@@ -24,7 +29,7 @@ const OrderHistoryScreen = () => {
     const getImageUrl = (url) => {
         if (!url) return 'https://dummyimage.com/100x100/f5f5f5/333333.png?text=No+Image';
         if (url.startsWith('http')) return url;
-        return `http://192.168.1.14:3001${url.startsWith('/') ? '' : '/'}${url}`;
+        return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     const fetchOrders = async () => {
@@ -68,10 +73,33 @@ const OrderHistoryScreen = () => {
         }
     };
 
+    const handleOpenSupport = async (order) => {
+        if (!order) return;
+        try {
+            setIsOpeningSupport(order._id);
+            const orderCode = order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`;
+            const res = await createConversationApi({
+                orderId: order._id,
+                orderCode,
+                subject: `Hỗ trợ đơn hàng ${orderCode}`
+            });
+            if (res.success) {
+                navigation.navigate('ChatSupport', { conversationId: res.data._id });
+            } else {
+                showToast('Không thể mở hội thoại hỗ trợ.', 'error');
+            }
+        } catch (error) {
+            console.error("Open support error:", error);
+            showToast('Lỗi kết nối server.', 'error');
+        } finally {
+            setIsOpeningSupport(null);
+        }
+    };
+
     if (isLoading) {
         return (
             <SafeAreaView style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#FF8A65" />
+                <ActivityIndicator size="large" color="#4c6545" />
             </SafeAreaView>
         );
     }
@@ -125,7 +153,7 @@ const OrderHistoryScreen = () => {
                             onPress={() => navigation.navigate('OrderDetail', { id: order._id })}
                         >
                             <View style={styles.orderHeader}>
-                                <Text style={styles.orderId}>#{order._id?.slice(-6).toUpperCase()}</Text>
+                                <Text style={styles.orderId}>{order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`}</Text>
                                 <View style={styles.statusBadge}>
                                     <Text style={styles.statusText}>{translateStatus(order.status)}</Text>
                                 </View>
@@ -277,6 +305,24 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#FF8A65',
+    },
+    actionRow: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        gap: 8,
+        marginTop: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#f1f5f9',
+    },
+    actionBtn: {
+        borderRadius: 8,
+        minWidth: 100,
+    },
+    actionBtnLabel: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        marginHorizontal: 0,
     },
     filterRow: {
         flexDirection: 'row',

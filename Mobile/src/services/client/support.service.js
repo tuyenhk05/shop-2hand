@@ -1,7 +1,6 @@
 import { get, post } from '../../utils/request';
 import { io } from 'socket.io-client';
-
-const SOCKET_URL = 'http://192.168.1.14:3001';
+import { SOCKET_URL } from '../../config/api';
 
 // --- Client REST API -----------------------------------------
 

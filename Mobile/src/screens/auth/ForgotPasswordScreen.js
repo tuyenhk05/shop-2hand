@@ -5,8 +5,11 @@ import { useNavigation } from '@react-navigation/native';
 import { forgotPassword, resetPassword } from '../../services/client/changePassword';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useToast } from '../../context/ToastContext';
+
 const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
+  const { showToast } = useToast();
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -24,7 +27,7 @@ const ForgotPasswordScreen = () => {
 
   const handleSendOTP = async () => {
     if (!formData.email) {
-      Alert.alert('Lỗi', 'Vui lòng nhập email');
+      showToast('Vui lòng nhập email', 'error');
       return;
     }
 
@@ -33,13 +36,13 @@ const ForgotPasswordScreen = () => {
       const data = await forgotPassword({ email: formData.email });
 
       if (data.success) {
-        Alert.alert('Thành công', 'Đã gửi mã OTP đến email của bạn!');
+        showToast('Đã gửi mã OTP đến email của bạn!', 'success');
         setStep(2);
       } else {
-        Alert.alert('Lỗi', data.message || 'Có lỗi xảy ra');
+        showToast(data.message || 'Có lỗi xảy ra', 'error');
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Lỗi kết nối đến máy chủ');
+      showToast('Lỗi kết nối đến máy chủ', 'error');
     } finally {
       setLoading(false);
     }
@@ -47,11 +50,11 @@ const ForgotPasswordScreen = () => {
 
   const handleResetPassword = async () => {
     if (!formData.otp || !formData.newPassword) {
-      Alert.alert('Lỗi', 'Vui lòng điền đầy đủ thông tin');
+      showToast('Vui lòng điền đầy đủ thông tin', 'error');
       return;
     }
     if (formData.newPassword !== formData.confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+      showToast('Mật khẩu xác nhận không khớp', 'error');
       return;
     }
 
@@ -64,14 +67,15 @@ const ForgotPasswordScreen = () => {
       });
 
       if (data.success) {
-        Alert.alert('Thành công', 'Đổi mật khẩu thành công! Vui lòng đăng nhập lại.', [
-          { text: 'OK', onPress: () => navigation.replace('Login') }
-        ]);
+        showToast('Đổi mật khẩu thành công!', 'success');
+        setTimeout(() => {
+          navigation.replace('Login');
+        }, 1000);
       } else {
-        Alert.alert('Lỗi', data.message || 'Có lỗi xảy ra');
+        showToast(data.message || 'Có lỗi xảy ra', 'error');
       }
     } catch (error) {
-      Alert.alert('Lỗi', 'Lỗi kết nối đến máy chủ');
+      showToast('Lỗi kết nối đến máy chủ', 'error');
     } finally {
       setLoading(false);
     }

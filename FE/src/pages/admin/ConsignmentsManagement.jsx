@@ -4,6 +4,7 @@ import { Table, Tag, Button, Modal, Form, Input, Select, message, Space, Typogra
 import { DownloadOutlined } from '@ant-design/icons';
 import { getAllConsignments, updateConsignmentStatus, convertToProductApi } from '../../services/admin/consignments.service.jsx';
 import { exportToCSV } from '../../untils/exportCSV';
+import Loading from '../../components/loading/loading';
 
 const { Title, Text } = Typography;
 
@@ -32,6 +33,10 @@ const ConsignmentsManagement = () => {
     useEffect(() => {
         fetchConsignments();
     }, []);
+
+    const pendingConsignments = consignments.filter(c => c.status === 'pending' || c.status === 'valued' || c.status === 'approved' || c.status === 'received');
+    const rejectedConsignments = consignments.filter(c => c.status === 'rejected');
+    const completedConsignments = consignments.filter(c => c.status === 'completed');
 
     const handleUpdateStatus = async (values) => {
         try {
@@ -160,13 +165,15 @@ const ConsignmentsManagement = () => {
                             className="bg-green-600 hover:bg-green-700 text-white border-none"
                             onClick={() => handleConvertToProduct(record._id)}
                         >
-                            Đăng bán ngay
+                            Thêm vào kho
                         </Button>
                     )}
                 </div>
             ),
         },
     ];
+
+    if (loading && consignments.length === 0) return <Loading fullScreen={true} text="Đang tải danh sách ký gửi..." />;
 
     return (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10">
@@ -185,14 +192,44 @@ const ConsignmentsManagement = () => {
                 </Button>
             </div>
 
-            <Table 
-                dataSource={consignments} 
-                columns={columns} 
-                rowKey="_id" 
-                loading={loading}
-                pagination={{ pageSize: 10 }}
-                className="w-full"
-            />
+            {/* Section 1: Yêu cầu Ký gửi đang xử lý */}
+            <div className="mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Yêu cầu Ký gửi đang xử lý</h3>
+                <Table 
+                    dataSource={pendingConsignments} 
+                    columns={columns} 
+                    rowKey="_id" 
+                    loading={loading}
+                    pagination={{ pageSize: 5 }}
+                    className="w-full"
+                />
+            </div>
+
+            {/* Section 2: Yêu cầu Đã hủy / Từ chối */}
+            <div className="mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Yêu cầu Đã hủy / Từ chối</h3>
+                <Table 
+                    dataSource={rejectedConsignments} 
+                    columns={columns} 
+                    rowKey="_id" 
+                    loading={loading}
+                    pagination={{ pageSize: 5 }}
+                    className="w-full"
+                />
+            </div>
+
+            {/* Section 3: Yêu cầu Đã hoàn tất / Lên kệ */}
+            <div className="mb-6 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Yêu cầu Đã hoàn tất / Lên kệ</h3>
+                <Table 
+                    dataSource={completedConsignments} 
+                    columns={columns} 
+                    rowKey="_id" 
+                    loading={loading}
+                    pagination={{ pageSize: 5 }}
+                    className="w-full"
+                />
+            </div>
 
             <Modal
                 title={"Chi tiết & Cập nhật Yêu cầu Ký gửi"}

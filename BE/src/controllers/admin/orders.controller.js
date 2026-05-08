@@ -73,6 +73,22 @@ exports.updateOrderStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
         }
 
+        // --- Tạo thông báo cho Người mua ---
+        const { createNotification } = require('../../helpers/notification.helper');
+        let statusText = status;
+        if (status === 'processing') statusText = 'đang được xử lý';
+        else if (status === 'shipping') statusText = 'đang được giao';
+        else if (status === 'delivered') statusText = 'đã giao thành công';
+        else if (status === 'cancelled') statusText = 'đã bị hủy';
+
+        await createNotification(req.app, {
+            userId: updatedOrder.buyerId._id,
+            title: 'Cập nhật đơn hàng',
+            content: `Đơn hàng #${updatedOrder._id.toString().slice(-6)} của bạn ${statusText}.`,
+            type: 'order_status',
+            link: `/history`
+        });
+
         res.status(200).json({ success: true, data: updatedOrder });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -83,7 +99,19 @@ exports.updateOrderStatus = async (req, res) => {
 exports.deleteOrder = async (req, res) => {
     try {
         const { id } = req.params;
-        await Order.findByIdAndUpdate(id, { status: 'cancelled', updatedAt: new Date() });
+        const order = await Order.findByIdAndUpdate(id, { status: 'cancelled', updatedAt: new Date() }, { new: true });
+        
+        if (order) {
+            const { createNotification } = require('../../helpers/notification.helper');
+            await createNotification(req.app, {
+                userId: order.buyerId,
+                title: 'Đơn hàng bị hủy',
+                content: `Đơn hàng #${order._id.toString().slice(-6)} của bạn đã bị hủy bởi hệ thống.`,
+                type: 'order_status',
+                link: `/history`
+            });
+        }
+
         res.status(200).json({ success: true, message: 'Đơn hàng đã được đánh dấu Hủy' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

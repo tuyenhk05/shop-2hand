@@ -11,6 +11,7 @@ import { createConsignmentApi } from '../../services/client/consignment.service'
 import { getAllCategories } from '../../services/client/category.service';
 import { getAllBrands } from '../../services/client/brand.service';
 import { getCookie } from '../../helpers/cookie';
+import Loading from '../../components/loading/loading';
 
 const Consignment = () => {
     useScrollToTop();
@@ -35,8 +36,8 @@ const Consignment = () => {
     const [color, setColor] = useState('');
     const [material, setMaterial] = useState('');
 
-    const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 
     // Ref để trigger thẻ input file bị ẩn
@@ -47,12 +48,18 @@ const Consignment = () => {
     // Fetch data for dropdowns
     useEffect(() => {
         const fetchData = async () => {
-            const [catRes, brandRes] = await Promise.all([
-                getAllCategories(),
-                getAllBrands()
-            ]);
-            if (catRes.success) setCategories(catRes.data || []);
-            if (brandRes.success) setBrands(brandRes.data || []);
+            try {
+                const [catRes, brandRes] = await Promise.all([
+                    getAllCategories(),
+                    getAllBrands()
+                ]);
+                if (catRes.success) setCategories(catRes.data || []);
+                if (brandRes.success) setBrands(brandRes.data || []);
+            } catch (error) {
+                console.error("Lỗi fetch data", error);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, []);
@@ -145,6 +152,8 @@ const Consignment = () => {
             setSubmitting(false);
         }
     };
+
+    if (loading) return <Loading fullScreen={true} text="Đang chuẩn bị biểu mẫu ký gửi..." />;
 
     return (
         <ProtectedRoute>

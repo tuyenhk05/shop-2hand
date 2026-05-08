@@ -5,6 +5,7 @@ import { Table, Button, Modal, Form, Select, message, Tag, Descriptions, Popconf
 import { EyeOutlined, EditOutlined, StopOutlined, PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
 import { getAllOrders, updateOrderStatus, cancelOrder } from '../../services/admin/orders.service.jsx';
 import { exportToCSV } from '../../untils/exportCSV';
+import Loading from '../../components/loading/loading';
 
 const { RangePicker } = DatePicker;
 
@@ -51,7 +52,6 @@ const OrdersManagement = () => {
         try {
             setLoading(true);
             const params = {};
-            if (currentFilters.status) params.status = currentFilters.status;
             if (currentFilters.dateRange && currentFilters.dateRange.length === 2) {
                 params.startDate = currentFilters.dateRange[0].format('YYYY-MM-DD');
                 params.endDate = currentFilters.dateRange[1].format('YYYY-MM-DD');
@@ -66,10 +66,14 @@ const OrdersManagement = () => {
         }
     };
 
-    // Trigger fetch khi status hoặc ngày thay đổi
+    // Trigger fetch khi ngày thay đổi
     useEffect(() => {
         fetchOrders();
-    }, [filters.status, filters.dateRange]);
+    }, [filters.dateRange]);
+
+    const activeOrders = orders.filter(o => o.status === 'paid' || o.status === 'processing');
+    const cancelledOrders = orders.filter(o => o.status === 'cancelled');
+    const otherOrders = orders.filter(o => o.status !== 'paid' && o.status !== 'processing' && o.status !== 'cancelled');
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key] : value }));
@@ -244,6 +248,8 @@ const OrdersManagement = () => {
         },
     ];
 
+    if (loading && orders.length === 0) return <Loading fullScreen={true} text="Đang tải danh sách đơn hàng..." />;
+
     return (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10">
             {/* Header */}
@@ -278,23 +284,6 @@ const OrdersManagement = () => {
                     />
                 </div>
 
-                <div className="w-48">
-                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Lọc trạng thái</p>
-                    <Select
-                        placeholder="Tất cả trạng thái"
-                        className="w-full"
-                        allowClear
-                        value={filters.status}
-                        onChange={(val) => handleFilterChange('status', val)}
-                    >
-                        {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
-                            <Select.Option key={val} value={val}>
-                                <Badge color={cfg.color} text={cfg.label} />
-                            </Select.Option>
-                        ))}
-                    </Select>
-                </div>
-
                 <Button onClick={resetFilters} className="mb-0.5">Đặt lại</Button>
                 
                 <Button 
@@ -307,13 +296,41 @@ const OrdersManagement = () => {
                 </Button>
             </div>
 
-            <Table
-                dataSource={orders}
-                columns={columns}
-                rowKey="_id"
-                loading={loading}
-                pagination={{ pageSize: 15 }}
-            />
+            {/* Section 1: Đã thanh toán & Đang xử lý */}
+            <div className="mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Đơn hàng Đã thanh toán & Đang xử lý</h3>
+                <Table
+                    dataSource={activeOrders}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={loading}
+                    pagination={{ pageSize: 10 }}
+                />
+            </div>
+
+            {/* Section 2: Đã hủy */}
+            <div className="mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Đơn hàng Đã hủy</h3>
+                <Table
+                    dataSource={cancelledOrders}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={loading}
+                    pagination={{ pageSize: 10 }}
+                />
+            </div>
+
+            {/* Section 3: Trạng thái khác */}
+            <div className="mb-6 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Các đơn hàng khác</h3>
+                <Table
+                    dataSource={otherOrders}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={loading}
+                    pagination={{ pageSize: 10 }}
+                />
+            </div>
 
             {/* Modal Cập nhật trạng thái */}
             <Modal

@@ -2,11 +2,11 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Import Screens (Placeholder for now until they are migrated)
+// Import Screens
 import HomeScreen from '../screens/main/HomeScreen';
 import StoreScreen from '../screens/main/StoreScreen';
-import ProfileScreen from '../screens/main/ProfileScreen'; // Not yet migrated
-import CartScreen from '../screens/main/CartScreen';       // Not yet migrated
+import ProfileScreen from '../screens/main/ProfileScreen';
+import WishlistScreen from '../screens/main/WishlistScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,12 +15,12 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#FF8A65',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: '#4c6545',
+        tabBarInactiveTintColor: '#64748b',
         tabBarStyle: {
           backgroundColor: '#fff',
           borderTopWidth: 1,
-          borderTopColor: '#f0f0f0',
+          borderTopColor: '#f1f5f9',
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,
@@ -52,12 +52,12 @@ const MainTabNavigator = () => {
         }}
       />
       <Tab.Screen 
-        name="CartTab" 
-        component={CartScreen} 
+        name="WishlistTab" 
+        component={WishlistScreen} 
         options={{
-          tabBarLabel: 'Giỏ hàng',
+          tabBarLabel: 'Yêu thích',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="cart-outline" color={color} size={size} />
+            <MaterialCommunityIcons name="heart-outline" color={color} size={size} />
           ),
         }}
       />

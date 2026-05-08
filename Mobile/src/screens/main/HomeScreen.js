@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { IconButton } from 'react-native-paper';
 import { getAllProducts } from '../../services/client/products';
 import { getAllCategories } from '../../services/client/category.service';
 import ProductCard from '../../components/ProductCard';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNotifications } from '../../context/NotificationContext';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +16,7 @@ const HomeScreen = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { unreadCount } = useNotifications();
 
     const defaultCategoryImages = [
         require('../../../assets/images/thoi_trang_nam.avif'),
@@ -24,7 +28,7 @@ const HomeScreen = () => {
     const getImageUrl = (url) => {
         if (!url) return 'https://dummyimage.com/400x500/f5f5f5/333333.png?text=No+Image';
         if (url.startsWith('http')) return url;
-        return `http://192.168.1.14:3001${url.startsWith('/') ? '' : '/'}${url}`;
+        return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     useEffect(() => {
@@ -54,71 +58,66 @@ const HomeScreen = () => {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#FF8A65" />
-                <Text style={styles.loadingText}>Atelier loading...</Text>
+                <ActivityIndicator size="large" color="#4c6545" />
+                <Text style={styles.loadingText}>Đang tải trang chủ...</Text>
             </View>
         );
     }
-
-    const featuredProduct = products[0];
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 
-                {/* LOGO HEADER */}
-                <View style={styles.logoHeader}>
+                {/* LOGO & SEARCH HEADER */}
+                <View style={styles.header}>
                     <Image source={require('../../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
-                </View>
-
-                {/* HERO SECTION */}
-                <View style={styles.heroSection}>
-                    <View style={styles.heroTextContainer}>
-                        <View style={styles.badgeContainer}>
-                            <Text style={styles.badgeText}>NGUỒN GỐC ĐƯỢC TUYỂN CHỌN</Text>
-                        </View>
-                        <Text style={styles.heroTitle}>
-                            Di sản được{'\n'}
-                            <Text style={styles.heroTitleHighlight}>tái tạo.</Text>
-                        </Text>
-                        <Text style={styles.heroSubtitle}>
-                            Khám phá những món đồ thời trang second-hand được tái định nghĩa như những tác phẩm nghệ thuật cao cấp.
-                        </Text>
-                        <TouchableOpacity 
-                            style={styles.heroButton}
-                            onPress={() => navigation.navigate('StoreTab')}
-                        >
-                            <Text style={styles.heroButtonText}>ĐẾN CỬA HÀNG</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {featuredProduct && (
-                        <TouchableOpacity 
-                            style={styles.heroImageContainer}
-                            activeOpacity={0.9}
-                            onPress={() => navigation.navigate('ProductDetail', { id: featuredProduct.slug || featuredProduct._id })}
-                        >
-                            <Image 
-                                source={{ uri: getImageUrl(featuredProduct?.images?.find(img => img.isPrimary)?.imageUrl || featuredProduct?.images?.[0]?.imageUrl) }}
-                                style={styles.heroImage}
-                            />
-                            <View style={styles.heroImageOverlay}>
-                                <Text style={styles.heroImageBadge}>Archive Nổi Bật</Text>
-                                <View style={styles.heroImageInfo}>
-                                    <Text style={styles.heroImageTitle} numberOfLines={1}>{featuredProduct.title}</Text>
-                                    <View style={styles.heroImagePriceContainer}>
-                                        <Text style={styles.heroImagePrice}>
-                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(featuredProduct.price)}
-                                        </Text>
-                                    </View>
-                                </View>
+                    <TouchableOpacity style={styles.searchBar} onPress={() => navigation.navigate('StoreTab')}>
+                        <IconButton icon="magnify" size={18} iconColor="#64748b" style={{ margin: 0 }} />
+                        <Text style={styles.searchPlaceholder}>Tìm kiếm sản phẩm...</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                        style={styles.notificationBtn} 
+                        onPress={() => navigation.navigate('Notification')}
+                    >
+                        <IconButton icon="bell-outline" size={24} iconColor="#1e293b" style={{ margin: 0 }} />
+                        {unreadCount > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
                             </View>
-                        </TouchableOpacity>
-                    )}
+                        )}
+                    </TouchableOpacity>
                 </View>
 
-                {/* NEW ARRIVALS */}
-                <View style={styles.section}>
+                {/* SMALL CATEGORY BOXES ROW */}
+                <View style={styles.categoriesSection}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryBoxes}>
+                        {categories.slice(0, 4).map((cat, idx) => {
+                            const imageSource = idx < 4 ? defaultCategoryImages[idx] : { uri: getImageUrl(cat.image) };
+                            return (
+                                <TouchableOpacity 
+                                    key={cat._id || idx} 
+                                    style={styles.categoryBox}
+                                    onPress={() => navigation.navigate('StoreTab', { category: cat._id })}
+                                >
+                                    <Image source={imageSource} style={styles.categoryBoxImage} />
+                                    <Text style={styles.categoryBoxText} numberOfLines={1}>{cat.name}</Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </ScrollView>
+                </View>
+
+                {/* ECO-FRIENDLY ENVIRONMENTAL MESSAGE */}
+                <View style={styles.ecoBanner}>
+                    <View style={styles.ecoBadge}>
+                        <Text style={styles.ecoBadgeText}>THÔNG ĐIỆP XANH</Text>
+                    </View>
+                    <Text style={styles.ecoTitle}>Thời trang bền vững, bảo vệ môi trường</Text>
+                    <Text style={styles.ecoText}>Sử dụng sản phẩm second-hand giúp giảm thiểu lượng rác thải dệt may ra môi trường và tiết kiệm hàng ngàn lít nước sạch.</Text>
+                </View>
+
+                {/* PRODUCTS LIST GRID */}
+                <View style={styles.productsSection}>
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>Sản phẩm mới</Text>
                         <TouchableOpacity onPress={() => navigation.navigate('StoreTab')}>
@@ -126,8 +125,8 @@ const HomeScreen = () => {
                         </TouchableOpacity>
                     </View>
                     
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
-                        {products.slice(0, 5).map((item, index) => (
+                    <View style={styles.productsGrid}>
+                        {products.slice(0, 10).map((item, index) => (
                             <View key={item._id || index} style={styles.productCardWrapper}>
                                 <ProductCard 
                                     item={item} 
@@ -136,60 +135,7 @@ const HomeScreen = () => {
                                 />
                             </View>
                         ))}
-                    </ScrollView>
-                </View>
-
-                {/* FEATURED BRANDS */}
-                <View style={[styles.section, styles.brandsSection]}>
-                    <Text style={styles.brandsTitle}>— CÁC NHÀ MỐT LƯU TRỮ —</Text>
-                    <View style={styles.brandsContainer}>
-                        {['CHANEL', 'PRADA', 'Céline', 'GUCCI', 'HERMÈS'].map((brand, idx) => (
-                            <Text key={idx} style={[styles.brandItem, brand === 'Céline' && styles.brandItalic]}>
-                                {brand}
-                            </Text>
-                        ))}
                     </View>
-                </View>
-
-                {/* CURATED CATEGORIES */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <View>
-                            <Text style={styles.sectionTitle}>Khám phá theo dòng</Text>
-                            <Text style={styles.sectionSubtitle}>Tuyển tập thẩm mỹ được cá nhân hóa.</Text>
-                        </View>
-                    </View>
-                    
-                    <View style={styles.categoriesGrid}>
-                        {categories.slice(0, 4).map((cat, idx) => {
-                            // Temporary fallback to web's default logic since require needs static strings in React Native
-                            // We use the imported defaultCategoryImages array for the first 4.
-                            const imageSource = idx < 4 ? defaultCategoryImages[idx] : { uri: getImageUrl(cat.image) };
-
-                            return (
-                                <TouchableOpacity 
-                                    key={cat._id || idx}
-                                    style={styles.categoryItem}
-                                    onPress={() => navigation.navigate('StoreTab', { category: cat._id })}
-                                >
-                                    <Image source={imageSource} style={styles.categoryImage} />
-                                    <View style={styles.categoryOverlay}>
-                                        <Text style={styles.categoryName}>{cat.name}</Text>
-                                        <Text style={styles.categoryExplore}>KHÁM PHÁ ➔</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })}
-                    </View>
-                </View>
-
-                {/* AUTHENTICATION SNIPPET */}
-                <View style={styles.authSnippetContainer}>
-                    <Text style={styles.authSnippetBadge}>— BẢO CHỨNG NIỀM TIN</Text>
-                    <Text style={styles.authSnippetTitle}>Xác minh{'\n'}<Text style={styles.authSnippetTitleItalic}>thủ công.</Text></Text>
-                    <Text style={styles.authSnippetDesc}>
-                        Mọi món đồ gia nhập Atelier đều trải qua quy trình kiểm định 12 bước bởi các chuyên gia độc lập.
-                    </Text>
                 </View>
 
             </ScrollView>
@@ -210,249 +156,152 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         marginTop: 12,
-        color: '#FF8A65',
-        fontWeight: 'bold',
+        fontSize: 14,
+        color: '#4c6545',
+        fontWeight: '600',
     },
     scrollContent: {
         paddingBottom: 40,
     },
-    logoHeader: {
+    header: {
+        flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f1f5f9',
-        backgroundColor: '#fff',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingBottom: 12,
+        backgroundColor: '#fef9f7',
     },
     logo: {
-        width: 120,
+        width: 80,
         height: 40,
     },
-    heroSection: {
-        padding: 24,
-        marginBottom: 16,
-    },
-    heroTextContainer: {
-        marginBottom: 32,
-    },
-    badgeContainer: {
-        backgroundColor: '#E4E5DE',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
-        alignSelf: 'flex-start',
-        marginBottom: 16,
-    },
-    badgeText: {
-        color: '#4A5D4E',
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
-    heroTitle: {
-        fontSize: 40,
-        fontWeight: 'bold',
-        color: '#1e293b',
-        lineHeight: 48,
-        marginBottom: 16,
-    },
-    heroTitleHighlight: {
-        fontStyle: 'italic',
-        color: '#9a3412',
-    },
-    heroSubtitle: {
-        fontSize: 16,
-        color: '#475569',
-        lineHeight: 24,
-        marginBottom: 24,
-    },
-    heroButton: {
-        backgroundColor: '#4A5D4E',
-        paddingVertical: 14,
-        paddingHorizontal: 24,
-        borderRadius: 12,
-        alignSelf: 'flex-start',
-    },
-    heroButtonText: {
-        color: '#E4E5DE',
-        fontWeight: 'bold',
-        fontSize: 12,
-        letterSpacing: 1,
-    },
-    heroImageContainer: {
-        width: '100%',
-        aspectRatio: 3/4,
+    searchBar: {
+        flex: 1,
+        height: 42,
+        backgroundColor: '#fff',
         borderRadius: 24,
-        overflow: 'hidden',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 16,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+    },
+    searchPlaceholder: {
+        fontSize: 13,
+        color: '#64748b',
+        marginLeft: 4,
+    },
+    notificationBtn: {
+        marginLeft: 10,
         position: 'relative',
     },
-    heroImage: {
-        width: '100%',
-        height: '100%',
-    },
-    heroImageOverlay: {
+    badge: {
         position: 'absolute',
-        bottom: 16,
-        left: 16,
-        right: 16,
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        borderRadius: 16,
-        padding: 16,
+        top: 2,
+        right: 2,
+        backgroundColor: '#FF8A65',
+        borderRadius: 10,
+        width: 16,
+        height: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#fff',
     },
-    heroImageBadge: {
-        fontSize: 10,
+    badgeText: {
+        color: '#fff',
+        fontSize: 9,
         fontWeight: 'bold',
-        color: '#FF8A65',
-        marginBottom: 4,
-        letterSpacing: 1,
     },
-    heroImageInfo: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
+    categoriesSection: {
+        paddingVertical: 12,
     },
-    heroImageTitle: {
-        fontSize: 18,
+    categoryBoxes: {
+        paddingHorizontal: 16,
+    },
+    categoryBox: {
+        alignItems: 'center',
+        marginRight: 16,
+        width: 75,
+    },
+    categoryBoxImage: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: '#f5f5f5',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+    },
+    categoryBoxText: {
+        fontSize: 11,
         fontWeight: 'bold',
         color: '#1e293b',
-        flex: 1,
-        marginRight: 8,
+        marginTop: 6,
+        textAlign: 'center',
     },
-    heroImagePriceContainer: {
-        backgroundColor: '#f1f5f9',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
+    ecoBanner: {
+        backgroundColor: '#f1f5eb',
+        borderRadius: 16,
+        padding: 20,
+        marginHorizontal: 20,
+        marginVertical: 16,
+        borderWidth: 1,
+        borderColor: '#d1e3ce',
+    },
+    ecoBadge: {
+        backgroundColor: '#4c6545',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 10,
+        paddingVertical: 3,
         borderRadius: 12,
+        marginBottom: 8,
     },
-    heroImagePrice: {
-        fontSize: 14,
+    ecoBadgeText: {
+        color: '#fff',
+        fontSize: 9,
         fontWeight: 'bold',
-        color: '#475569',
+        letterSpacing: 1,
     },
-    section: {
-        paddingHorizontal: 24,
-        marginBottom: 40,
+    ecoTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#1b321a',
+        marginBottom: 4,
+    },
+    ecoText: {
+        fontSize: 12,
+        color: '#4c6545',
+        lineHeight: 18,
+    },
+    productsSection: {
+        paddingHorizontal: 20,
     },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        marginBottom: 20,
+        alignItems: 'center',
+        marginBottom: 16,
     },
     sectionTitle: {
-        fontSize: 24,
+        fontSize: 18,
         fontWeight: 'bold',
         color: '#1e293b',
     },
-    sectionSubtitle: {
-        fontSize: 14,
-        color: '#64748b',
-        marginTop: 4,
-    },
     seeAllText: {
-        color: '#FF8A65',
-        fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 13,
+        color: '#4c6545',
+        fontWeight: '600',
     },
-    horizontalScroll: {
-        paddingRight: 24,
-    },
-    productCardWrapper: {
-        width: width * 0.45,
-        marginRight: 16,
-    },
-    brandsSection: {
-        backgroundColor: '#ebe8e3',
-        paddingVertical: 40,
-        alignItems: 'center',
-    },
-    brandsTitle: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#46483c',
-        letterSpacing: 2,
-        marginBottom: 24,
-    },
-    brandsContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: 16,
-    },
-    brandItem: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#46483c',
-        opacity: 0.7,
-        marginHorizontal: 8,
-    },
-    brandItalic: {
-        fontStyle: 'italic',
-    },
-    categoriesGrid: {
+    productsGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
     },
-    categoryItem: {
+    productCardWrapper: {
         width: '48%',
-        aspectRatio: 3/4,
-        borderRadius: 16,
-        overflow: 'hidden',
         marginBottom: 16,
-        position: 'relative',
-    },
-    categoryImage: {
-        width: '100%',
-        height: '100%',
-    },
-    categoryOverlay: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: 16,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-    },
-    categoryName: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 4,
-    },
-    categoryExplore: {
-        color: '#fff',
-        fontSize: 10,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-    },
-    authSnippetContainer: {
-        marginHorizontal: 24,
-        backgroundColor: '#4c6545',
-        borderRadius: 24,
-        padding: 24,
-        marginBottom: 24,
-    },
-    authSnippetBadge: {
-        color: '#ceebc2',
-        fontSize: 10,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-        marginBottom: 16,
-    },
-    authSnippetTitle: {
-        color: '#fff',
-        fontSize: 32,
-        fontWeight: 'bold',
-        lineHeight: 40,
-        marginBottom: 16,
-    },
-    authSnippetTitleItalic: {
-        fontStyle: 'italic',
-        fontWeight: '300',
-    },
-    authSnippetDesc: {
-        color: '#ceebc2',
-        fontSize: 14,
-        lineHeight: 22,
     },
 });
 

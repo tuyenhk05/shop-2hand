@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-
+import { Pagination } from 'antd';
 import { useSelector } from 'react-redux';
 import AnimateWhenVisible from '../../helpers/animationScroll';
 import OrderCard from './OrderCard';
@@ -68,6 +68,16 @@ const PurchaseHistory = () => {
         return true;
     });
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 6;
+
+    const handleFilterChange = (newFilter) => {
+        setFilter(newFilter);
+        setCurrentPage(1);
+    };
+
+    const paginatedOrders = filteredOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
     return (
         <main className="pt-32 pb-20 max-w-7xl mx-auto px-6 font-manrope">
             {/* Hero Section */}
@@ -101,9 +111,9 @@ const PurchaseHistory = () => {
             <section className="space-y-12">
                 <AnimateWhenVisible direction="fadeInUp" className="flex flex-wrap items-center justify-between gap-4 py-6 border-b border-outline-variant/30">
                     <div className="flex gap-4 overflow-x-auto pb-2 sm:pb-0 hide-scrollbar w-full sm:w-auto">
-                        <button onClick={() => setFilter('all')} className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'all' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>Tất cả</button>
-                        <button onClick={() => setFilter('pending')} className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'pending' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>Đang xử lý</button>
-                        <button onClick={() => setFilter('completed')} className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'completed' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>Hoàn thành</button>
+                        <button onClick={() => handleFilterChange('all')} className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'all' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>Tất cả</button>
+                        <button onClick={() => handleFilterChange('pending')} className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'pending' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>Đang xử lý</button>
+                        <button onClick={() => handleFilterChange('completed')} className={`px-6 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'completed' ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'}`}>Hoàn thành</button>
                     </div>
                 </AnimateWhenVisible>
 
@@ -112,13 +122,30 @@ const PurchaseHistory = () => {
                 ) : filteredOrders.length === 0 ? (
                     <div className="text-center p-10 bg-surface-container-low rounded-xl">Bạn không có đơn hàng nào trong mục này.</div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredOrders.map((order, idx) => (
-                            <AnimateWhenVisible key={order._id || idx} direction="fadeInUp" transition={{ delay: idx * 0.1 }}>
-                                <OrderCard order={order} formatPrice={formatPrice} />
-                            </AnimateWhenVisible>
-                        ))}
-                    </div>
+                    <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                            {paginatedOrders.map((order, idx) => (
+                                <AnimateWhenVisible key={order._id || idx} direction="fadeInUp" transition={{ delay: idx * 0.1 }}>
+                                    <OrderCard order={order} formatPrice={formatPrice} />
+                                </AnimateWhenVisible>
+                            ))}
+                        </div>
+                        
+                        {filteredOrders.length > pageSize && (
+                            <div className="flex justify-center pb-10">
+                                <Pagination
+                                    current={currentPage}
+                                    total={filteredOrders.length}
+                                    pageSize={pageSize}
+                                    onChange={(page) => {
+                                        setCurrentPage(page);
+                                        window.scrollTo({ top: 300, behavior: 'smooth' });
+                                    }}
+                                    showSizeChanger={false}
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
             </section>
         </main>

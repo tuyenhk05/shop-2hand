@@ -6,7 +6,7 @@ const getToken = async () => await AsyncStorage.getItem('token');
 const getHeaders = async (isFormData = false) => {
     const headers = {};
     const token = await getToken();
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    if (token && token !== 'null' && token !== 'undefined') headers['Authorization'] = `Bearer ${token}`;
     if (!isFormData) {
         headers['Content-Type'] = 'application/json';
         headers['Accept'] = 'application/json';

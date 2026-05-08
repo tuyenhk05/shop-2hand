@@ -28,6 +28,11 @@ import OrdersManagement from "../pages/admin/OrdersManagement";
 import AdminSettings from "../pages/admin/AdminSettings";
 import CustomerSupport from "../pages/admin/CustomerSupport";
 import ChatWithShop from "../pages/chat/ChatWithShop";
+import NotificationPage from "../pages/notifications/NotificationPage";
+import About from "../pages/about/About";
+import Support from "../pages/support/Support";
+import Privacy from "../pages/legal/Privacy";
+import Terms from "../pages/legal/Terms";
 import { Navigate } from "react-router-dom";
 
 export const routes = [
@@ -86,6 +91,26 @@ export const routes = [
             {
                 path: "/chat",
                 element: <ChatWithShop />
+            },
+            {
+                path: "/notifications",
+                element: <NotificationPage />
+            },
+            {
+                path: "/about",
+                element: <About />
+            },
+            {
+                path: "/support",
+                element: <Support />
+            },
+            {
+                path: "/privacy",
+                element: <Privacy />
+            },
+            {
+                path: "/terms",
+                element: <Terms />
             }
         ]
     },
@@ -155,6 +180,10 @@ export const routes = [
                     {
                         path: "settings",
                         element: <AdminSettings />
+                    },
+                    {
+                        path: "notifications",
+                        element: <NotificationPage isAdmin={true} />
                     }
                 ]
             }

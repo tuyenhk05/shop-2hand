@@ -1,11 +1,20 @@
 export const checkLogin = (data) => {
+    let role = data.role;
+    if (role && typeof role === 'object') {
+        role = role.name || role.id || JSON.stringify(role);
+    } else if (role === undefined || role === null) {
+        role = 'customer';
+    } else {
+        role = String(role);
+    }
+
     return {
         type: "LOGIN",
         userId: data.id,
         fullName: data.fullName,
         email: data.email,
         token: data.token,
-        role: data.role
+        role: role
     }
 }
 

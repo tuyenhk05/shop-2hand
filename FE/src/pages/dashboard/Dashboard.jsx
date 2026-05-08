@@ -9,6 +9,7 @@ import { Modal, message } from 'antd';
 
 import { getCookie } from '../../helpers/cookie';
 import useScrollToTop from '../../hooks/useScrollToTop';
+import Loading from '../../components/loading/loading';
 import ProtectedRoute from '../../components/checkLogin/ProtectedRoute';
 
 const Dashboard = () => {
@@ -22,10 +23,20 @@ const Dashboard = () => {
     const [wishlistItems, setWishlistItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
+    const [isDetailsModalVisible, setIsDetailsModalVisible] = useState(false);
     const [selectedConsignmentId, setSelectedConsignmentId] = useState(null);
+    const [selectedConsignment, setSelectedConsignment] = useState(null);
 
 
     const userId = useSelector((state) => state.auth.userId);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const tabParam = queryParams.get('tab');
+        if (tabParam) {
+            setActiveTab(tabParam);
+        }
+    }, [location.search]);
 
     useEffect(() => {
         if (!userId) {
@@ -138,6 +149,11 @@ const Dashboard = () => {
     };
 
 
+    const handleViewDetails = (consignment) => {
+        setSelectedConsignment(consignment);
+        setIsDetailsModalVisible(true);
+    };
+
     // --- XỬ LÝ LOGIC HIỂN THỊ DỮ LIỆU BẰNG USEMEMO (Tối ưu hiệu năng) ---
     const processingOrders = useMemo(() => {
         return orders.filter(o => ['pending_payment', 'processing', 'shipped'].includes(o.status));
@@ -168,11 +184,7 @@ const Dashboard = () => {
 
     // --- HIỂN THỊ LOADING SKELETON / SPINNER ---
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center min-h-[60vh]">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
+        return <Loading fullScreen={true} text="Đang tải bảng điều khiển..." />;
     }
 
     return (
@@ -243,6 +255,77 @@ const Dashboard = () => {
                             </p>
                         </div>
                     </div>
+                </Modal>
+
+                {/* Modal Xem chi tiết Ký gửi */}
+                <Modal
+                    title={<span className="font-notoSerif text-xl font-bold">Chi tiết Yêu cầu Ký gửi</span>}
+                    open={isDetailsModalVisible}
+                    onCancel={() => setIsDetailsModalVisible(false)}
+                    footer={[
+                        <button 
+                            key="close"
+                            onClick={() => setIsDetailsModalVisible(false)}
+                            className="px-8 py-2.5 bg-primary text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:shadow-lg transition-all font-manrope"
+                        >
+                            Đóng
+                        </button>
+                    ]}
+                    width={700}
+                    centered
+                >
+                    {selectedConsignment && (
+                        <div className="py-2 space-y-6 font-manrope">
+                            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-outline-variant/20">
+                                {selectedConsignment.photos?.map((img, idx) => (
+                                    <div key={idx} className="w-32 h-40 shrink-0 rounded-xl overflow-hidden border border-outline-variant/10 shadow-sm">
+                                        <img src={img} className="w-full h-full object-cover" alt="product" />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Tên sản phẩm</h4>
+                                    <p className="text-sm font-semibold text-on-surface">{selectedConsignment.title}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Trạng thái</h4>
+                                    <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md ${
+                                        selectedConsignment.status === 'pending' ? 'bg-surface-container-high text-on-surface' : 
+                                        (selectedConsignment.status === 'valued' ? 'bg-primary/10 text-primary' : 
+                                        (selectedConsignment.status === 'rejected' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed'))
+                                    }`}>
+                                        {translateConsignmentStatus(selectedConsignment.status)}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Giá mong muốn</h4>
+                                    <p className="text-sm font-bold text-primary">{formatPrice(selectedConsignment.expectedPrice)}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Danh mục / Thương hiệu</h4>
+                                    <p className="text-sm font-medium text-on-surface">
+                                        {selectedConsignment.categoryId?.name || 'N/A'} / {selectedConsignment.brandId?.name || 'N/A'}
+                                    </p>
+                                </div>
+                                <div className="col-span-2">
+                                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant mb-1">Mô tả sản phẩm</h4>
+                                    <p className="text-sm text-on-surface-variant leading-relaxed bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+                                        {selectedConsignment.description || 'Không có mô tả.'}
+                                    </p>
+                                </div>
+                                {selectedConsignment.adminNotes && (
+                                    <div className="col-span-2">
+                                        <h4 className="text-[10px] font-bold uppercase tracking-wider text-error/80 mb-1 italic">Ghi chú từ Shop</h4>
+                                        <p className="text-sm text-on-surface font-medium leading-relaxed bg-error-container/10 p-4 rounded-xl border border-error/10 italic">
+                                            {selectedConsignment.adminNotes}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </Modal>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -354,9 +437,18 @@ const Dashboard = () => {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="text-right">
-                                                            <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${item.status === 'pending' ? 'bg-surface-container-high text-on-surface' : (item.status === 'valued' ? 'bg-primary/10 text-primary' : (item.status === 'rejected' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed'))}`}>{translateConsignmentStatus(item.status)}</span>
-                                                            <p className="text-xs text-primary font-bold mt-2">{formatPrice(item.expectedPrice)}</p>
+                                                        <div className="text-right flex items-center gap-4">
+                                                            <button 
+                                                                onClick={() => handleViewDetails(item)}
+                                                                className="w-9 h-9 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-primary/10 hover:text-primary transition-all"
+                                                                title="Xem chi tiết"
+                                                            >
+                                                                <span className="material-symbols-outlined text-[18px]">visibility</span>
+                                                            </button>
+                                                            <div>
+                                                                <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full ${item.status === 'pending' ? 'bg-surface-container-high text-on-surface' : (item.status === 'valued' ? 'bg-primary/10 text-primary' : (item.status === 'rejected' ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed'))}`}>{translateConsignmentStatus(item.status)}</span>
+                                                                <p className="text-xs text-primary font-bold mt-2">{formatPrice(item.expectedPrice)}</p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     {item.status === 'pending' && (

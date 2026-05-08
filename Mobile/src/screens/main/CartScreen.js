@@ -6,10 +6,14 @@ import { IconButton, Button } from 'react-native-paper';
 import { getCartApi, removeFromCartApi } from '../../services/client/cart.service';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useToast } from '../../context/ToastContext';
+
 const CartScreen = () => {
     const navigation = useNavigation();
+    const { showToast } = useToast();
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedItemIds, setSelectedItemIds] = useState([]);
 
     const userId = useSelector((state) => state.auth.userId);
 
@@ -22,7 +26,11 @@ const CartScreen = () => {
         try {
             const response = await getCartApi(userId);
             if (response?.success) {
-                setCartItems(response.cart || []);
+                const items = response.cart || [];
+                setCartItems(items);
+                // Initially select all items
+                const validIds = items.map(item => String(item.productId?._id || item.productId || ''));
+                setSelectedItemIds(validIds);
             }
         } catch (error) {
             console.error('Fetch cart error:', error);
@@ -47,11 +55,11 @@ const CartScreen = () => {
                     return itemPid !== pid;
                 }));
             } else {
-                Alert.alert('Lỗi', 'Không thể xóa. Vui lòng thử lại!');
+                showToast('Không thể xóa. Vui lòng thử lại!', 'error');
             }
         } catch (error) {
             console.error('Remove cart item error:', error);
-            Alert.alert('Lỗi', 'Đã xảy ra lỗi. Vui lòng thử lại!');
+            showToast('Đã xảy ra lỗi. Vui lòng thử lại!', 'error');
         }
     };
 
@@ -59,19 +67,52 @@ const CartScreen = () => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0);
     };
 
-    const subtotal = cartItems.reduce((acc, item) => {
+    const isAllSelected = cartItems.length > 0 && selectedItemIds.length === cartItems.length;
+
+    const toggleSelectAll = () => {
+        if (isAllSelected) {
+            setSelectedItemIds([]);
+        } else {
+            setSelectedItemIds(cartItems.map(item => String(item.productId?._id || item.productId || '')));
+        }
+    };
+
+    const toggleSelectItem = (productId) => {
+        const pid = String(productId);
+        if (selectedItemIds.includes(pid)) {
+            setSelectedItemIds(prev => prev.filter(id => id !== pid));
+        } else {
+            setSelectedItemIds(prev => [...prev, pid]);
+        }
+    };
+
+    const selectedItems = cartItems.filter(item => {
+        const pid = String(item.productId?._id || item.productId || '');
+        return selectedItemIds.includes(pid);
+    });
+
+    const subtotal = selectedItems.reduce((acc, item) => {
         const product = item.productId || item;
         return acc + (product.price || 0) * (item.quantity || 1);
     }, 0);
-    const shippingFee = 30000;
+    const shippingFee = subtotal > 0 ? 30000 : 0;
     const total = subtotal > 0 ? subtotal + shippingFee : 0;
 
     const renderItem = ({ item }) => {
         const product = item.productId || item;
+        const pid = String(product._id || product.slug);
+        const isSelected = selectedItemIds.includes(pid);
         const mainImage = product.images?.find(img => img.isPrimary)?.imageUrl || product.images?.[0]?.imageUrl || 'https://placehold.co/150x200?text=No+Image';
 
         return (
             <View style={styles.cartItem}>
+                <IconButton 
+                    icon={isSelected ? "checkbox-marked" : "checkbox-blank-outline"} 
+                    size={22} 
+                    iconColor={isSelected ? "#4c6545" : "#64748b"} 
+                    style={styles.checkboxButton}
+                    onPress={() => toggleSelectItem(pid)}
+                />
                 <Image source={{ uri: mainImage }} style={styles.itemImage} />
                 <View style={styles.itemInfo}>
                     <Text style={styles.itemBrand}>{product.brandId?.name || 'Archive'}</Text>
@@ -109,7 +150,31 @@ const CartScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.headerTitle}>Giỏ hàng</Text>
+            <View style={styles.header}>
+                <IconButton 
+                    icon="arrow-left" 
+                    size={24} 
+                    iconColor="#1e293b" 
+                    onPress={() => navigation.goBack()} 
+                    style={styles.backButton}
+                />
+                <Text style={styles.headerTitle}>Giỏ hàng</Text>
+                <View style={{ width: 48 }} /> 
+            </View>
+
+            {cartItems.length > 0 && (
+                <View style={styles.selectAllRow}>
+                    <TouchableOpacity onPress={toggleSelectAll} style={styles.selectAllButton}>
+                        <IconButton 
+                            icon={isAllSelected ? "checkbox-marked" : "checkbox-blank-outline"} 
+                            size={22} 
+                            iconColor={isAllSelected ? "#4c6545" : "#64748b"} 
+                            style={styles.selectAllCheckbox}
+                        />
+                        <Text style={styles.selectAllText}>Chọn tất cả ({cartItems.length} sản phẩm)</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
             
             <FlatList
                 data={cartItems}
@@ -149,7 +214,13 @@ const CartScreen = () => {
 
                     <Button 
                         mode="contained" 
-                        onPress={() => navigation.navigate('Checkout')} 
+                        onPress={() => {
+                            if (selectedItems.length === 0) {
+                                showToast('Vui lòng chọn ít nhất một sản phẩm để thanh toán.', 'info');
+                                return;
+                            }
+                            navigation.navigate('Checkout', { items: selectedItems });
+                        }} 
                         style={styles.checkoutButton}
                         labelStyle={styles.checkoutButtonText}
                         buttonColor="#4c6545"
@@ -173,13 +244,38 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fef9f7',
     },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 8,
+        paddingTop: 8,
+    },
+    backButton: {
+        margin: 0,
+    },
     headerTitle: {
-        fontSize: 28,
+        fontSize: 20,
         fontWeight: 'bold',
         color: '#1e293b',
+        textAlign: 'center',
+    },
+    selectAllRow: {
         paddingHorizontal: 24,
-        paddingTop: 16,
-        paddingBottom: 16,
+        marginBottom: 12,
+    },
+    selectAllButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    selectAllCheckbox: {
+        margin: 0,
+        marginRight: 4,
+    },
+    selectAllText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#475569',
     },
     listContent: {
         paddingHorizontal: 24,
@@ -187,6 +283,7 @@ const styles = StyleSheet.create({
     },
     cartItem: {
         flexDirection: 'row',
+        alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 16,
         padding: 12,
@@ -194,6 +291,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#f1f5f9',
         position: 'relative',
+    },
+    checkboxButton: {
+        margin: 0,
+        marginRight: 8,
     },
     itemImage: {
         width: 80,

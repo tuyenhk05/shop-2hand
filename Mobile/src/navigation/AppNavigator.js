@@ -19,6 +19,8 @@ import OrderHistoryScreen from '../screens/main/OrderHistoryScreen';
 import OrderDetailScreen from '../screens/main/OrderDetailScreen';
 import ChatScreen from '../screens/main/ChatScreen';
 import ConsignmentScreen from '../screens/main/ConsignmentScreen';
+import CartScreen from '../screens/main/CartScreen';
+import NotificationScreen from '../screens/main/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -49,6 +51,8 @@ const AppNavigator = () => {
         <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
         <Stack.Screen name="ChatSupport" component={ChatScreen} />
         <Stack.Screen name="Consignment" component={ConsignmentScreen} />
+        <Stack.Screen name="Cart" component={CartScreen} />
+        <Stack.Screen name="Notification" component={NotificationScreen} options={{ headerShown: true, title: 'Thông báo' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

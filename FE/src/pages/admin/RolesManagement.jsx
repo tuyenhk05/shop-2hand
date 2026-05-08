@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Input, Checkbox, message } from 'antd';
 import { getAllRoles, createRole, updateRole, deleteRole } from '../../services/admin/roles.service.jsx';
+import Loading from '../../components/loading/loading';
 
 const RolesManagement = () => {
     const { role } = useSelector((state) => state.auth);
@@ -141,6 +142,8 @@ const RolesManagement = () => {
             ),
         },
     ];
+
+    if (loading && roles.length === 0) return <Loading fullScreen={true} text="Đang tải danh sách quyền..." />;
 
     return (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10">

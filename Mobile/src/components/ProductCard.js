@@ -1,13 +1,14 @@
 import React, { memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { IconButton } from 'react-native-paper';
+import { IMAGE_BASE_URL } from '../config/api';
 
 const conditionLabel = (c) => ({ new: 'Mới', like_new: 'Như mới', good: 'Tốt', fair: 'Khá', poor: 'Cũ' }[c] || c);
 
 const getImageUrl = (url) => {
     if (!url) return 'https://dummyimage.com/400x500/f5f5f5/333333.png?text=No+Image';
     if (url.startsWith('http')) return url;
-    return `http://192.168.1.14:3001${url.startsWith('/') ? '' : '/'}${url}`;
+    return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
 const getMainImageHelper = (product) => {
@@ -46,29 +47,6 @@ const ProductCard = memo(({ item, isLarge, wishlisted, onWishlist, onCart, onNav
                         <Text style={styles.badgeText}>✦ CHỌN LỌC</Text>
                     </View>
                 )}
-
-                <View style={styles.actionsContainer}>
-                    <IconButton
-                        icon={wishlisted ? 'cards-heart' : 'heart-outline'}
-                        iconColor={wishlisted ? '#fff' : '#4c6545'}
-                        containerColor={wishlisted ? '#4c6545' : 'rgba(255, 255, 255, 0.9)'}
-                        size={18}
-                        onPress={(e) => {
-                            // React Native onPress doesn't have stopPropagation, we use it natively but since it's nested in TouchableOpacity, it might trigger the parent.
-                            // However, IconButton handles its own onPress usually blocking the parent if it's hit directly.
-                            onWishlist && onWishlist(item._id || item.slug);
-                        }}
-                        style={styles.actionButton}
-                    />
-                    <IconButton
-                        icon="cart-plus"
-                        iconColor="#4c6545"
-                        containerColor="rgba(255, 255, 255, 0.9)"
-                        size={18}
-                        onPress={() => onCart && onCart(item._id || item.slug)}
-                        style={styles.actionButton}
-                    />
-                </View>
             </View>
 
             <View style={styles.infoContainer}>

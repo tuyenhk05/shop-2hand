@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Select, Switch, message, Tag } from 'antd';
 import { getAllUsers, updateUser, deleteUser } from '../../services/admin/users.service.jsx';
 import { getAllRoles } from '../../services/admin/roles.service.jsx';
+import Loading from '../../components/loading/loading';
 
 const UsersManagement = () => {
     const { role } = useSelector((state) => state.auth);
@@ -120,6 +121,8 @@ const UsersManagement = () => {
             ),
         },
     ];
+
+    if (loading && users.length === 0) return <Loading fullScreen={true} text="Đang tải danh sách người dùng..." />;
 
     return (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10">

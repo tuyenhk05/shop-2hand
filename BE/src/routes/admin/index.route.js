@@ -7,6 +7,8 @@ const consignmentsRoutes = require('./consignments.route');
 const ordersRoutes = require('./orders.route');
 const brandsRoutes = require('./brands.route');
 const supportRoutes = require('./support.route');
+const settingsRoutes = require('./settings.route');
+const notificationRoutes = require('./notification.route');
 
 module.exports = (app) => {
     const PATH_ADMIN = app.locals.prefixAdmin || '/admin';
@@ -20,4 +22,6 @@ module.exports = (app) => {
     app.use(`${PATH_ADMIN}/orders`, ordersRoutes);
     app.use(`${PATH_ADMIN}/brands`, brandsRoutes);
     app.use(`${PATH_ADMIN}/support`, supportRoutes);
+    app.use(`${PATH_ADMIN}/settings`, settingsRoutes);
+    app.use(`${PATH_ADMIN}/notifications`, notificationRoutes);
 };

@@ -7,6 +7,7 @@ import { getProductById } from '../../services/client/products';
 import { addToCartApi } from '../../services/client/cart.service';
 import { addToWishlistApi, getWishlistApi, removeFromWishlistApi } from '../../services/client/wishlist.service';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 const { width } = Dimensions.get('window');
 
@@ -23,6 +24,12 @@ const ProductDetailScreen = () => {
     const showCustomAlert = (type, message) => {
         setAlert({ type, message });
         setTimeout(() => setAlert(null), 3000);
+    };
+
+    const getImageUrl = (url) => {
+        if (!url) return 'https://dummyimage.com/400x500/f5f5f5/333333.png?text=No+Image';
+        if (url.startsWith('http')) return url;
+        return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     const userId = useSelector((state) => state.auth.userId);
@@ -177,18 +184,22 @@ const ProductDetailScreen = () => {
                 <View style={styles.galleryContainer}>
                     <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
                         {product.images && product.images.length > 0 ? (
-                            product.images.map((img, idx) => (
-                                <Image 
-                                    key={idx} 
-                                    source={{ uri: img.imageUrl }} 
-                                    style={styles.galleryImage} 
-                                    resizeMode="cover"
-                                />
-                            ))
+                            product.images.map((img, idx) => {
+                                const imgUrl = typeof img === 'string' ? img : (img.imageUrl || img.image || '');
+                                return (
+                                    <Image 
+                                        key={idx} 
+                                        source={{ uri: getImageUrl(imgUrl) }} 
+                                        style={styles.galleryImage} 
+                                        resizeMode="cover"
+                                    />
+                                );
+                            })
                         ) : (
                             <Image 
-                                source={{ uri: 'https://placehold.co/800x1000?text=No+Image' }} 
+                                source={{ uri: getImageUrl(product.image || product.images?.[0]?.imageUrl) }} 
                                 style={styles.galleryImage} 
+                                resizeMode="cover"
                             />
                         )}
                     </ScrollView>

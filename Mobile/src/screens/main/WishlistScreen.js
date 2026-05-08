@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getWishlistApi, removeFromWishlistApi } from '../../services/client/wishlist.service';
 import { addToCartApi } from '../../services/client/cart.service';
+import { getAllProducts } from '../../services/client/products';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 const { width } = Dimensions.get('window');
 
@@ -25,8 +27,10 @@ const WishlistScreen = () => {
     const getImageUrl = (url) => {
         if (!url) return 'https://dummyimage.com/400x500/f5f5f5/333333.png?text=No+Image';
         if (url.startsWith('http')) return url;
-        return `http://192.168.1.14:3001${url.startsWith('/') ? '' : '/'}${url}`;
+        return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     };
+
+    const [suggestedProducts, setSuggestedProducts] = useState([]);
 
     const fetchWishlists = async () => {
         if (!userId) {
@@ -35,11 +39,19 @@ const WishlistScreen = () => {
         }
         try {
             setIsLoading(true);
-            const response = await getWishlistApi(userId);
-            if (response && response.data) {
-                setWishlistItems(response.data || []);
-            } else if (response && response.success) {
-                setWishlistItems(response.wishlists || response.data || []);
+            const [wishlistRes, productsRes] = await Promise.all([
+                getWishlistApi(userId),
+                getAllProducts()
+            ]);
+
+            if (wishlistRes && wishlistRes.data) {
+                setWishlistItems(wishlistRes.data || []);
+            } else if (wishlistRes && wishlistRes.success) {
+                setWishlistItems(wishlistRes.wishlists || wishlistRes.data || []);
+            }
+
+            if (productsRes && productsRes.success) {
+                setSuggestedProducts(productsRes.data || []);
             }
         } catch (error) {
             console.error("Lỗi khi tải wishlist", error);
@@ -110,10 +122,6 @@ const WishlistScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <IconButton icon="arrow-left" size={24} iconColor="#1e293b" style={{ margin: 0 }} />
-                    <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#1e293b' }}>Quay lại</Text>
-                </TouchableOpacity>
                 <Text style={styles.headerTitle}>Sản phẩm đã thích</Text>
                 <Text style={styles.headerSubtitle}>Lưu trữ phong cách bền vững cho bạn.</Text>
             </View>
@@ -132,17 +140,17 @@ const WishlistScreen = () => {
                 </View>
             )}
 
-            {wishlistItems.length === 0 ? (
-                <View style={styles.emptyBox}>
-                    <IconButton icon="heart-outline" size={48} iconColor="#64748b" />
-                    <Text style={styles.emptyText}>Danh sách của bạn đang trống.</Text>
-                    <Button mode="contained" onPress={() => navigation.navigate('StoreTab')} style={{ marginTop: 16 }} buttonColor="#4A5D4E">
-                        Khám phá ngay
-                    </Button>
-                </View>
-            ) : (
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                    {wishlistItems.map((item, idx) => {
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                {wishlistItems.length === 0 ? (
+                    <View style={styles.emptyBox}>
+                        <IconButton icon="heart-outline" size={48} iconColor="#64748b" />
+                        <Text style={styles.emptyText}>Danh sách của bạn đang trống.</Text>
+                        <Button mode="contained" onPress={() => navigation.navigate('StoreTab')} style={{ marginTop: 16 }} buttonColor="#4c6545">
+                            Khám phá ngay
+                        </Button>
+                    </View>
+                ) : (
+                    wishlistItems.map((item, idx) => {
                         const product = item.productId;
                         if (!product) return null;
                         const mainImage = product.images?.[0]?.imageUrl || product.images?.find(img => img.isPrimary)?.imageUrl || product.image;
@@ -162,16 +170,41 @@ const WishlistScreen = () => {
                                     </View>
                                     <Text style={styles.itemPrice}>{formatPrice(product.price)}</Text>
                                     <View style={styles.cardActions}>
-                                        <Button mode="outlined" onPress={() => handleAddToCart(product._id || product.slug)} style={styles.cartBtn} textColor="#4A5D4E" borderColor="#4A5D4E">
+                                        <Button mode="outlined" onPress={() => handleAddToCart(product._id || product.slug)} style={styles.cartBtn} textColor="#4c6545" borderColor="#4c6545">
                                             THÊM VÀO GIỎ
                                         </Button>
                                     </View>
                                 </View>
                             </TouchableOpacity>
                         );
-                    })}
-                </ScrollView>
-            )}
+                    })
+                )}
+
+                {/* SUGGESTED PRODUCTS SECTION */}
+                {suggestedProducts.length > 0 && (
+                    <View style={styles.suggestionsSection}>
+                        <Text style={styles.suggestionsTitle}>Có thể bạn sẽ thích</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalScroll}>
+                            {suggestedProducts.slice(0, 5).map((prod, index) => {
+                                const prodImg = prod.images?.[0]?.imageUrl || prod.images?.find(img => img.isPrimary)?.imageUrl || prod.image;
+                                return (
+                                    <TouchableOpacity 
+                                        key={prod._id || index} 
+                                        style={styles.suggestionCard}
+                                        onPress={() => navigation.navigate('ProductDetail', { id: prod.slug || prod._id })}
+                                    >
+                                        <Image source={{ uri: getImageUrl(prodImg) }} style={styles.suggestionImage} />
+                                        <View style={styles.suggestionInfo}>
+                                            <Text style={styles.suggestionTitleText} numberOfLines={1}>{prod.title}</Text>
+                                            <Text style={styles.suggestionPrice}>{formatPrice(prod.price)}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </ScrollView>
+                    </View>
+                )}
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -300,6 +333,47 @@ const styles = StyleSheet.create({
     },
     alertTextError: {
         color: '#991b1b',
+    },
+    suggestionsSection: {
+        marginTop: 32,
+        marginBottom: 16,
+    },
+    suggestionsTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#1e293b',
+        marginBottom: 16,
+    },
+    horizontalScroll: {
+        paddingRight: 16,
+    },
+    suggestionCard: {
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        width: 140,
+        marginRight: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        overflow: 'hidden',
+    },
+    suggestionImage: {
+        width: '100%',
+        height: 140,
+        backgroundColor: '#f5f5f5',
+    },
+    suggestionInfo: {
+        padding: 10,
+    },
+    suggestionTitleText: {
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: '#1e293b',
+        marginBottom: 4,
+    },
+    suggestionPrice: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#FF8A65',
     },
 });
 

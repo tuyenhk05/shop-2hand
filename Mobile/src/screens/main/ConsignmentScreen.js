@@ -1,24 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, ActivityIndicator, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, ActivityIndicator, Image, FlatList, Modal } from 'react-native';
+import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { IconButton, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createConsignmentApi } from '../../services/client/consignment.service';
+import { 
+    createConsignmentApi, 
+    getConsignmentsApi, 
+    updateUserConsignmentStatusApi 
+} from '../../services/client/consignment.service';
 import { getAllCategories } from '../../services/client/category.service';
 import { getAllBrands } from '../../services/client/brand.service';
+import * as ImagePicker from 'expo-image-picker';
+import { useToast } from '../../context/ToastContext';
 
 const { width } = Dimensions.get('window');
 
+const translateConsignmentStatus = (status) => {
+    switch (status) {
+        case 'pending': return 'Đang chờ định giá';
+        case 'valued': return 'Chờ bạn xác nhận';
+        case 'approved': return 'Chờ nhận hàng';
+        case 'received': return 'Đã nhận & Kiểm định';
+        case 'rejected': return 'Đã từ chối/hủy';
+        case 'completed': return 'Đã hoàn tất';
+        default: return status || 'Đang xử lý';
+    }
+};
+
+const statusColors = {
+    pending: '#94a3b8',
+    valued: '#4c6545',
+    approved: '#f59e0b',
+    received: '#10b981',
+    rejected: '#ef4444',
+    completed: '#1c1c19',
+};
+
 const ConsignmentScreen = () => {
     const navigation = useNavigation();
+    const route = useRoute();
+    const isFocused = useIsFocused();
+    const { showToast } = useToast();
     const userId = useSelector((state) => state.auth.userId);
 
-    // States matching the FE 3-step wizard
-    const [step, setStep] = useState(1);
-    const [uploadedFiles, setUploadedFiles] = useState([]); // Array of strings (URLs/Placeholders)
-    const [previewUrls, setPreviewUrls] = useState([]);
+    const [activeTab, setActiveTab] = useState('list'); // 'list' or 'create'
+    const [consignments, setConsignments] = useState([]);
+    const [isLoadingList, setIsLoadingList] = useState(false);
+    
+    // View Detail state
+    const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+    const [selectedConsignment, setSelectedConsignment] = useState(null);
 
+    // Form States
+    const [step, setStep] = useState(1);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
+    const [previewUrls, setPreviewUrls] = useState([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [expectedPrice, setExpectedPrice] = useState('');
@@ -33,26 +70,72 @@ const ConsignmentScreen = () => {
     const [categories, setCategories] = useState([]);
     const [brands, setBrands] = useState([]);
     const [submitting, setSubmitting] = useState(false);
-    const [alert, setAlert] = useState(null); // { type: 'success' | 'error', message: string }
 
-    // Fetch drop down lists exactly like FE
-    useEffect(() => {
-        const fetchData = async () => {
+    // Modal State
+    const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
+    const [selectedConsId, setSelectedConsId] = useState(null);
+
+    const fetchDropdowns = useCallback(async () => {
+        try {
             const [catRes, brandRes] = await Promise.all([
                 getAllCategories(),
                 getAllBrands()
             ]);
             if (catRes?.success) setCategories(catRes.data || []);
             if (brandRes?.success) setBrands(brandRes.data || []);
-        };
-        fetchData();
+        } catch (error) {
+            console.error(error);
+        }
     }, []);
 
-    // Simulated image picker exactly for mobile preview environment
-    const handleAddImage = () => {
-        const mockImageUrl = 'https://dummyimage.com/400x500/4c6545/ffffff.png?text=Atelier+Mock';
-        setUploadedFiles(prev => [...prev, mockImageUrl]);
-        setPreviewUrls(prev => [...prev, mockImageUrl]);
+    const fetchList = useCallback(async () => {
+        if (!userId) return;
+        setIsLoadingList(true);
+        try {
+            const res = await getConsignmentsApi(userId);
+            if (res.success) setConsignments(res.consignments || []);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoadingList(false);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        if (isFocused) {
+            fetchDropdowns();
+            fetchList();
+            
+            // Check for initial tab from navigation params
+            if (route.params?.activeTab) {
+                setActiveTab(route.params.activeTab === 'consignor' ? 'list' : route.params.activeTab);
+            }
+        }
+    }, [isFocused, fetchDropdowns, fetchList, route.params]);
+
+    const handleAddImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            showToast('Vui lòng cấp quyền truy cập thư viện ảnh.', 'error');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsMultipleSelection: true,
+            quality: 1,
+        });
+
+        if (!result.canceled && result.assets && result.assets.length > 0) {
+            const newPreviews = result.assets.map(asset => asset.uri);
+            const newFiles = result.assets.map(asset => ({
+                uri: asset.uri,
+                name: asset.fileName || `consignment_${Date.now()}.jpg`,
+                type: asset.mimeType || 'image/jpeg',
+            }));
+            setPreviewUrls(prev => [...prev, ...newPreviews]);
+            setUploadedFiles(prev => [...prev, ...newFiles]);
+        }
     };
 
     const handleRemoveImage = (indexToRemove) => {
@@ -62,41 +145,19 @@ const ConsignmentScreen = () => {
 
     const handleNext = () => {
         if (step === 1) {
-            if (previewUrls.length === 0) {
-                setAlert({ type: 'error', message: 'Vui lòng tải lên ít nhất 1 hình ảnh sản phẩm.' });
-                return;
-            }
-            setAlert(null);
+            if (previewUrls.length === 0) return showToast('Vui lòng tải lên ít nhất 1 ảnh.', 'error');
             setStep(2);
         } else if (step === 2) {
-            if (!title || !description || !categoryId) {
-                setAlert({ type: 'error', message: 'Vui lòng điền tên, mô tả và chọn danh mục.' });
-                return;
-            }
-            setAlert(null);
+            if (!title || !description || !categoryId) return showToast('Vui lòng điền thông tin bắt buộc.', 'error');
             setStep(3);
         } else if (step === 3) {
             submitConsignment();
         }
     };
 
-    const handleBack = () => {
-        if (step > 1) {
-            setStep(step - 1);
-        }
-    };
-
     const submitConsignment = async () => {
-        if (!userId) {
-            setAlert({ type: 'error', message: 'Vui lòng đăng nhập để gửi bán sản phẩm.' });
-            return;
-        }
-
+        setSubmitting(true);
         try {
-            setSubmitting(true);
-            setAlert(null);
-
-            // FormData to send to creating consignment API exactly like FE
             const formData = new FormData();
             formData.append('userId', userId);
             formData.append('title', title);
@@ -110,274 +171,390 @@ const ConsignmentScreen = () => {
             formData.append('color', color);
             formData.append('material', material);
 
-            uploadedFiles.forEach(fileUrl => {
-                formData.append('images', fileUrl);
+            uploadedFiles.forEach(file => {
+                formData.append('images', {
+                    uri: file.uri,
+                    name: file.name,
+                    type: file.type
+                });
             });
 
             const res = await createConsignmentApi(formData);
-
-            if (res && res.success) {
-                setAlert({ type: 'success', message: 'Yêu cầu ký gửi đã được gửi thành công!' });
-                setTimeout(() => navigation.navigate('ProfileTab'), 1500);
+            if (res.success) {
+                showToast('Yêu cầu đã được gửi thành công!', 'success');
+                setStep(1);
+                setActiveTab('list');
+                fetchList();
             } else {
-                setAlert({ type: 'error', message: 'Lưu yêu cầu thất bại: ' + (res.message || 'Lỗi không xác định') });
+                showToast(res.message || 'Lỗi không xác định', 'error');
             }
         } catch (error) {
-            console.error("Lỗi gửi ký gửi", error);
-            setAlert({ type: 'error', message: 'Có lỗi xảy ra kết nối server.' });
+            showToast('Lỗi kết nối server', 'error');
         } finally {
             setSubmitting(false);
         }
     };
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0);
+    const handleUserAction = async (id, status) => {
+        if (status === 'approved') {
+            setSelectedConsId(id);
+            setIsAddressModalVisible(true);
+            return;
+        }
+
+        try {
+            const res = await updateUserConsignmentStatusApi(id, { status });
+            if (res.success) {
+                showToast('Đã cập nhật trạng thái.', 'success');
+                fetchList();
+            }
+        } catch (error) {
+            showToast('Lỗi khi thao tác.', 'error');
+        }
     };
 
-    return (
-        <SafeAreaView style={styles.container}>
-            {/* Top Navigation */}
-            <View style={styles.header}>
-                <IconButton icon="arrow-left" size={24} iconColor="#4c6545" onPress={() => navigation.goBack()} />
-                <Text style={styles.headerTitle}>Ký gửi Atelier</Text>
-                <View style={{ width: 48 }} />
-            </View>
+    const confirmAddressAndApprove = async () => {
+        try {
+            const res = await updateUserConsignmentStatusApi(selectedConsId, { status: 'approved' });
+            if (res.success) {
+                setIsAddressModalVisible(false);
+                showToast('Đã xác nhận. Vui lòng gửi hàng cho Shop!', 'success');
+                fetchList();
+            }
+        } catch (error) {
+            showToast('Lỗi khi thao tác.', 'error');
+        }
+    };
 
-            {/* Step Stepper Indicator */}
-            <View style={styles.stepperContainer}>
-                <View style={styles.stepTrack}>
-                    <View style={[styles.stepFill, { width: `${(step / 3) * 100}%` }]} />
-                </View>
-                <View style={styles.stepTextRow}>
-                    <Text style={[styles.stepText, step >= 1 && styles.stepTextActive]}>01 Ảnh & Tình trạng</Text>
-                    <Text style={[styles.stepText, step >= 2 && styles.stepTextActive]}>02 Chi tiết</Text>
-                    <Text style={[styles.stepText, step >= 3 && styles.stepTextActive]}>03 Xác nhận</Text>
-                </View>
-            </View>
+    const formatPrice = (price) => {
+        return (price || 0).toLocaleString('vi-VN') + 'đ';
+    };
 
-            {/* Beautiful alert boxes */}
-            {alert && (
-                <View style={[styles.alertBox, alert.type === 'success' ? styles.alertSuccess : styles.alertError]}>
-                    <IconButton 
-                        icon={alert.type === 'success' ? 'check-circle' : 'alert-circle'} 
-                        iconColor={alert.type === 'success' ? '#1b4332' : '#7f1d1d'} 
-                        size={20}
-                        style={styles.alertIcon} 
+    const handleViewDetail = (item) => {
+        setSelectedConsignment(item);
+        setIsDetailModalVisible(true);
+    };
+
+    const renderConsignmentItem = ({ item }) => (
+        <TouchableOpacity style={styles.consCard} activeOpacity={0.7} onPress={() => handleViewDetail(item)}>
+            <View style={styles.consHeader}>
+                <View style={styles.consMainInfo}>
+                    <Image 
+                        source={{ uri: item.photos?.[0] || 'https://placehold.co/100x120?text=Atelier' }} 
+                        style={styles.consThumb} 
                     />
-                    <Text style={[styles.alertText, alert.type === 'success' ? styles.alertTextSuccess : styles.alertTextError]}>
-                        {alert.message}
-                    </Text>
+                    <View style={styles.consTextInfo}>
+                        <Text style={styles.consTitle} numberOfLines={1}>{item.title || 'Yêu cầu ký gửi'}</Text>
+                        <Text style={styles.consMeta}>{item.categoryId?.name} • {item.brandId?.name || 'No Brand'}</Text>
+                        <Text style={styles.consDate}>{new Date(item.createdAt).toLocaleDateString('vi-VN')}</Text>
+                    </View>
+                </View>
+                <View style={styles.consPriceStatus}>
+                    <Text style={styles.consPrice}>{formatPrice(item.expectedPrice)}</Text>
+                    <View style={[styles.statusBadge, { backgroundColor: statusColors[item.status] + '15' }]}>
+                        <Text style={[styles.statusText, { color: statusColors[item.status] }]}>
+                            {translateConsignmentStatus(item.status)}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+
+            {/* Action Buttons based on status */}
+            {item.status === 'valued' && (
+                <View style={styles.actionRowList}>
+                    <TouchableOpacity style={styles.acceptBtn} onPress={() => handleUserAction(item._id, 'approved')}>
+                        <Text style={styles.acceptBtnText}>CHẤP NHẬN & GỬI ĐỒ</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.rejectBtn} onPress={() => handleUserAction(item._id, 'rejected')}>
+                        <Text style={styles.rejectBtnText}>TỪ CHỐI</Text>
+                    </TouchableOpacity>
                 </View>
             )}
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                {/* STEP 1: IMAGES & CONDITION */}
-                {step === 1 && (
-                    <View style={styles.stepContent}>
-                        <Text style={styles.sectionTitle}>Hình ảnh sản phẩm</Text>
-                        <Text style={styles.sectionSubtitle}>
-                            Tải lên các góc độ chi tiết của sản phẩm để chúng tôi định giá tốt nhất.
-                        </Text>
+            {item.status === 'pending' && (
+                <View style={styles.actionRowList}>
+                    <TouchableOpacity style={styles.cancelBtn} onPress={() => handleUserAction(item._id, 'rejected')}>
+                        <Text style={styles.cancelBtnText}>HỦY YÊU CẦU</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
 
-                        <View style={styles.imageGrid}>
-                            {previewUrls.map((imgUrl, index) => (
-                                <View key={index} style={styles.imageBox}>
-                                    <Image source={{ uri: imgUrl }} style={styles.imageItem} />
-                                    <TouchableOpacity style={styles.deleteOverlay} onPress={() => handleRemoveImage(index)}>
-                                        <IconButton icon="delete" size={18} iconColor="#fff" style={{ margin: 0 }} />
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
-                            
-                            {previewUrls.length < 8 && (
-                                <TouchableOpacity style={styles.addImageBtn} onPress={handleAddImage}>
-                                    <IconButton icon="camera-plus" size={28} iconColor="#4c6545" style={{ margin: 0 }} />
-                                    <Text style={styles.addImageLabel}>Thêm ảnh</Text>
-                                </TouchableOpacity>
-                            )}
+            {item.status === 'approved' && (
+                <View style={styles.infoRow}>
+                    <IconButton icon="information-outline" size={16} iconColor="#f59e0b" />
+                    <Text style={styles.infoText}>Vui lòng gửi hàng đến địa chỉ của Shop.</Text>
+                </View>
+            )}
+        </TouchableOpacity>
+    );
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <View style={styles.header}>
+                <IconButton icon="arrow-left" size={24} iconColor="#1e293b" onPress={() => navigation.goBack()} />
+                <Text style={styles.headerTitle}>Quản lý Ký gửi</Text>
+                <View style={{ width: 48 }} />
+            </View>
+
+            {/* Tab Switcher */}
+            <View style={styles.tabContainer}>
+                <TouchableOpacity 
+                    style={[styles.tab, activeTab === 'list' && styles.tabActive]} 
+                    onPress={() => setActiveTab('list')}
+                >
+                    <Text style={[styles.tabText, activeTab === 'list' && styles.tabTextActive]}>LỊCH SỬ</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.tab, activeTab === 'create' && styles.tabActive]} 
+                    onPress={() => setActiveTab('create')}
+                >
+                    <Text style={[styles.tabText, activeTab === 'create' && styles.tabTextActive]}>GỬI YÊU CẦU</Text>
+                </TouchableOpacity>
+            </View>
+
+            {activeTab === 'list' ? (
+                <View style={styles.content}>
+                    {isLoadingList ? (
+                        <View style={styles.loader}>
+                            <ActivityIndicator size="large" color="#4c6545" />
                         </View>
-
-                        <Text style={styles.label}>Tình trạng hiện tại</Text>
-                        <View style={styles.conditionSelectRow}>
-                            {[
-                                { val: 'perfect', lbl: 'Hoàn hảo' },
-                                { val: 'excellent', lbl: 'Tuyệt vời' },
-                                { val: 'very_good', lbl: 'Rất tốt' },
-                                { val: 'good', lbl: 'Tốt' }
-                            ].map(cond => (
-                                <TouchableOpacity 
-                                    key={cond.val} 
-                                    style={[styles.condPill, condition === cond.val && styles.condPillActive]} 
-                                    onPress={() => setCondition(cond.val)}
-                                >
-                                    <Text style={[styles.condPillText, condition === cond.val && styles.condPillTextActive]}>
-                                        {cond.lbl}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
+                    ) : (
+                        <FlatList
+                            data={consignments}
+                            keyExtractor={item => item._id}
+                            renderItem={renderConsignmentItem}
+                            contentContainerStyle={styles.listPadding}
+                            ListEmptyComponent={
+                                <View style={styles.emptyContainer}>
+                                    <IconButton icon="storefront-outline" size={60} iconColor="#e2e8f0" />
+                                    <Text style={styles.emptyText}>Bạn chưa có yêu cầu ký gửi nào.</Text>
+                                    <Button mode="contained" onPress={() => setActiveTab('create')} style={styles.emptyBtn} buttonColor="#4c6545">
+                                        KÝ GỬI NGAY
+                                    </Button>
+                                </View>
+                            }
+                            refreshing={isLoadingList}
+                            onRefresh={fetchList}
+                        />
+                    )}
+                </View>
+            ) : (
+                <ScrollView contentContainerStyle={styles.formContainer}>
+                    {/* Stepper */}
+                    <View style={styles.stepper}>
+                        <View style={styles.stepTrack}>
+                            <View style={[styles.stepFill, { width: `${(step / 3) * 100}%` }]} />
+                        </View>
+                        <View style={styles.stepLabels}>
+                            <Text style={[styles.stepLabel, step >= 1 && styles.stepLabelActive]}>Ảnh</Text>
+                            <Text style={[styles.stepLabel, step >= 2 && styles.stepLabelActive]}>Thông tin</Text>
+                            <Text style={[styles.stepLabel, step >= 3 && styles.stepLabelActive]}>Xác nhận</Text>
                         </View>
                     </View>
-                )}
 
-                {/* STEP 2: DETAILED PRODUCT INFO */}
-                {step === 2 && (
-                    <View style={styles.stepContent}>
-                        <Text style={styles.sectionTitle}>Thông tin chi tiết</Text>
+                    {step === 1 && (
+                        <View style={styles.formStep}>
+                            <Text style={styles.stepTitle}>Hình ảnh sản phẩm</Text>
+                            <Text style={styles.stepDesc}>Vui lòng cung cấp ít nhất 1 ảnh chi tiết.</Text>
+                            
+                            <View style={styles.imageGrid}>
+                                {previewUrls.map((url, idx) => (
+                                    <View key={idx} style={styles.imageWrapper}>
+                                        <Image source={{ uri: url }} style={styles.image} />
+                                        <TouchableOpacity style={styles.removeImg} onPress={() => handleRemoveImage(idx)}>
+                                            <IconButton icon="close" size={14} iconColor="#fff" style={{ margin: 0 }} />
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                                {previewUrls.length < 8 && (
+                                    <TouchableOpacity style={styles.addImgBtn} onPress={handleAddImage}>
+                                        <IconButton icon="camera-plus" size={30} iconColor="#4c6545" />
+                                        <Text style={styles.addImgLabel}>Thêm ảnh</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
 
-                        <Text style={styles.label}>Tên sản phẩm *</Text>
-                        <TextInput 
-                            style={styles.input} 
-                            placeholder="Ví dụ: Túi Chanel Boy Size M Black"
-                            placeholderTextColor="#94a3b8"
-                            value={title}
-                            onChangeText={setTitle}
-                        />
+                            <Text style={styles.inputLabel}>Tình trạng hiện tại</Text>
+                            <View style={styles.pillRow}>
+                                {['perfect', 'excellent', 'very_good', 'good'].map(val => (
+                                    <TouchableOpacity 
+                                        key={val} 
+                                        style={[styles.pill, condition === val && styles.pillActive]}
+                                        onPress={() => setCondition(val)}
+                                    >
+                                        <Text style={[styles.pillText, condition === val && styles.pillTextActive]}>
+                                            {val === 'perfect' ? 'Hoàn hảo' : val === 'excellent' ? 'Tuyệt vời' : val === 'very_good' ? 'Rất tốt' : 'Tốt'}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+                    )}
 
-                        <Text style={styles.label}>Mô tả sản phẩm *</Text>
-                        <TextInput 
-                            style={[styles.input, styles.textArea]} 
-                            placeholder="Mô tả về tình trạng chi tiết, phụ kiện đi kèm..."
-                            placeholderTextColor="#94a3b8"
-                            multiline
-                            numberOfLines={4}
-                            value={description}
-                            onChangeText={setDescription}
-                        />
+                    {step === 2 && (
+                        <View style={styles.formStep}>
+                            <Text style={styles.stepTitle}>Chi tiết sản phẩm</Text>
+                            
+                            <Text style={styles.inputLabel}>Tên sản phẩm *</Text>
+                            <TextInput style={styles.input} value={title} onChangeText={setTitle} placeholder="Ví dụ: Túi Chanel Boy" />
 
-                        <Text style={styles.label}>Danh mục *</Text>
-                        <View style={styles.selectScroll}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <Text style={styles.inputLabel}>Mô tả *</Text>
+                            <TextInput style={[styles.input, styles.textArea]} value={description} onChangeText={setDescription} multiline placeholder="Mô tả tình trạng..." />
+
+                            <Text style={styles.inputLabel}>Danh mục *</Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
                                 {categories.map(cat => (
                                     <TouchableOpacity 
                                         key={cat._id} 
-                                        style={[styles.selectPill, categoryId === cat._id && styles.selectPillActive]} 
+                                        style={[styles.pill, categoryId === cat._id && styles.pillActive]}
                                         onPress={() => setCategoryId(cat._id)}
                                     >
-                                        <Text style={[styles.selectPillText, categoryId === cat._id && styles.selectPillTextActive]}>
-                                            {cat.name}
-                                        </Text>
+                                        <Text style={[styles.pillText, categoryId === cat._id && styles.pillTextActive]}>{cat.name}</Text>
                                     </TouchableOpacity>
                                 ))}
                             </ScrollView>
-                        </View>
 
-                        <Text style={styles.label}>Thương hiệu</Text>
-                        <View style={styles.selectScroll}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                            <Text style={styles.inputLabel}>Thương hiệu</Text>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
                                 {brands.map(brand => (
                                     <TouchableOpacity 
                                         key={brand._id} 
-                                        style={[styles.selectPill, brandId === brand._id && styles.selectPillActive]} 
+                                        style={[styles.pill, brandId === brand._id && styles.pillActive]}
                                         onPress={() => setBrandId(brand._id)}
                                     >
-                                        <Text style={[styles.selectPillText, brandId === brand._id && styles.selectPillTextActive]}>
-                                            {brand.name}
-                                        </Text>
+                                        <Text style={[styles.pillText, brandId === brand._id && styles.pillTextActive]}>{brand.name}</Text>
                                     </TouchableOpacity>
                                 ))}
                             </ScrollView>
+
+                            <View style={styles.inputRow}>
+                                <View style={styles.inputCol}>
+                                    <Text style={styles.inputLabel}>Size</Text>
+                                    <TextInput style={styles.input} value={size} onChangeText={setSize} placeholder="S, M, 38..." />
+                                </View>
+                                <View style={styles.inputCol}>
+                                    <Text style={styles.inputLabel}>Màu sắc</Text>
+                                    <TextInput style={styles.input} value={color} onChangeText={setColor} placeholder="Đen, Trắng..." />
+                                </View>
+                            </View>
+
+                            <Text style={styles.inputLabel}>Giá kỳ vọng (VNĐ) *</Text>
+                            <TextInput style={styles.input} value={expectedPrice} onChangeText={setExpectedPrice} keyboardType="numeric" placeholder="Ví dụ: 1000000" />
                         </View>
-
-                        <View style={styles.rowFields}>
-                            <View style={styles.fieldItem}>
-                                <Text style={styles.label}>Giới tính</Text>
-                                <TextInput style={styles.input} value={gender} onChangeText={setGender} placeholder="Ví dụ: unisex" placeholderTextColor="#94a3b8" />
-                            </View>
-                            <View style={styles.fieldItem}>
-                                <Text style={styles.label}>Kích cỡ (Size)</Text>
-                                <TextInput style={styles.input} value={size} onChangeText={setSize} placeholder="S, M, 41" placeholderTextColor="#94a3b8" />
-                            </View>
-                        </View>
-
-                        <View style={styles.rowFields}>
-                            <View style={styles.fieldItem}>
-                                <Text style={styles.label}>Màu sắc</Text>
-                                <TextInput style={styles.input} value={color} onChangeText={setColor} placeholder="Ví dụ: Đen" placeholderTextColor="#94a3b8" />
-                            </View>
-                            <View style={styles.fieldItem}>
-                                <Text style={styles.label}>Chất liệu</Text>
-                                <TextInput style={styles.input} value={material} onChangeText={setMaterial} placeholder="Cotton, Da" placeholderTextColor="#94a3b8" />
-                            </View>
-                        </View>
-
-                        <Text style={styles.label}>Giá bạn kỳ vọng (VNĐ) *</Text>
-                        <TextInput 
-                            style={styles.input} 
-                            placeholder="Ví dụ: 5000000"
-                            placeholderTextColor="#94a3b8"
-                            keyboardType="numeric"
-                            value={expectedPrice}
-                            onChangeText={setExpectedPrice}
-                        />
-                    </View>
-                )}
-
-                {/* STEP 3: CONFIRMATION & REVIEW */}
-                {step === 3 && (
-                    <View style={styles.stepContent}>
-                        <Text style={styles.sectionTitle}>Xác nhận thông tin</Text>
-                        
-                        <View style={styles.previewSummaryCard}>
-                            <Image source={{ uri: previewUrls[0] }} style={styles.previewImg} />
-                            <View style={styles.previewInfoCol}>
-                                <Text style={styles.previewTitle}>{title || 'Chưa đặt tên'}</Text>
-                                <Text style={styles.previewDesc} numberOfLines={2}>{description || 'Chưa có mô tả'}</Text>
-                                <Text style={styles.previewPrice}>Giá kỳ vọng: {formatPrice(expectedPrice)}</Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.gridDetails}>
-                            <View style={styles.detailItemBox}>
-                                <Text style={styles.detailLabel}>Danh mục</Text>
-                                <Text style={styles.detailValue}>
-                                    {categories.find(c => c._id === categoryId)?.name || 'N/A'}
-                                </Text>
-                            </View>
-                            <View style={styles.detailItemBox}>
-                                <Text style={styles.detailLabel}>Thương hiệu</Text>
-                                <Text style={styles.detailValue}>
-                                    {brands.find(b => b._id === brandId)?.name || 'N/A'}
-                                </Text>
-                            </View>
-                            <View style={styles.detailItemBox}>
-                                <Text style={styles.detailLabel}>Tình trạng</Text>
-                                <Text style={styles.detailValue}>
-                                    {condition === 'perfect' ? 'Hoàn hảo' : condition === 'excellent' ? 'Tuyệt vời' : condition === 'very_good' ? 'Rất tốt' : 'Tốt'}
-                                </Text>
-                            </View>
-                        </View>
-
-                        <View style={styles.disclaimerBox}>
-                            <Text style={styles.disclaimerText}>
-                                Khi nhấn <Text style={{ fontWeight: 'bold' }}>Hoàn tất</Text>, yêu cầu của bạn sẽ được gửi tới đội ngũ thẩm định. Chúng tôi sẽ phản hồi lại mức giá đề xuất trong vòng 24h.
-                            </Text>
-                        </View>
-                    </View>
-                )}
-
-                {/* Actions Bottom Bar */}
-                <View style={styles.actionRow}>
-                    {step > 1 && (
-                        <TouchableOpacity style={styles.backBtn} onPress={handleBack}>
-                            <Text style={styles.backBtnText}>QUAY LẠI</Text>
-                        </TouchableOpacity>
                     )}
 
-                    <TouchableOpacity 
-                        style={[styles.nextBtn, step === 1 && { width: '100%' }]} 
-                        onPress={handleNext}
-                        disabled={submitting}
-                    >
-                        {submitting ? (
-                            <ActivityIndicator size="small" color="#fff" />
-                        ) : (
-                            <Text style={styles.nextBtnText}>
-                                {step === 3 ? 'HOÀN TẤT KÝ GỬI' : 'TIẾP TỤC BƯỚC TIẾP'}
-                            </Text>
+                    {step === 3 && (
+                        <View style={styles.formStep}>
+                            <Text style={styles.stepTitle}>Xác nhận & Gửi</Text>
+                            <View style={styles.summaryCard}>
+                                <Image source={{ uri: previewUrls[0] }} style={styles.summaryImg} />
+                                <View style={styles.summaryContent}>
+                                    <Text style={styles.summaryTitle}>{title}</Text>
+                                    <Text style={styles.summaryPrice}>{formatPrice(expectedPrice)}</Text>
+                                    <Text style={styles.summaryMeta}>{categories.find(c => c._id === categoryId)?.name}</Text>
+                                </View>
+                            </View>
+                            <View style={styles.warningBox}>
+                                <Text style={styles.warningText}>Sau khi gửi, chuyên gia của Atelier sẽ thẩm định và báo giá cho bạn trong vòng 24h.</Text>
+                            </View>
+                        </View>
+                    )}
+
+                    <View style={styles.actionRow}>
+                        {step > 1 && (
+                            <TouchableOpacity style={styles.secondaryBtn} onPress={() => setStep(step - 1)}>
+                                <Text style={styles.secondaryBtnText}>QUAY LẠI</Text>
+                            </TouchableOpacity>
                         )}
-                    </TouchableOpacity>
+                        <TouchableOpacity style={[styles.primaryBtn, step === 1 && { width: '100%' }]} onPress={handleNext} disabled={submitting}>
+                            {submitting ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.primaryBtnText}>{step === 3 ? 'HOÀN TẤT' : 'TIẾP TỤC'}</Text>}
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            )}
+
+            {/* Detail Modal */}
+            <Modal visible={isDetailModalVisible} transparent animationType="slide">
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContent, { maxHeight: '85%' }]}>
+                        <Text style={styles.modalTitle}>Chi tiết Yêu cầu Ký gửi</Text>
+                        
+                        {selectedConsignment && (
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+                                    {selectedConsignment.photos?.map((p, idx) => (
+                                        <Image key={idx} source={{ uri: p }} style={{ width: 120, height: 150, borderRadius: 12, marginRight: 8 }} />
+                                    ))}
+                                </ScrollView>
+
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Tên sản phẩm:</Text>
+                                    <Text style={styles.detailValue}>{selectedConsignment.title}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Trạng thái:</Text>
+                                    <Text style={[styles.detailValue, { color: statusColors[selectedConsignment.status], fontWeight: 'bold' }]}>
+                                        {translateConsignmentStatus(selectedConsignment.status)}
+                                    </Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Giá kỳ vọng:</Text>
+                                    <Text style={styles.detailValue}>{formatPrice(selectedConsignment.expectedPrice)}</Text>
+                                </View>
+                                {selectedConsignment.finalPrice > 0 && (
+                                    <View style={styles.detailRow}>
+                                        <Text style={styles.detailLabel}>Giá Shop định giá:</Text>
+                                        <Text style={[styles.detailValue, { color: '#4c6545', fontWeight: 'bold' }]}>{formatPrice(selectedConsignment.finalPrice)}</Text>
+                                    </View>
+                                )}
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Danh mục:</Text>
+                                    <Text style={styles.detailValue}>{selectedConsignment.categoryId?.name}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Thương hiệu:</Text>
+                                    <Text style={styles.detailValue}>{selectedConsignment.brandId?.name || 'N/A'}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Kích thước:</Text>
+                                    <Text style={styles.detailValue}>{selectedConsignment.size || 'N/A'}</Text>
+                                </View>
+                                <View style={styles.detailRow}>
+                                    <Text style={styles.detailLabel}>Mô tả:</Text>
+                                    <Text style={styles.detailValue}>{selectedConsignment.description}</Text>
+                                </View>
+                                
+                                <View style={{ height: 20 }} />
+                            </ScrollView>
+                        )}
+
+                        <Button mode="contained" onPress={() => setIsDetailModalVisible(false)} style={styles.modalBtn} buttonColor="#4c6545">
+                            ĐÓNG
+                        </Button>
+                    </View>
                 </View>
-            </ScrollView>
+            </Modal>
+
+            {/* Address Modal */}
+            <Modal visible={isAddressModalVisible} transparent animationType="fade">
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Thông tin Gửi hàng</Text>
+                        <View style={styles.addressBox}>
+                            <Text style={styles.addressLabel}>Địa chỉ Shop:</Text>
+                            <Text style={styles.addressValue}>123 Đường Sư Vạn Hạnh, Phường 12, Quận 10, TP. Hồ Chí Minh</Text>
+                        </View>
+                        <Text style={styles.modalNote}>• Vui lòng gửi hàng qua GHTK, Viettel Post...</Text>
+                        <Text style={styles.modalNote}>• Hoặc mang trực tiếp đến địa chỉ trên.</Text>
+                        <Button mode="contained" onPress={confirmAddressAndApprove} style={styles.modalBtn} buttonColor="#4c6545">
+                            TÔI ĐÃ HIỂU & GỬI HÀNG
+                        </Button>
+                        <TouchableOpacity onPress={() => setIsAddressModalVisible(false)} style={styles.modalClose}>
+                            <Text style={styles.modalCloseText}>Hủy</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
 };
@@ -385,30 +562,209 @@ const ConsignmentScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fcf9f4',
+        backgroundColor: '#fef9f7',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 16,
+        paddingHorizontal: 12,
         paddingVertical: 12,
-        backgroundColor: '#fcf9f4',
+        backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#4c6545',
+        color: '#1e293b',
     },
-    stepperContainer: {
-        paddingHorizontal: 24,
+    tabContainer: {
+        flexDirection: 'row',
+        padding: 16,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+    },
+    tab: {
+        flex: 1,
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderRadius: 12,
+        backgroundColor: '#f8fafc',
+        marginHorizontal: 4,
+    },
+    tabActive: {
+        backgroundColor: '#4c6545',
+    },
+    tabText: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#64748b',
+        letterSpacing: 1,
+    },
+    tabTextActive: {
+        color: '#fff',
+    },
+    content: {
+        flex: 1,
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    listPadding: {
+        padding: 16,
+        paddingBottom: 40,
+    },
+    consCard: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        shadowColor: '#000',
+        shadowOpacity: 0.02,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+    },
+    consHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    consMainInfo: {
+        flexDirection: 'row',
+        flex: 1,
+    },
+    consThumb: {
+        width: 60,
+        height: 72,
+        borderRadius: 12,
+        backgroundColor: '#f1f5f9',
+    },
+    consTextInfo: {
+        marginLeft: 12,
+        flex: 1,
+        justifyContent: 'center',
+    },
+    consTitle: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#1e293b',
+    },
+    consMeta: {
+        fontSize: 12,
+        color: '#64748b',
+        marginTop: 4,
+    },
+    consDate: {
+        fontSize: 11,
+        color: '#94a3b8',
+        marginTop: 2,
+    },
+    consPriceStatus: {
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+    },
+    consPrice: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#4c6545',
+        marginBottom: 8,
+    },
+    statusBadge: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    statusText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+    actionRowList: {
+        flexDirection: 'row',
+        marginTop: 16,
         paddingTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#f1f5f9',
+        gap: 8,
+    },
+    acceptBtn: {
+        flex: 2,
+        backgroundColor: '#4c6545',
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    acceptBtnText: {
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    rejectBtn: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#ef4444',
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    rejectBtnText: {
+        color: '#ef4444',
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    cancelBtn: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#94a3b8',
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    cancelBtnText: {
+        color: '#64748b',
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 12,
+        backgroundColor: '#fff9eb',
+        borderRadius: 10,
+        paddingRight: 12,
+    },
+    infoText: {
+        fontSize: 11,
+        color: '#b45309',
+        flex: 1,
+    },
+    emptyContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 100,
+    },
+    emptyText: {
+        fontSize: 14,
+        color: '#94a3b8',
+        marginTop: 12,
+    },
+    emptyBtn: {
+        marginTop: 24,
+        borderRadius: 12,
+    },
+    formContainer: {
+        padding: 20,
+    },
+    stepper: {
+        marginBottom: 24,
     },
     stepTrack: {
         height: 4,
-        backgroundColor: '#e5e2dd',
+        backgroundColor: '#e2e8f0',
         borderRadius: 2,
         overflow: 'hidden',
     },
@@ -416,74 +772,36 @@ const styles = StyleSheet.create({
         height: '100%',
         backgroundColor: '#4c6545',
     },
-    stepTextRow: {
+    stepLabels: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 8,
     },
-    stepText: {
-        fontSize: 10,
+    stepLabel: {
+        fontSize: 11,
         fontWeight: 'bold',
         color: '#94a3b8',
-        textTransform: 'uppercase',
     },
-    stepTextActive: {
+    stepLabelActive: {
         color: '#4c6545',
     },
-    alertBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginHorizontal: 16,
-        marginTop: 12,
-        padding: 12,
-        borderRadius: 12,
-        borderWidth: 1,
-    },
-    alertSuccess: {
-        backgroundColor: '#d1fae5',
-        borderColor: '#a7f3d0',
-    },
-    alertError: {
-        backgroundColor: '#fee2e2',
-        borderColor: '#fecaca',
-    },
-    alertIcon: {
-        margin: 0,
-        padding: 0,
-    },
-    alertText: {
-        fontSize: 13,
-        fontWeight: '600',
-        flex: 1,
-        marginLeft: 4,
-    },
-    alertTextSuccess: {
-        color: '#065f46',
-    },
-    alertTextError: {
-        color: '#991b1b',
-    },
-    scrollContent: {
-        padding: 24,
-        paddingBottom: 40,
-    },
-    stepContent: {
+    formStep: {
         backgroundColor: '#fff',
-        borderRadius: 20,
+        borderRadius: 24,
         padding: 24,
         borderWidth: 1,
         borderColor: '#f1f5f9',
     },
-    sectionTitle: {
-        fontSize: 22,
+    stepTitle: {
+        fontSize: 20,
         fontWeight: 'bold',
-        color: '#1c1c19',
-        marginBottom: 4,
+        color: '#1e293b',
+        marginBottom: 8,
     },
-    sectionSubtitle: {
+    stepDesc: {
         fontSize: 13,
-        color: '#475569',
-        marginBottom: 24,
+        color: '#64748b',
+        marginBottom: 20,
     },
     imageGrid: {
         flexDirection: 'row',
@@ -491,223 +809,248 @@ const styles = StyleSheet.create({
         gap: 12,
         marginBottom: 24,
     },
-    imageBox: {
-        width: (width - 104) / 3,
+    imageWrapper: {
+        width: (width - 128) / 3,
         aspectRatio: 1,
-        borderRadius: 12,
+        borderRadius: 14,
         overflow: 'hidden',
         position: 'relative',
     },
-    imageItem: {
+    image: {
         width: '100%',
         height: '100%',
-        objectFit: 'cover',
     },
-    deleteOverlay: {
+    removeImg: {
         position: 'absolute',
         top: 4,
         right: 4,
-        backgroundColor: 'rgba(239, 68, 68, 0.85)',
+        backgroundColor: 'rgba(239, 68, 68, 0.8)',
         borderRadius: 12,
     },
-    addImageBtn: {
-        width: (width - 104) / 3,
+    addImgBtn: {
+        width: (width - 128) / 3,
         aspectRatio: 1,
-        borderRadius: 12,
+        borderRadius: 14,
         borderWidth: 2,
         borderStyle: 'dashed',
-        borderColor: '#c6c8b8',
+        borderColor: '#cbd5e1',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fcf9f4',
+        backgroundColor: '#f8fafc',
     },
-    addImageLabel: {
-        fontSize: 11,
-        fontWeight: '700',
+    addImgLabel: {
+        fontSize: 10,
+        fontWeight: 'bold',
         color: '#4c6545',
-        marginTop: 2,
     },
-    label: {
+    inputLabel: {
         fontSize: 12,
         fontWeight: 'bold',
         color: '#475569',
         textTransform: 'uppercase',
         letterSpacing: 1,
         marginBottom: 8,
-        marginTop: 16,
+        marginTop: 20,
     },
-    conditionSelectRow: {
+    pillRow: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 8,
-        marginTop: 4,
     },
-    condPill: {
-        backgroundColor: '#f1f5f9',
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 12,
-    },
-    condPillActive: {
-        backgroundColor: '#4c6545',
-    },
-    condPillText: {
-        fontSize: 13,
-        color: '#475569',
-        fontWeight: '500',
-    },
-    condPillTextActive: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    input: {
-        backgroundColor: '#fcf9f4',
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        fontSize: 15,
-        color: '#1c1c19',
-    },
-    textArea: {
-        height: 100,
-        textAlignVertical: 'top',
-    },
-    selectScroll: {
-        marginBottom: 4,
-    },
-    selectPill: {
+    pill: {
         backgroundColor: '#f1f5f9',
         paddingHorizontal: 16,
         paddingVertical: 10,
         borderRadius: 12,
         marginRight: 8,
     },
-    selectPillActive: {
+    pillActive: {
         backgroundColor: '#4c6545',
     },
-    selectPillText: {
+    pillText: {
         fontSize: 13,
         color: '#475569',
         fontWeight: '500',
     },
-    selectPillTextActive: {
+    pillTextActive: {
         color: '#fff',
         fontWeight: 'bold',
     },
-    rowFields: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    fieldItem: {
-        width: '48%',
-    },
-    previewSummaryCard: {
-        flexDirection: 'row',
-        backgroundColor: '#fcf9f4',
+    input: {
+        backgroundColor: '#f8fafc',
         borderRadius: 14,
-        padding: 12,
-        marginBottom: 20,
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        fontSize: 15,
+        color: '#1e293b',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
     },
-    previewImg: {
-        width: 70,
-        height: 85,
-        borderRadius: 10,
-        backgroundColor: '#e5e2dd',
+    textArea: {
+        height: 100,
+        textAlignVertical: 'top',
     },
-    previewInfoCol: {
-        marginLeft: 14,
+    horizontalScroll: {
+        marginTop: 4,
+    },
+    inputRow: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    inputCol: {
+        flex: 1,
+    },
+    summaryCard: {
+        flexDirection: 'row',
+        backgroundColor: '#f8fafc',
+        padding: 16,
+        borderRadius: 16,
+    },
+    summaryImg: {
+        width: 80,
+        height: 100,
+        borderRadius: 12,
+    },
+    summaryContent: {
+        marginLeft: 16,
         flex: 1,
         justifyContent: 'center',
     },
-    previewTitle: {
+    summaryTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#1c1c19',
+        color: '#1e293b',
     },
-    previewDesc: {
-        fontSize: 12,
-        color: '#64748b',
-        marginTop: 2,
-    },
-    previewPrice: {
-        fontSize: 13,
+    summaryPrice: {
+        fontSize: 15,
         fontWeight: 'bold',
         color: '#4c6545',
+        marginTop: 8,
+    },
+    summaryMeta: {
+        fontSize: 12,
+        color: '#64748b',
         marginTop: 4,
     },
-    gridDetails: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-        marginBottom: 20,
-    },
-    detailItemBox: {
-        flex: 1,
-        minWidth: '45%',
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-        borderRadius: 12,
-        padding: 12,
-    },
-    detailLabel: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#64748b',
-        textTransform: 'uppercase',
-        marginBottom: 2,
-    },
-    detailValue: {
-        fontSize: 14,
-        fontWeight: '700',
-        color: '#1c1c19',
-    },
-    disclaimerBox: {
-        backgroundColor: '#fef3c7',
+    warningBox: {
+        marginTop: 24,
+        padding: 16,
+        backgroundColor: '#fff9eb',
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: '#fde68a',
-        borderRadius: 12,
-        padding: 14,
     },
-    disclaimerText: {
+    warningText: {
         fontSize: 13,
-        color: '#78350f',
-        lineHeight: 18,
+        color: '#b45309',
+        lineHeight: 20,
+        textAlign: 'center',
     },
     actionRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         marginTop: 24,
+        gap: 12,
     },
-    backBtn: {
-        width: '32%',
-        backgroundColor: '#fff',
-        borderWidth: 1,
-        borderColor: '#4c6545',
-        borderRadius: 14,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    backBtnText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#4c6545',
-    },
-    nextBtn: {
-        width: '64%',
+    primaryBtn: {
+        flex: 2,
         backgroundColor: '#4c6545',
-        paddingVertical: 16,
-        borderRadius: 14,
+        paddingVertical: 18,
+        borderRadius: 16,
         alignItems: 'center',
         justifyContent: 'center',
     },
-    nextBtnText: {
+    primaryBtnText: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 12,
+        fontSize: 14,
         letterSpacing: 1,
-    }
+    },
+    secondaryBtn: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#4c6545',
+        paddingVertical: 18,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    secondaryBtnText: {
+        color: '#4c6545',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        padding: 24,
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        padding: 24,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1e293b',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    addressBox: {
+        backgroundColor: '#f8fafc',
+        padding: 16,
+        borderRadius: 16,
+        marginBottom: 16,
+    },
+    addressLabel: {
+        fontSize: 11,
+        fontWeight: 'bold',
+        color: '#4c6545',
+        textTransform: 'uppercase',
+        marginBottom: 4,
+    },
+    addressValue: {
+        fontSize: 14,
+        color: '#1e293b',
+        lineHeight: 20,
+    },
+    modalNote: {
+        fontSize: 13,
+        color: '#64748b',
+        marginBottom: 8,
+    },
+    modalBtn: {
+        marginTop: 24,
+        borderRadius: 14,
+    },
+    modalClose: {
+        marginTop: 16,
+        alignItems: 'center',
+    },
+    modalCloseText: {
+        color: '#94a3b8',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    detailRow: {
+        flexDirection: 'row',
+        marginBottom: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+        paddingBottom: 8,
+    },
+    detailLabel: {
+        width: 120,
+        fontSize: 13,
+        fontWeight: 'bold',
+        color: '#64748b',
+    },
+    detailValue: {
+        flex: 1,
+        fontSize: 14,
+        color: '#1e293b',
+    },
 });
 
 export default ConsignmentScreen;

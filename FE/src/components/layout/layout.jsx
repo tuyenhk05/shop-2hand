@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import GlobalSearch from './GlobalSearch';
+import NotificationDropdown from './NotificationDropdown';
 import Chatbot from '../chatbot/Chatbot';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { deleteCookie, getCookie } from '../../helpers/cookie';
@@ -94,8 +94,8 @@ const ClientLayout = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    {/* Search Bar */}
-                    <GlobalSearch />
+                    {/* Notifications */}
+                    <NotificationDropdown />
 
                     {/* Cart / Action Icon */}
                     <Link to="/cart" className="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all">
@@ -189,7 +189,7 @@ const ClientLayout = () => {
                             <li><Link to="/products" className="hover:text-primary transition-colors block w-fit">Cửa hàng Archive</Link></li>
                             <li><Link to="/sustain" className="hover:text-primary transition-colors block w-fit">Dấu chân sinh thái</Link></li>
                             <li><Link to="/about" className="hover:text-primary transition-colors block w-fit">Câu chuyện Atelier</Link></li>
-                            <li><Link to="/journal" className="hover:text-primary transition-colors block w-fit">Tạp chí (Journal)</Link></li>
+                            <li><a href="https://www.nationalgeographic.com/environment/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors block w-fit">Tạp chí (Journal)</a></li>
                         </ul>
                     </div>
 
@@ -197,10 +197,10 @@ const ClientLayout = () => {
                     <div>
                         <h3 className="font-headline text-lg font-bold mb-5 text-on-surface">Hỗ trợ</h3>
                         <ul className="space-y-4 font-body text-on-surface-variant font-medium">
-                            <li><Link to="/faq" className="hover:text-primary transition-colors block w-fit">Câu hỏi thường gặp</Link></li>
-                            <li><Link to="/shipping" className="hover:text-primary transition-colors block w-fit">Vận chuyển & Đổi trả</Link></li>
-                            <li><Link to="/authenticity" className="hover:text-primary transition-colors block w-fit">Xác thực sản phẩm</Link></li>
-                            <li><Link to="/contact" className="hover:text-primary transition-colors block w-fit">Liên hệ chăm sóc</Link></li>
+                            <li><Link to="/support" className="hover:text-primary transition-colors block w-fit">Trung tâm hỗ trợ</Link></li>
+                            <li><Link to="/support" className="hover:text-primary transition-colors block w-fit">Vận chuyển & Đổi trả</Link></li>
+                            <li><Link to="/support" className="hover:text-primary transition-colors block w-fit">Xác thực sản phẩm</Link></li>
+                            <li><Link to="/chat" className="hover:text-primary transition-colors block w-fit">Liên hệ chăm sóc</Link></li>
                         </ul>
                     </div>
                 </div>

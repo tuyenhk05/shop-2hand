@@ -5,6 +5,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import store from './src/store';
 import AppNavigator from './src/navigation/AppNavigator';
 
+import { ToastProvider } from './src/context/ToastContext';
+import { NotificationProvider } from './src/context/NotificationContext';
+
 const AppContainer = () => {
   useEffect(() => {
     const bootstrapAsync = async () => {
@@ -42,7 +45,11 @@ const AppContainer = () => {
 
   return (
     <SafeAreaProvider>
-      <AppNavigator />
+      <ToastProvider>
+        <NotificationProvider>
+          <AppNavigator />
+        </NotificationProvider>
+      </ToastProvider>
     </SafeAreaProvider>
   );
 };

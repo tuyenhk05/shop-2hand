@@ -93,17 +93,16 @@ exports.createOrder = async (req, res) => {
         await cleanupExpiredOrders();
         const { buyerId, items, totalAmount, shippingAddress, buyerName, buyerPhone, paymentMethod } = req.body;
 
-        // --- Kiểm tra spam đơn hàng ---
+        // --- Kiểm tra đơn hàng đang chờ thanh toán ---
         if (buyerId) {
-            const recentPendingCount = await Order.countDocuments({
+            const hasPendingPayment = await Order.findOne({
                 buyerId,
-                status: 'pending_payment',
-                createdAt: { $gte: new Date(Date.now() - 10 * 60 * 1000) }
+                status: 'pending_payment'
             });
-            if (recentPendingCount >= 3) {
-                return res.status(429).json({
+            if (hasPendingPayment) {
+                return res.status(400).json({
                     success: false,
-                    message: 'Bạn đang có quá nhiều đơn hàng chưa thanh toán. Vui lòng thanh toán các đơn hàng cũ trước hoặc thử lại sau 10 phút.'
+                    message: 'Bạn đang có đơn hàng chưa thanh toán. Vui lòng thanh toán đơn hàng cũ trước khi tiếp tục đặt đơn mới.'
                 });
             }
         }
@@ -164,6 +163,17 @@ exports.createOrder = async (req, res) => {
             paymentMethod
         });
         await newOrder.save();
+
+        // --- 4. Tạo thông báo cho Admin ---
+        const { createNotification } = require('../../helpers/notification.helper');
+        const systemConfig = require('../../configs/system');
+        await createNotification(req.app, {
+            role: 'admin',
+            title: 'Đơn hàng mới',
+            content: `Bạn có một đơn hàng mới từ ${buyerName || 'Khách hàng'}. Tổng tiền: ${totalAmount.toLocaleString()}đ`,
+            type: 'new_order',
+            link: `${systemConfig.prefixAdmin}/orders`
+        });
 
         // Xoá các sản phẩm đã thanh toán khỏi giỏ hàng
         const purchasedProductIds = items.map(item => item.productId.toString());

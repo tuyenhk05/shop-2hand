@@ -11,6 +11,7 @@ import useScrollToTop from "../../hooks/useScrollToTop";
 import { useSelector } from 'react-redux';
 import ProductCard from '../../components/ProductCard';
 import { getOrdersApi } from '../../services/client/order.service';
+import Loading from '../../components/loading/loading';
 
 
 
@@ -462,9 +463,7 @@ const Store = () => {
             {/* Product Grid – bố cục 2 cột xen kẽ (7+5 / 5+7) */}
             <div className="space-y-6">
                 {loading ? (
-                    <div className="text-center py-20 text-on-surface-variant font-bold">
-                        Đang lấy dữ liệu từ kho lưu trữ...
-                    </div>
+                    <Loading fullScreen={false} text="Đang lấy dữ liệu từ kho lưu trữ..." />
                 ) : filteredProducts.length === 0 ? (
                     <div className="text-center py-20 text-on-surface-variant">
                         Không tìm thấy sản phẩm nào phù hợp với bộ lọc.

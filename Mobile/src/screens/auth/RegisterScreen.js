@@ -11,9 +11,12 @@ import { Image } from 'react-native';
 const imageRegister = require('../../../assets/images/image_register.png');
 const logo = require('../../../assets/images/logo.png');
 
+import { useToast } from '../../context/ToastContext';
+
 const RegisterScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const isLoggedIn = useSelector((state) => state.auth.isLogin);
 
   useEffect(() => {
@@ -115,18 +118,19 @@ const RegisterScreen = () => {
 
       if (data?.success) {
         await AsyncStorage.setItem('token', data.data.token);
-        Alert.alert('Thành công', 'Đăng ký thành công!', [
-          { text: 'OK', onPress: () => navigation.replace('Login') }
-        ]);
+        showToast('Đăng ký thành công!', 'success');
+        setTimeout(() => {
+          navigation.replace('Login');
+        }, 1000);
       } else {
         const errorMsg = data?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
         setSubmitError(errorMsg);
-        Alert.alert('Lỗi', errorMsg);
+        showToast(errorMsg, 'error');
       }
     } catch (error) {
       console.error('Registration error:', error);
       setSubmitError('Có lỗi xảy ra. Vui lòng thử lại.');
-      Alert.alert('Lỗi', 'Có lỗi xảy ra. Vui lòng thử lại.');
+      showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
     } finally {
       setLoading(false);
     }
@@ -137,7 +141,7 @@ const RegisterScreen = () => {
   };
 
   const handleGoogleLoginMock = () => {
-    Alert.alert("Google Login", "Tính năng đăng nhập Google cần cấu hình Firebase/Expo Auth Session.");
+    showToast("Tính năng đăng nhập Google cần cấu hình Firebase/Expo Auth Session.", 'info');
   };
 
   return (

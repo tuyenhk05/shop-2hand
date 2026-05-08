@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, Linking, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { IconButton, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,8 +8,11 @@ import { getCartApi } from '../../services/client/cart.service';
 import { createOrderApi } from '../../services/client/order.service';
 import { createPaymentUrlApi } from '../../services/client/payment.service';
 
+import { useToast } from '../../context/ToastContext';
+
 const CheckoutScreen = () => {
     const navigation = useNavigation();
+    const { showToast } = useToast();
     const userId = useSelector((state) => state.auth.userId);
 
     const [cartItems, setCartItems] = useState([]);
@@ -20,8 +23,14 @@ const CheckoutScreen = () => {
         shippingAddress: '',
     });
 
+    const route = useRoute();
     useEffect(() => {
         const fetchCart = async () => {
+            if (route.params?.items) {
+                setCartItems(route.params.items);
+                setIsLoading(false);
+                return;
+            }
             if (!userId) return;
             setIsLoading(true);
             try {
@@ -36,7 +45,7 @@ const CheckoutScreen = () => {
             }
         };
         fetchCart();
-    }, [userId]);
+    }, [userId, route.params?.items]);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price || 0);
@@ -51,7 +60,7 @@ const CheckoutScreen = () => {
 
     const handleCheckout = async () => {
         if (!form.buyerPhone.trim() || !form.shippingAddress.trim()) {
-            Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ số điện thoại và địa chỉ giao hàng.');
+            showToast('Vui lòng nhập đầy đủ số điện thoại và địa chỉ giao hàng.', 'error');
             return;
         }
 
@@ -83,17 +92,19 @@ const CheckoutScreen = () => {
                 if (payRes.success && payRes.url) {
                     // Open browser for VNPay
                     Linking.openURL(payRes.url);
-                    Alert.alert('Thành công', 'Đơn hàng đã được tạo. Vui lòng hoàn tất thanh toán trên trình duyệt.');
-                    navigation.navigate('StoreTab'); // Or History if it exists in Tab
+                    showToast('Đơn hàng đã được tạo thành công!', 'success');
+                    setTimeout(() => {
+                        navigation.navigate('StoreTab');
+                    }, 1000);
                 } else {
-                    Alert.alert('Lỗi', 'Không thể tạo cổng thanh toán VNPAY.');
+                    showToast('Không thể tạo cổng thanh toán VNPAY.', 'error');
                 }
             } else {
-                Alert.alert('Lỗi', orderRes.message || 'Lỗi đặt hàng. Vui lòng thử lại.');
+                showToast(orderRes.message || 'Lỗi đặt hàng. Vui lòng thử lại.', 'error');
             }
         } catch (error) {
             console.error('Checkout error:', error);
-            Alert.alert('Lỗi', 'Quá trình thanh toán xảy ra lỗi.');
+            showToast('Quá trình thanh toán xảy ra lỗi.', 'error');
         }
     };
 

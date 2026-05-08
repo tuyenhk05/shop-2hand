@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, TextInput, FlatList } from 'react-native';
 import { useNavigation, useRoute, useIsFocused } from '@react-navigation/native';
-import { IconButton } from 'react-native-paper';
+import { IconButton, Button } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector } from 'react-redux';
 import {
     getMyConversationsApi,
     getConversationByIdApi,
-    createConversationApi,
     markReadByCustomerApi,
     connectSupportSocket,
     disconnectSupportSocket
 } from '../../services/client/support.service';
+import { useToast } from '../../context/ToastContext';
 
 const statusLabel = {
     open: 'Chờ phản hồi',
@@ -35,6 +35,7 @@ const ChatScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const isFocused = useIsFocused();
+    const { showToast } = useToast();
     const [conversations, setConversations] = useState([]);
     const [activeConv, setActiveConv] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -43,8 +44,6 @@ const ChatScreen = () => {
     const [isLoading, setIsLoading] = useState(true);
     const socketRef = useRef(null);
     const scrollViewRef = useRef(null);
-
-    const userId = useSelector((state) => state.auth.userId);
 
     const fetchConversations = useCallback(async () => {
         try {
@@ -88,16 +87,32 @@ const ChatScreen = () => {
                 );
                 setActiveConv(prev => prev?._id === conversationId ? { ...prev, status: 'closed' } : prev);
                 if (activeConv?._id === conversationId) {
-                    Alert.alert('Thông báo', 'Hội thoại này đã được đóng bởi admin.');
+                    showToast('Hội thoại này đã được đóng bởi admin.', 'info');
                 }
             });
+
+            const targetConvId = route.params?.conversationId;
+            if (targetConvId) {
+                const target = conversations.find(c => c._id === targetConvId);
+                if (target) openConversation(target);
+                else {
+                    fetchConversations();
+                }
+            }
 
             return () => {
                 socket.off('conversation_closed');
                 disconnectSupportSocket();
             };
         }
-    }, [isFocused]);
+    }, [isFocused, route.params?.conversationId]);
+
+    useEffect(() => {
+        if (route.params?.conversationId && conversations.length > 0 && !activeConv) {
+            const target = conversations.find(c => c._id === route.params.conversationId);
+            if (target) openConversation(target);
+        }
+    }, [conversations, route.params?.conversationId]);
 
     useEffect(() => {
         const socket = socketRef.current;
@@ -151,7 +166,8 @@ const ChatScreen = () => {
 
     const formatTime = (date) => {
         if (!date) return '';
-        return new Date(date).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        const d = new Date(date);
+        return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     };
 
     if (isLoading) {
@@ -165,26 +181,29 @@ const ChatScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <IconButton icon="arrow-left" size={24} onPress={() => navigation.goBack()} />
-                <View>
-                    <Text style={styles.headerTitle}>Hỗ trợ & Chat</Text>
-                    <Text style={styles.headerSubtitle}>Trao đổi trực tiếp cùng đội ngũ Atelier</Text>
+                <IconButton 
+                    icon="arrow-left" 
+                    size={24} 
+                    iconColor="#1e293b" 
+                    onPress={() => activeConv ? setActiveConv(null) : navigation.goBack()} 
+                />
+                <View style={styles.headerInfo}>
+                    <Text style={styles.headerTitle}>{activeConv ? 'Hỗ trợ trực tuyến' : 'Tin nhắn hỗ trợ'}</Text>
+                    <Text style={styles.headerSubtitle}>
+                        {activeConv ? (activeConv.orderCode ? `Đơn hàng: ${activeConv.orderCode}` : 'Atelier Concierge') : 'Trao đổi cùng đội ngũ Atelier'}
+                    </Text>
                 </View>
+                {!activeConv && (
+                    <IconButton icon="plus" size={24} iconColor="#4c6545" onPress={() => showToast('Vui lòng tạo yêu cầu hỗ trợ từ đơn hàng cụ thể.', 'info')} />
+                )}
             </View>
 
             {activeConv ? (
                 <View style={styles.chatArea}>
-                    <View style={styles.chatHeader}>
-                        <IconButton icon="arrow-left" size={20} onPress={() => setActiveConv(null)} />
-                        <View style={styles.chatHeaderInfo}>
-                            <Text style={styles.activeSubject} numberOfLines={1}>{activeConv.subject || 'Trò chuyện hỗ trợ'}</Text>
-                            {activeConv.orderCode && (
-                                <Text style={styles.activeSubtitle}>Đơn hàng: {activeConv.orderCode}</Text>
-                            )}
-                        </View>
-                        <View style={[styles.statusBadge, { backgroundColor: statusColor[activeConv.status] }]}>
-                            <Text style={[styles.statusText, { color: textStatusColor[activeConv.status] }]}>{statusLabel[activeConv.status]}</Text>
-                        </View>
+                    <View style={[styles.statusRibbon, { backgroundColor: statusColor[activeConv.status] }]}>
+                        <Text style={[styles.statusRibbonText, { color: textStatusColor[activeConv.status] }]}>
+                            Trạng thái: {statusLabel[activeConv.status]}
+                        </Text>
                     </View>
 
                     <ScrollView 
@@ -195,16 +214,26 @@ const ChatScreen = () => {
                     >
                         {messages.length === 0 ? (
                             <View style={styles.emptyMessages}>
-                                <Text style={styles.emptyText}>Chưa có tin nhắn nào. Gửi tin nhắn đầu tiên để bắt đầu.</Text>
+                                <View style={styles.infoCircle}>
+                                    <IconButton icon="chat-outline" size={40} iconColor="#4c6545" />
+                                </View>
+                                <Text style={styles.emptyText}>Bắt đầu cuộc hội thoại bằng cách gửi tin nhắn cho chúng tôi.</Text>
                             </View>
                         ) : (
                             messages.map((msg, index) => {
                                 const isMe = msg.sender === 'customer';
+                                const showTime = index === 0 || 
+                                    new Date(msg.createdAt) - new Date(messages[index-1].createdAt) > 300000;
+
                                 return (
-                                    <View key={index} style={[styles.messageRow, isMe ? styles.myRow : styles.otherRow]}>
-                                        <View style={[styles.bubble, isMe ? styles.myBubble : styles.otherBubble]}>
-                                            <Text style={[styles.messageText, isMe ? styles.myText : styles.otherText]}>{msg.content}</Text>
-                                            <Text style={[styles.msgTime, isMe ? styles.myTime : styles.otherTime]}>{formatTime(msg.createdAt)}</Text>
+                                    <View key={index}>
+                                        {showTime && (
+                                            <Text style={styles.timeDivider}>{formatTime(msg.createdAt)}</Text>
+                                        )}
+                                        <View style={[styles.messageRow, isMe ? styles.myRow : styles.otherRow]}>
+                                            <View style={[styles.bubble, isMe ? styles.myBubble : styles.otherBubble]}>
+                                                <Text style={[styles.messageText, isMe ? styles.myText : styles.otherText]}>{msg.content}</Text>
+                                            </View>
                                         </View>
                                     </View>
                                 );
@@ -213,21 +242,33 @@ const ChatScreen = () => {
                     </ScrollView>
 
                     {activeConv.status !== 'closed' ? (
-                        <View style={styles.inputArea}>
-                            <TextInput 
-                                placeholder="Nhập tin nhắn..."
-                                value={inputText}
-                                onChangeText={setInputText}
-                                style={styles.textInput}
-                                placeholderTextColor="#94a3b8"
-                            />
-                            <TouchableOpacity style={styles.sendBtn} onPress={handleSend} disabled={!inputText.trim() || isSending}>
-                                <IconButton icon="send" size={18} iconColor="#fff" style={styles.sendIcon} />
-                            </TouchableOpacity>
+                        <View style={styles.inputWrapper}>
+                            <View style={styles.inputArea}>
+                                <TextInput 
+                                    placeholder="Viết tin nhắn..."
+                                    value={inputText}
+                                    onChangeText={setInputText}
+                                    style={styles.textInput}
+                                    placeholderTextColor="#94a3b8"
+                                    multiline
+                                />
+                                <TouchableOpacity 
+                                    style={[styles.sendBtn, !inputText.trim() && styles.sendBtnDisabled]} 
+                                    onPress={handleSend} 
+                                    disabled={!inputText.trim() || isSending}
+                                >
+                                    {isSending ? (
+                                        <ActivityIndicator size="small" color="#fff" />
+                                    ) : (
+                                        <IconButton icon="send" size={20} iconColor="#fff" style={styles.sendIcon} />
+                                    )}
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     ) : (
                         <View style={styles.closedArea}>
-                            <Text style={styles.closedText}>Hội thoại này đã được đóng bởi Admin</Text>
+                            <IconButton icon="lock-outline" size={20} iconColor="#64748b" />
+                            <Text style={styles.closedText}>Cuộc hội thoại này đã kết thúc</Text>
                         </View>
                     )}
                 </View>
@@ -235,34 +276,54 @@ const ChatScreen = () => {
                 <View style={styles.listArea}>
                     {conversations.length === 0 ? (
                         <View style={styles.emptyBox}>
-                            <Text style={styles.emptyText}>Chưa có hội thoại nào được tạo.</Text>
+                            <IconButton icon="message-off-outline" size={60} iconColor="#e2e8f0" />
+                            <Text style={styles.emptyText}>Hộp thư hỗ trợ trống</Text>
+                            <Text style={styles.emptySubtext}>Bạn có thể tạo yêu cầu hỗ trợ từ trang chi tiết đơn hàng.</Text>
+                            <Button 
+                                mode="outlined" 
+                                onPress={() => navigation.navigate('OrderHistory')}
+                                style={styles.historyBtn}
+                                textColor="#4c6545"
+                            >
+                                ĐI TỚI ĐƠN HÀNG
+                            </Button>
                         </View>
                     ) : (
-                        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-                            {conversations.map((conv) => (
+                        <FlatList
+                            data={conversations}
+                            keyExtractor={item => item._id}
+                            contentContainerStyle={styles.scrollContent}
+                            renderItem={({ item: conv }) => (
                                 <TouchableOpacity 
-                                    key={conv._id} 
                                     style={styles.convCard}
                                     onPress={() => openConversation(conv)}
-                                    activeOpacity={0.8}
+                                    activeOpacity={0.7}
                                 >
-                                    <View style={styles.convHeader}>
-                                        <Text style={styles.convSubject} numberOfLines={1}>{conv.subject || 'Trò chuyện hỗ trợ'}</Text>
-                                        {conv.unreadByCustomer > 0 && (
-                                            <View style={styles.unreadBadge}>
-                                                <Text style={styles.unreadText}>{conv.unreadByCustomer}</Text>
-                                            </View>
-                                        )}
+                                    <View style={styles.avatarPlaceholder}>
+                                        <Text style={styles.avatarText}>
+                                            {conv.subject ? conv.subject.charAt(0).toUpperCase() : 'A'}
+                                        </Text>
+                                        {conv.unreadByCustomer > 0 && <View style={styles.onlineDot} />}
                                     </View>
-                                    <View style={styles.convFooter}>
-                                        <View style={[styles.statusBadge, { backgroundColor: statusColor[conv.status] }]}>
-                                            <Text style={[styles.statusText, { color: textStatusColor[conv.status] }]}>{statusLabel[conv.status]}</Text>
+                                    <View style={styles.convInfo}>
+                                        <View style={styles.convHeaderRow}>
+                                            <Text style={styles.convSubject} numberOfLines={1}>{conv.subject || 'Hỗ trợ Atelier'}</Text>
+                                            <Text style={styles.convTime}>{formatTime(conv.lastMessageAt)}</Text>
                                         </View>
-                                        <Text style={styles.convTime}>{formatTime(conv.lastMessageAt)}</Text>
+                                        <View style={styles.convFooterRow}>
+                                            <Text style={styles.convStatus} numberOfLines={1}>
+                                                Trạng thái: {statusLabel[conv.status]}
+                                            </Text>
+                                            {conv.unreadByCustomer > 0 && (
+                                                <View style={styles.unreadBadge}>
+                                                    <Text style={styles.unreadText}>{conv.unreadByCustomer}</Text>
+                                                </View>
+                                            )}
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
-                            ))}
-                        </ScrollView>
+                            )}
+                        />
                     )}
                 </View>
             )}
@@ -287,8 +348,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         paddingTop: 8,
         paddingBottom: 16,
+        backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#f1f5f9',
+    },
+    headerInfo: {
+        flex: 1,
+        marginLeft: 4,
     },
     headerTitle: {
         fontSize: 18,
@@ -303,37 +369,76 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        padding: 24,
-    },
-    emptyBox: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 24,
-    },
-    emptyText: {
-        fontSize: 14,
-        color: '#64748b',
+        padding: 20,
     },
     convCard: {
+        flexDirection: 'row',
         backgroundColor: '#fff',
-        borderRadius: 16,
+        borderRadius: 20,
         padding: 16,
         marginBottom: 16,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.02,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
         borderWidth: 1,
         borderColor: '#f1f5f9',
     },
-    convHeader: {
+    avatarPlaceholder: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: '#f1f5f9',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative',
+    },
+    avatarText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#4c6545',
+    },
+    onlineDot: {
+        position: 'absolute',
+        bottom: 2,
+        right: 2,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: '#4c6545',
+        borderWidth: 2,
+        borderColor: '#fff',
+    },
+    convInfo: {
+        flex: 1,
+        marginLeft: 16,
+    },
+    convHeaderRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 4,
     },
     convSubject: {
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: 'bold',
         color: '#1e293b',
         flex: 1,
+        marginRight: 8,
+    },
+    convTime: {
+        fontSize: 11,
+        color: '#94a3b8',
+    },
+    convFooterRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    convStatus: {
+        fontSize: 12,
+        color: '#64748b',
     },
     unreadBadge: {
         backgroundColor: '#4c6545',
@@ -349,63 +454,55 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold',
     },
-    convFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    emptyBox: {
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
+        padding: 40,
     },
-    statusBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
+    emptyText: {
+        fontSize: 14,
+        color: '#64748b',
     },
-    statusText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-    },
-    convTime: {
-        fontSize: 11,
+    emptySubtext: {
+        fontSize: 14,
         color: '#94a3b8',
+        textAlign: 'center',
+        marginTop: 8,
+        lineHeight: 20,
+    },
+    historyBtn: {
+        marginTop: 24,
+        borderRadius: 12,
     },
     chatArea: {
         flex: 1,
-        backgroundColor: '#fff',
     },
-    chatHeader: {
-        flexDirection: 'row',
+    statusRibbon: {
+        paddingVertical: 6,
+        paddingHorizontal: 16,
         alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f1f5f9',
-        backgroundColor: '#fafafa',
     },
-    chatHeaderInfo: {
-        flex: 1,
-        marginLeft: 4,
-    },
-    activeSubject: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#1e293b',
-    },
-    activeSubtitle: {
+    statusRibbonText: {
         fontSize: 11,
-        color: '#64748b',
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
     },
     messagesContainer: {
-        padding: 16,
-        paddingBottom: 24,
+        padding: 20,
     },
-    emptyMessages: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 40,
+    timeDivider: {
+        fontSize: 11,
+        color: '#94a3b8',
+        textAlign: 'center',
+        marginVertical: 16,
+        textTransform: 'uppercase',
+        letterSpacing: 1,
     },
     messageRow: {
         flexDirection: 'row',
-        marginBottom: 12,
+        marginBottom: 8,
     },
     myRow: {
         justifyContent: 'flex-end',
@@ -414,22 +511,24 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     bubble: {
-        maxWidth: '75%',
+        maxWidth: '80%',
         paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 18,
+        paddingVertical: 12,
+        borderRadius: 20,
     },
     myBubble: {
         backgroundColor: '#4c6545',
         borderBottomRightRadius: 4,
     },
     otherBubble: {
-        backgroundColor: '#f1f5f9',
+        backgroundColor: '#fff',
         borderBottomLeftRadius: 4,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
     },
     messageText: {
-        fontSize: 14,
-        lineHeight: 20,
+        fontSize: 15,
+        lineHeight: 22,
     },
     myText: {
         color: '#fff',
@@ -437,54 +536,55 @@ const styles = StyleSheet.create({
     otherText: {
         color: '#1e293b',
     },
-    msgTime: {
-        fontSize: 10,
-        marginTop: 4,
-    },
-    myTime: {
-        color: '#e2e8f0',
-        textAlign: 'right',
-    },
-    otherTime: {
-        color: '#94a3b8',
+    inputWrapper: {
+        padding: 16,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#f1f5f9',
     },
     inputArea: {
         flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#f1f5f9',
-        backgroundColor: '#fff',
+        alignItems: 'flex-end',
+        backgroundColor: '#f8fafc',
+        borderRadius: 24,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
     },
     textInput: {
         flex: 1,
-        backgroundColor: '#f1f5f9',
-        borderRadius: 24,
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        fontSize: 14,
+        fontSize: 15,
         color: '#1e293b',
-        maxHeight: 100,
+        maxHeight: 120,
+        paddingTop: 8,
+        paddingBottom: 8,
     },
     sendBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         backgroundColor: '#4c6545',
-        marginLeft: 12,
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 2,
+        marginLeft: 8,
+    },
+    sendBtnDisabled: {
+        backgroundColor: '#cbd5e1',
     },
     sendIcon: {
         margin: 0,
     },
     closedArea: {
-        padding: 16,
+        flexDirection: 'row',
+        padding: 20,
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#f8fafc',
     },
     closedText: {
-        fontSize: 13,
+        fontSize: 14,
         color: '#64748b',
         fontStyle: 'italic',
     }

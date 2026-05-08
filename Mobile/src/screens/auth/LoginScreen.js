@@ -12,10 +12,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const imageLogin = require('../../../assets/images/image_login.png');
 const logo = require('../../../assets/images/logo.png');
 
+import { useToast } from '../../context/ToastContext';
+
 const LoginScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const theme = useTheme();
+  const { showToast } = useToast();
   const isLoggedIn = useSelector((state) => state.auth.isLogin);
 
   const [formData, setFormData] = useState({
@@ -80,7 +83,16 @@ const LoginScreen = () => {
           email: data.data.email,
           phone: data.data.phone
         }));
-        await AsyncStorage.setItem('role', data.data.role);
+
+        let userRole = data.data.role;
+        if (userRole && typeof userRole === 'object') {
+          userRole = userRole.name || userRole.id || JSON.stringify(userRole);
+        } else if (userRole === undefined || userRole === null) {
+          userRole = 'customer';
+        } else {
+          userRole = String(userRole);
+        }
+        await AsyncStorage.setItem('role', userRole);
         
         dispatch(checkLogin(data.data));
 
@@ -88,26 +100,27 @@ const LoginScreen = () => {
           await AsyncStorage.setItem('rememberMe', formData.email);
         }
 
-        const destination = data.data.role === 'admin' ? 'Dashboard' : 'Main';
-        Alert.alert('Thành công', 'Đăng nhập thành công!', [
-          { text: 'OK', onPress: () => navigation.replace(destination) }
-        ]);
+        const destination = userRole === 'admin' ? 'Dashboard' : 'Main';
+        showToast('Đăng nhập thành công!', 'success');
+        setTimeout(() => {
+          navigation.replace(destination);
+        }, 1000);
       } else {
         const errorMsg = data?.message || 'Đăng nhập thất bại. Vui lòng thử lại.';
         setSubmitError(errorMsg);
-        Alert.alert('Lỗi', errorMsg);
+        showToast(errorMsg, 'error');
       }
     } catch (error) {
       console.error('Login error:', error);
       setSubmitError('Có lỗi xảy ra. Vui lòng thử lại.');
-      Alert.alert('Lỗi', 'Có lỗi xảy ra. Vui lòng thử lại.');
+      showToast('Có lỗi xảy ra. Vui lòng thử lại.', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLoginMock = () => {
-    Alert.alert("Google Login", "Tính năng đăng nhập Google cần cấu hình Firebase/Expo Auth Session.");
+    showToast("Tính năng đăng nhập Google cần cấu hình Firebase/Expo Auth Session.", 'info');
   };
 
   return (

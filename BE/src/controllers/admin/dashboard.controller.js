@@ -1,6 +1,7 @@
 const User = require('../../models/users.model');
 const Product = require('../../models/products.model');
 const Order = require('../../models/orders.model');
+const Consignment = require('../../models/consignments.model');
 
 // ✅ GET Dashboard Stats
 exports.getStats = async (req, res) => {
@@ -82,14 +83,56 @@ exports.getStats = async (req, res) => {
             .select('orderCode buyerName totalAmount status paymentMethod createdAt')
             .lean();
 
+        const pendingOrders = await Order.countDocuments({ status: { $in: ['paid', 'processing'] } });
+        const totalActiveProducts = await Product.countDocuments({ status: 'active' });
+        const totalDeliveredOrders = await Order.countDocuments({ status: 'delivered' });
+        const totalPendingConsignments = await Consignment.countDocuments({ status: { $in: ['pending', 'received'] } });
+
+        // Tính toán doanh thu tuần hiện tại (Thứ 2 -> Chủ nhật)
+        const currentWeekStart = new Date();
+        const day = currentWeekStart.getDay();
+        const diffToMonday = currentWeekStart.getDate() - (day === 0 ? 6 : day - 1);
+        currentWeekStart.setDate(diffToMonday);
+        currentWeekStart.setHours(0, 0, 0, 0);
+
+        const currentWeekEnd = new Date(currentWeekStart);
+        currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
+        currentWeekEnd.setHours(23, 59, 59, 999);
+
+        const weeklyOrders = await Order.find({
+            paymentStatus: 'paid',
+            createdAt: { $gte: currentWeekStart, $lte: currentWeekEnd }
+        });
+
+        const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+        const weeklyRevenue = dayNames.map((name, index) => {
+            const startOfDay = new Date(currentWeekStart);
+            startOfDay.setDate(currentWeekStart.getDate() + index);
+            startOfDay.setHours(0, 0, 0, 0);
+
+            const endOfDay = new Date(startOfDay);
+            endOfDay.setHours(23, 59, 59, 999);
+
+            const total = weeklyOrders
+                .filter(o => o.createdAt >= startOfDay && o.createdAt <= endOfDay)
+                .reduce((acc, o) => acc + o.totalAmount, 0);
+
+            return { name, revenue: total };
+        });
+
         res.status(200).json({
             success: true,
             data: {
                 totalUsers,
                 totalProducts,
+                totalActiveProducts,
+                pendingOrders,
+                totalDeliveredOrders,
+                totalPendingConsignments,
                 totalOrders: currentMonthOrders,
                 totalRevenue: currentMonthRevenue,
                 monthlyRevenue,
+                weeklyRevenue,
                 orderStatusCounts,
                 recentOrders
             }

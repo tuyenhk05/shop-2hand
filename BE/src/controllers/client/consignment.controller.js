@@ -52,6 +52,17 @@ exports.createConsignment = async (req, res) => {
         });
         await newCon.save();
 
+        // --- Tạo thông báo cho Admin ---
+        const { createNotification } = require('../../helpers/notification.helper');
+        const systemConfig = require('../../configs/system');
+        await createNotification(req.app, {
+            role: 'admin',
+            title: 'Yêu cầu ký gửi mới',
+            content: `Bạn có một yêu cầu ký gửi mới: "${title}". Vui lòng kiểm tra và định giá.`,
+            type: 'new_consignment',
+            link: `${systemConfig.prefixAdmin}/consignments`
+        });
+
         res.status(201).json({ success: true, consignment: newCon, message: 'Yêu cầu ký gửi đã được gửi thành công!' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

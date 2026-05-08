@@ -8,6 +8,7 @@ import { getAllProducts, getProductById, createProduct, updateProduct, updatePro
 import { getAllCategories } from '../../services/admin/categories.service.jsx';
 import { adminGet } from '../../untils/adminRequest.jsx';
 import { exportToCSV } from '../../untils/exportCSV';
+import Loading from '../../components/loading/loading';
 
 const { TextArea, Search } = Input;
 
@@ -53,20 +54,11 @@ const ProductsManagement = () => {
     });
 
     // ─── Fetch ───────────────────────────────────────────────
-    const fetchData = async (currentFilters = filters) => {
+    const fetchData = async () => {
         try {
             setLoading(true);
-
-            // Lọc bỏ các filter undefined/empty để gửi lên API
-            const params = {};
-            if (currentFilters.q) params.q = currentFilters.q;
-            if (currentFilters.status) params.status = currentFilters.status;
-            if (currentFilters.categoryId) params.categoryId = currentFilters.categoryId;
-            if (currentFilters.minPrice) params.minPrice = currentFilters.minPrice;
-            if (currentFilters.maxPrice) params.maxPrice = currentFilters.maxPrice;
-
             const [prodRes, catRes, brandRes] = await Promise.all([
-                getAllProducts(params),
+                getAllProducts({}),
                 getAllCategories(),
                 adminGet('/brands')
             ]);
@@ -80,18 +72,21 @@ const ProductsManagement = () => {
         }
     };
 
-    // Trigger fetch khi filter (trừ search q) thay đổi trực tiếp
     useEffect(() => {
         fetchData();
-    }, [filters.status, filters.categoryId, filters.minPrice, filters.maxPrice]);
+    }, []);
 
-    // Debounce search input
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchData();
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [filters.q]);
+    const matchesFilters = (p) => {
+        if (filters.q && !p.title.toLowerCase().includes(filters.q.toLowerCase()) && !p.description?.toLowerCase().includes(filters.q.toLowerCase())) return false;
+        if (filters.categoryId && (p.categoryId?._id || p.categoryId) !== filters.categoryId) return false;
+        if (filters.minPrice !== undefined && filters.minPrice !== null && p.price < filters.minPrice) return false;
+        if (filters.maxPrice !== undefined && filters.maxPrice !== null && p.price > filters.maxPrice) return false;
+        return true;
+    };
+
+    const activeProducts = products.filter(p => p.status === 'active' && matchesFilters(p));
+    const pendingProducts = products.filter(p => p.status === 'pending');
+    const otherProducts = products.filter(p => p.status !== 'active' && p.status !== 'pending');
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
@@ -360,6 +355,8 @@ const ProductsManagement = () => {
         },
     ];
 
+    if (loading && products.length === 0) return <Loading fullScreen={true} text="Đang tải danh sách sản phẩm..." />;
+
     return (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10">
             {/* Header */}
@@ -381,95 +378,107 @@ const ProductsManagement = () => {
                 )}
             </div>
 
-            {/* Filter Bar */}
-            <div className="bg-surface-container-low p-4 rounded-lg mb-6 flex flex-wrap gap-4 items-end border border-outline-variant/10">
-                <div className="flex-1 min-w-[240px]">
-                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tìm kiếm</p>
-                    <Search
-                        placeholder="Tên sản phẩm hoặc mô tả..."
-                        allowClear
-                        value={filters.q}
-                        onChange={(e) => handleFilterChange('q', e.target.value)}
-                        className="w-full"
-                    />
-                </div>
-
-                <div className="w-36">
-                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Trạng thái</p>
-                    <Select
-                        placeholder="Tất cả"
-                        className="w-full"
-                        allowClear
-                        value={filters.status}
-                        onChange={(val) => handleFilterChange('status', val)}
-                    >
-                        {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
-                            <Select.Option key={val} value={val}>{cfg.label}</Select.Option>
-                        ))}
-                    </Select>
-                </div>
-
-                <div className="w-44">
-                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Danh mục</p>
-                    <Select
-                        placeholder="Tất cả danh mục"
-                        className="w-full"
-                        allowClear
-                        showSearch
-                        optionFilterProp="children"
-                        value={filters.categoryId}
-                        onChange={(val) => handleFilterChange('categoryId', val)}
-                    >
-                        {categories.map(c => (
-                            <Select.Option key={c._id} value={c._id}>{c.name}</Select.Option>
-                        ))}
-                    </Select>
-                </div>
-
-                <div className="w-64">
-                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Khoảng giá (VNĐ)</p>
-                    <Space.Compact className="w-full">
-                        <InputNumber
-                            placeholder="Từ"
+            {/* Section 1: Sản phẩm Đang bán */}
+            <div className="mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Sản phẩm Đang bán</h3>
+                {/* Filter Bar */}
+                <div className="bg-surface-container-lowest p-4 rounded-lg mb-4 flex flex-wrap gap-4 items-end border border-outline-variant/5">
+                    <div className="flex-1 min-w-[240px]">
+                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Tìm kiếm</p>
+                        <Search
+                            placeholder="Tên sản phẩm hoặc mô tả..."
+                            allowClear
+                            value={filters.q}
+                            onChange={(e) => handleFilterChange('q', e.target.value)}
                             className="w-full"
-                            min={0}
-                            value={filters.minPrice}
-                            onChange={(val) => handleFilterChange('minPrice', val)}
-                            formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={v => v.replace(/,/g, '')}
                         />
-                        <InputNumber
-                            placeholder="Đến"
+                    </div>
+
+                    <div className="w-44">
+                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Danh mục</p>
+                        <Select
+                            placeholder="Tất cả danh mục"
                             className="w-full"
-                            min={0}
-                            value={filters.maxPrice}
-                            onChange={(val) => handleFilterChange('maxPrice', val)}
-                            formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={v => v.replace(/,/g, '')}
-                        />
-                    </Space.Compact>
+                            allowClear
+                            showSearch
+                            optionFilterProp="children"
+                            value={filters.categoryId}
+                            onChange={(val) => handleFilterChange('categoryId', val)}
+                        >
+                            {categories.map(c => (
+                                <Select.Option key={c._id} value={c._id}>{c.name}</Select.Option>
+                            ))}
+                        </Select>
+                    </div>
+
+                    <div className="w-64">
+                        <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1.5">Khoảng giá (VNĐ)</p>
+                        <Space.Compact className="w-full">
+                            <InputNumber
+                                placeholder="Từ"
+                                className="w-full"
+                                min={0}
+                                value={filters.minPrice}
+                                onChange={(val) => handleFilterChange('minPrice', val)}
+                                formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={v => v.replace(/,/g, '')}
+                            />
+                            <InputNumber
+                                placeholder="Đến"
+                                className="w-full"
+                                min={0}
+                                value={filters.maxPrice}
+                                onChange={(val) => handleFilterChange('maxPrice', val)}
+                                formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={v => v.replace(/,/g, '')}
+                            />
+                        </Space.Compact>
+                    </div>
+
+                    <Button onClick={handleResetFilters} className="mb-0.5">Đặt lại</Button>
+
+                    <Button
+                        type="primary"
+                        icon={<DownloadOutlined />}
+                        onClick={() => exportToCSV(activeProducts, columns.filter(c => c.key !== 'action' && c.key !== 'product'), 'DanhSachSanPhamDangBan')}
+                        className="mb-0.5 bg-green-600 hover:bg-green-700"
+                    >
+                        Xuất CSV
+                    </Button>
                 </div>
 
-                <Button onClick={handleResetFilters} className="mb-0.5">Đặt lại</Button>
-
-                <Button
-                    type="primary"
-                    icon={<DownloadOutlined />}
-                    onClick={() => exportToCSV(products, columns.filter(c => c.key !== 'action' && c.key !== 'product'), 'DanhSachSanPham')}
-                    className="mb-0.5 bg-green-600 hover:bg-green-700"
-                >
-                    Xuất CSV
-                </Button>
+                <Table
+                    dataSource={activeProducts}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={loading}
+                    pagination={{ pageSize: 5 }}
+                />
             </div>
 
-            {/* Table */}
-            <Table
-                dataSource={products}
-                columns={columns}
-                rowKey="_id"
-                loading={loading}
-                pagination={{ pageSize: 10 }}
-            />
+            {/* Section 2: Sản phẩm Chờ duyệt */}
+            <div className="mb-8 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Sản phẩm Chờ duyệt</h3>
+                <Table
+                    dataSource={pendingProducts}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={loading}
+                    pagination={{ pageSize: 5 }}
+                />
+            </div>
+
+            {/* Section 3: Các trạng thái khác */}
+            <div className="mb-6 p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                <h3 className="font-notoSerif text-lg font-bold text-on-surface mb-3">Các sản phẩm khác</h3>
+                <Table
+                    dataSource={otherProducts}
+                    columns={columns}
+                    rowKey="_id"
+                    loading={loading}
+                    pagination={{ pageSize: 5 }}
+                />
+            </div>
 
             {/* Modal Thêm / Sửa */}
             <Modal

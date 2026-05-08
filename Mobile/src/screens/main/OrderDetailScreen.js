@@ -4,18 +4,23 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { Button, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getOrderByIdApi } from '../../services/client/order.service';
+import { createConversationApi } from '../../services/client/support.service';
+import { useToast } from '../../context/ToastContext';
+import { IMAGE_BASE_URL } from '../../config/api';
 
 const OrderDetailScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
+    const { showToast } = useToast();
     const orderId = route.params?.id;
     const [order, setOrder] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isOpeningSupport, setIsOpeningSupport] = useState(false);
 
     const getImageUrl = (url) => {
         if (!url) return 'https://dummyimage.com/100x100/f5f5f5/333333.png?text=No+Image';
         if (url.startsWith('http')) return url;
-        return `http://192.168.1.14:3001${url.startsWith('/') ? '' : '/'}${url}`;
+        return `${IMAGE_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     const fetchOrderDetails = async () => {
@@ -57,10 +62,33 @@ const OrderDetailScreen = () => {
         }
     };
 
+    const handleOpenSupport = async () => {
+        if (!order) return;
+        try {
+            setIsOpeningSupport(true);
+            const orderCode = order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`;
+            const res = await createConversationApi({
+                orderId: order._id,
+                orderCode,
+                subject: `Hỗ trợ đơn hàng ${orderCode}`
+            });
+            if (res.success) {
+                navigation.navigate('ChatSupport', { conversationId: res.data._id });
+            } else {
+                showToast('Không thể mở hội thoại hỗ trợ.', 'error');
+            }
+        } catch (error) {
+            console.error("Open support error:", error);
+            showToast('Lỗi kết nối server.', 'error');
+        } finally {
+            setIsOpeningSupport(false);
+        }
+    };
+
     if (isLoading) {
         return (
             <SafeAreaView style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#FF8A65" />
+                <ActivityIndicator size="large" color="#4c6545" />
             </SafeAreaView>
         );
     }
@@ -69,7 +97,7 @@ const OrderDetailScreen = () => {
         return (
             <SafeAreaView style={styles.centerContainer}>
                 <Text style={styles.emptyText}>Không tìm thấy đơn hàng</Text>
-                <Button mode="contained" onPress={() => navigation.goBack()} style={{ marginTop: 16 }} buttonColor="#4A5D4E">Quay lại</Button>
+                <Button mode="contained" onPress={() => navigation.goBack()} style={{ marginTop: 16 }} buttonColor="#4c6545">Quay lại</Button>
             </SafeAreaView>
         );
     }
@@ -81,7 +109,7 @@ const OrderDetailScreen = () => {
                 <IconButton icon="arrow-left" size={24} onPress={() => navigation.goBack()} />
                 <View>
                     <Text style={styles.headerTitle}>Chi tiết đơn hàng</Text>
-                    <Text style={styles.headerSubtitle}>Mã đơn: #{order._id?.slice(-6).toUpperCase()}</Text>
+                    <Text style={styles.headerSubtitle}>Mã đơn: {order.orderCode || `#${order._id?.slice(-8).toUpperCase()}`}</Text>
                 </View>
             </View>
 
@@ -139,6 +167,23 @@ const OrderDetailScreen = () => {
                         <Text style={styles.finalTotalLabel}>Tổng số tiền</Text>
                         <Text style={styles.finalTotalValue}>{formatPrice(order.totalAmount)}</Text>
                     </View>
+                </View>
+
+                {/* Support Section */}
+                <View style={styles.supportSection}>
+                    <Text style={styles.supportHint}>Bạn có thắc mắc hay vấn đề gì về đơn hàng này?</Text>
+                    <Button 
+                        mode="contained" 
+                        onPress={handleOpenSupport}
+                        loading={isOpeningSupport}
+                        disabled={isOpeningSupport}
+                        icon="chat-question-outline"
+                        style={styles.supportBtn}
+                        buttonColor="#4c6545"
+                        labelStyle={styles.supportBtnLabel}
+                    >
+                        HỖ TRỢ ĐƠN HÀNG
+                    </Button>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -320,6 +365,31 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#FF8A65',
+    },
+    supportSection: {
+        marginTop: 8,
+        padding: 16,
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+    },
+    supportHint: {
+        fontSize: 13,
+        color: '#64748b',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    supportBtn: {
+        width: '100%',
+        borderRadius: 12,
+        paddingVertical: 4,
+    },
+    supportBtnLabel: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        letterSpacing: 1,
     },
     emptyText: {
         fontSize: 14,

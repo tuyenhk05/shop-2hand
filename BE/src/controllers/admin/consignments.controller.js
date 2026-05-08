@@ -33,6 +33,28 @@ exports.updateConsignmentStatus = async (req, res) => {
             .populate('categoryId', 'name')
             .populate('brandId', 'name');
             
+        // --- Tạo thông báo cho Người bán ---
+        if (updatedConsignment) {
+            const { createNotification } = require('../../helpers/notification.helper');
+            let content = `Yêu cầu ký gửi "${updatedConsignment.title}" đã được cập nhật.`;
+            
+            if (expectedPrice !== undefined) {
+                content = `Sản phẩm ký gửi "${updatedConsignment.title}" đã có định giá mới từ shop: ${Number(expectedPrice).toLocaleString()}đ.`;
+            } else if (status === 'received') {
+                content = `Shop đã nhận được sản phẩm ký gửi "${updatedConsignment.title}" và đang tiến hành kiểm định.`;
+            } else if (status === 'completed') {
+                content = `Sản phẩm ký gửi "${updatedConsignment.title}" đã được duyệt và đăng bán thành công!`;
+            }
+
+            await createNotification(req.app, {
+                userId: updatedConsignment.userId._id,
+                title: 'Cập nhật ký gửi',
+                content,
+                type: 'consignment_status',
+                link: `/dashboard?tab=consignor`
+            });
+        }
+
         res.status(200).json({ success: true, data: updatedConsignment });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -65,11 +87,18 @@ exports.convertToProduct = async (req, res) => {
         }
 
         // 1. Tạo sản phẩm mới
+        const Setting = require('../../models/settings.model');
+        const setting = await Setting.findOne({ key: 'consignment_commission_rate' });
+        const commissionRate = setting ? Number(setting.value) : 0;
+
+        const markup = commissionRate > 0 ? (consignment.expectedPrice * commissionRate / 100) : 0;
+        const finalPrice = consignment.expectedPrice + markup;
+
         const product = new Product({
             title: consignment.title,
             description: consignment.description,
-            price: consignment.expectedPrice, // Lấy giá đã được định giá (hoặc giá mong muốn)
-            originalPrice: consignment.expectedPrice * 1.2, // Mock 
+            price: finalPrice, // Lấy giá đã được định giá (hoặc giá mong muốn) + % chiết khấu
+            originalPrice: finalPrice * 1.2, // Mock 
             condition: consignment.condition === 'perfect' ? 'new' : (consignment.condition === 'excellent' ? 'like_new' : 'good'),
             size: consignment.size,
             color: consignment.color,
@@ -79,7 +108,7 @@ exports.convertToProduct = async (req, res) => {
             brandId: consignment.brandId,
             sellerId: consignment.userId,
             listingType: 'consignment',
-            status: 'active', // Đăng lên kệ luôn
+            status: 'pending', // Trạng thái chờ duyệt (Thêm vào kho)
             stock: 1
         });
 

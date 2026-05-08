@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Table, Button, Modal, Form, Input, Select, message, Space, Popconfirm, Tag } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import { getAllCategories, createCategory, updateCategory, deleteCategory } from '../../services/admin/categories.service.jsx';
+import Loading from '../../components/loading/loading';
 
 const CategoriesManagement = () => {
     const { role } = useSelector((state) => state.auth);
@@ -161,6 +162,8 @@ const CategoriesManagement = () => {
             ),
         },
     ];
+
+    if (loading && categories.length === 0) return <Loading fullScreen={true} text="Đang tải danh mục..." />;
 
     return (
         <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/10">

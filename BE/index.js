@@ -141,6 +141,31 @@ supportNS.on('connection', (socket) => {
   });
 });
 
+// ✅ Socket.IO namespace /notifications
+const notificationNS = io.of('/notifications');
+
+notificationNS.on('connection', (socket) => {
+  console.log(`🔔 Notification socket connected: ${socket.id}`);
+
+  // Join user room
+  socket.on('join', (userId) => {
+    socket.join(userId);
+    console.log(`User ${userId} joined notification room`);
+  });
+
+  // Admin join
+  socket.on('admin_join', () => {
+    socket.join('admin_room');
+    console.log(`Admin joined notification room`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`🔔 Notification socket disconnected: ${socket.id}`);
+  });
+});
+
+app.set('notificationNS', notificationNS);
+
 // ✅ Start server
 server.listen(port, () => {
   console.log(`🚀 Backend API running at http://localhost:${port}`);
