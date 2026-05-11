@@ -96,7 +96,7 @@ const Login = () => {
           navigate('/complete-profile');
         } else {
           message.success('Đăng nhập thành công!');
-          
+
           localStorage.setItem('user', JSON.stringify({
             id: data.data.id,
             fullName: data.data.fullName,

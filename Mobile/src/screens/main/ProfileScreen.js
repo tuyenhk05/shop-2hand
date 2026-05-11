@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import ConfirmModal from '../../components/ConfirmModal';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconButton } from 'react-native-paper';
@@ -17,6 +18,7 @@ const ProfileScreen = () => {
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     useEffect(() => {
         const loadUserInfo = async () => {
@@ -46,23 +48,15 @@ const ProfileScreen = () => {
         }
     }, [userId, isFocused]);
 
-    const handleLogout = async () => {
-        Alert.alert(
-            'Đăng xuất',
-            'Bạn có chắc chắn muốn đăng xuất?',
-            [
-                { text: 'Hủy', style: 'cancel' },
-                {
-                    text: 'Đăng xuất',
-                    style: 'destructive',
-                    onPress: async () => {
-                        await AsyncStorage.clear();
-                        dispatch({ type: 'LOGOUT' });
-                        navigation.replace('Login');
-                    }
-                }
-            ]
-        );
+    const handleLogout = () => {
+        setShowLogoutModal(true);
+    };
+
+    const handleConfirmLogout = async () => {
+        setShowLogoutModal(false);
+        await AsyncStorage.clear();
+        dispatch({ type: 'LOGOUT' });
+        navigation.replace('Login');
     };
 
     if (!userId) {
@@ -86,6 +80,17 @@ const ProfileScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <ConfirmModal
+                visible={showLogoutModal}
+                title="Đăng xuất"
+                message="Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?"
+                confirmText="Đăng xuất"
+                cancelText="Hủy"
+                confirmType="danger"
+                icon="logout"
+                onConfirm={handleConfirmLogout}
+                onCancel={() => setShowLogoutModal(false)}
+            />
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 
                 {/* CUSTOMER BASIC INFO SECTION */}

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mobile",
+    "name": "Atelier",
     "slug": "Mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,6 +12,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.atelier.shop2hand",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -43,6 +45,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "60aa893f-92c2-4af7-aa8e-bc908a5c3f15"
+      }
+    },
+    "owner": "tuyen2005"
   }
 }

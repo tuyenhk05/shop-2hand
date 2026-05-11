@@ -13,6 +13,7 @@ const ClientLayout = () => {
 
     // ─── Ẩn/hiện header khi scroll ─────────────────────────────
     const [headerVisible, setHeaderVisible] = useState(true);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const lastScrollY = useRef(0);
 
     useEffect(() => {
@@ -75,7 +76,17 @@ const ClientLayout = () => {
                     headerVisible ? 'translate-y-0 shadow-sm' : '-translate-y-full shadow-none'
                 }`}
             >
-                <div className="flex items-center gap-10">
+                <div className="flex items-center gap-4 md:gap-10">
+                    {/* Mobile Menu Toggle Button */}
+                    <button 
+                        className="md:hidden p-1 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        <span className="material-symbols-outlined text-[28px]">
+                            {isMobileMenuOpen ? 'close' : 'menu'}
+                        </span>
+                    </button>
+
                     <Link to="/" className="text-2xl font-bold font-headline text-primary-fixed-variant tracking-tighter italic">
                         Atelier.
                     </Link>
@@ -151,6 +162,21 @@ const ClientLayout = () => {
                     )}
                 </div>
             </header>
+
+            {/* Mobile Menu Dropdown */}
+            <div className={`md:hidden fixed top-[72px] left-0 w-full bg-[#fef9f7] border-b border-outline-variant/20 shadow-md transition-all duration-300 overflow-hidden z-40 ${isMobileMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+                <nav className="flex flex-col py-4 px-6 space-y-4">
+                    <Link to="/" className={`w-fit ${getLinkClass('/')}`} onClick={() => setIsMobileMenuOpen(false)}>
+                        Trang chủ
+                    </Link>
+                    <Link to="/products" className={`w-fit ${getLinkClass('/products')}`} onClick={() => setIsMobileMenuOpen(false)}>
+                        Sản phẩm
+                    </Link>
+                    <Link to="/sustain" className={`w-fit ${getLinkClass('/sustain')}`} onClick={() => setIsMobileMenuOpen(false)}>
+                        Bền vững
+                    </Link>
+                </nav>
+            </div>
 
             {/* ================= MAIN CONTENT ================= */}
             {/* pt-20 để bù lại khoảng không gian bị chiếm bởi Header fixed (fixed position) */}

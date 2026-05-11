@@ -71,7 +71,7 @@ export default function Home() {
             />
             <main className="pt-8 pb-20">
                 {/* HERO */}
-                <section className="px-6 md:px-12 mb-28 max-w-[1400px] mx-auto flex flex-col md:flex-row items-center gap-12" style={{ maxHeight: "90vh" }}>
+                <section className="px-6 md:px-12 mb-28 max-w-[1400px] mx-auto flex flex-col md:flex-row items-center gap-12 min-h-[calc(100vh-100px)] md:min-h-0 md:max-h-[90vh]">
                     {/* Text Content */}
                     <AnimateWhenVisible direction="slideFromLeft" className="w-full md:w-1/2 flex flex-col space-y-6">
                         <div className="inline-flex items-center px-4 py-1.5 bg-orange-600/10 border border-orange-600/20 text-orange-600 rounded-full text-xs font-bold uppercase tracking-widest w-fit mb-2 hover:bg-orange-600/20 transition-colors"
@@ -131,14 +131,14 @@ export default function Home() {
 
                 {/* NEW ARRIVALS */}
                 <section className="px-6 max-w-7xl mx-auto mb-24">
-                    <AnimateWhenVisible className="flex justify-between items-center mb-16">
+                    <AnimateWhenVisible className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-12 sm:mb-16">
                         <h2 className="text-4xl font-notoSerif font-bold text-on-background relative inline-block">
                             Sản phẩm mới
                             <span className="absolute -bottom-2 left-0 w-12 h-1 bg-primary rounded-full"></span>
                         </h2>
                         <button
                             onClick={() => navigate('/products')}
-                            className="text-primary font-bold text-sm border-b border-primary/30 pb-1 hover:border-primary hover:text-primary-fixed-variant transition-all flex items-center gap-1 group"
+                            className="text-primary font-bold text-sm border-b border-primary/30 pb-1 hover:border-primary hover:text-primary-fixed-variant transition-all flex items-center gap-1 group self-start sm:self-auto mt-2 sm:mt-0"
                         >
                             Xem tất cả Kho <span className="material-symbols-outlined text-sm transform group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </button>
@@ -213,7 +213,7 @@ export default function Home() {
                                 <span className="w-12 h-px bg-[#46483c]/30"></span>
                             </h2>
                         </AnimateWhenVisible>
-                        <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24">
+                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-24">
                             {[
                                 { name: 'CHANEL', class: 'font-serif font-bold tracking-tight' },
                                 { name: 'PRADA', class: 'font-manrope font-light tracking-widest' },
@@ -222,7 +222,7 @@ export default function Home() {
                                 { name: 'HERMÈS', class: 'font-serif tracking-widest' }
                             ].map((brand, i) => (
                                 <AnimateWhenVisible key={brand.name} direction="fadeInUp" transition={{ delay: i * 0.1 }}>
-                                    <span className={`text-3xl md:text-4xl text-[#1c1c19] opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-500 cursor-pointer inline-block ${brand.class}`}>
+                                    <span className={`text-2xl sm:text-3xl md:text-4xl text-[#1c1c19] opacity-50 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-500 cursor-pointer inline-block ${brand.class}`}>
                                         {brand.name}
                                     </span>
                                 </AnimateWhenVisible>
@@ -235,15 +235,15 @@ export default function Home() {
 
                 {/* CURATED CATEGORIES */}
                 <section className="px-6 md:px-12 pb-32 max-w-7xl mx-auto">
-                    <AnimateWhenVisible direction="fade" className="flex justify-between items-end mb-16">
+                    <AnimateWhenVisible direction="fade" className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12 md:mb-16">
                         <div>
-                            <h2 className="text-5xl font-notoSerif font-bold mb-4 text-on-background tracking-tight relative inline-block">
+                            <h2 className="text-4xl md:text-5xl font-notoSerif font-bold mb-4 text-on-background tracking-tight relative inline-block">
                                 Khám phá theo dòng
                                 <span className="absolute -bottom-2 left-0 w-16 h-1 bg-primary rounded-full"></span>
                             </h2>
-                            <p className="text-on-surface-variant font-manrope text-lg mt-4">Tuyển tập thẩm mỹ được cá nhân hóa cho phong cách của bạn.</p>
+                            <p className="text-on-surface-variant font-manrope text-base md:text-lg mt-4">Tuyển tập thẩm mỹ được cá nhân hóa cho phong cách của bạn.</p>
                         </div>
-                        <button onClick={() => navigate('/products')} className="hidden md:flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em] hover:opacity-80 hover:-translate-y-0.5 transition-all border-b border-primary/20 pb-1 group">
+                        <button onClick={() => navigate('/products')} className="flex items-center gap-2 text-primary font-bold text-sm uppercase tracking-[0.2em] hover:opacity-80 hover:-translate-y-0.5 transition-all border-b border-primary/20 pb-1 group self-start md:self-auto mt-2 md:mt-0">
                             Xem toàn bộ Kho <span className="material-symbols-outlined text-base transform group-hover:translate-x-1 transition-transform">arrow_forward</span>
                         </button>
                     </AnimateWhenVisible>
@@ -288,8 +288,8 @@ export default function Home() {
 
                 {/* AUTHENTICATION SNIPPET */}
                 <section className="px-6 md:px-12 pb-32 max-w-[1400px] mx-auto">
-                    <div className="bg-[#4c6545] text-white rounded-[2.5rem] p-12 md:p-20 flex flex-col md:flex-row items-center gap-16 relative overflow-hidden group">
-                        <div className="md:w-1/2 z-10">
+                    <div className="bg-[#4c6545] text-white rounded-[2.5rem] p-8 sm:p-12 md:p-20 flex flex-col md:flex-row items-center gap-10 md:gap-16 relative overflow-hidden group">
+                        <div className="w-full md:w-1/2 z-10">
                             <AnimateWhenVisible direction="fadeInDown">
                                 <span className="font-manrope text-xs font-bold uppercase tracking-[0.3em] text-[#ceebc2] mb-6 block flex items-center gap-3">
                                     <span className="w-8 h-px bg-[#ceebc2]"></span>
