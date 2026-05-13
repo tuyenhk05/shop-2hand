@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { IconButton } from 'react-native-paper';
 import { IMAGE_BASE_URL } from '../config/api';
 
@@ -39,7 +40,8 @@ const ProductCard = memo(({ item, isLarge, wishlisted, onWishlist, onCart, onNav
                 <Image
                     source={{ uri: getMainImageHelper(item) }}
                     style={styles.image}
-                    resizeMode="cover"
+                    contentFit="cover"
+                    transition={300}
                 />
                 
                 {isMuseumQuality && (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { Button, IconButton } from 'react-native-paper';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
@@ -162,7 +163,7 @@ const WishlistScreen = () => {
                                 activeOpacity={0.9}
                                 onPress={() => navigation.navigate('ProductDetail', { id: product.slug || product._id })}
                             >
-                                <Image source={{ uri: getImageUrl(mainImage) }} style={styles.itemImage} />
+                                <Image source={{ uri: getImageUrl(mainImage) }} style={styles.itemImage} contentFit="cover" transition={300} />
                                 <View style={styles.itemDetails}>
                                     <View style={styles.itemHeader}>
                                         <Text style={styles.itemTitle} numberOfLines={2}>{product.title}</Text>
@@ -193,7 +194,7 @@ const WishlistScreen = () => {
                                         style={styles.suggestionCard}
                                         onPress={() => navigation.navigate('ProductDetail', { id: prod.slug || prod._id })}
                                     >
-                                        <Image source={{ uri: getImageUrl(prodImg) }} style={styles.suggestionImage} />
+                                        <Image source={{ uri: getImageUrl(prodImg) }} style={styles.suggestionImage} contentFit="cover" transition={300} />
                                         <View style={styles.suggestionInfo}>
                                             <Text style={styles.suggestionTitleText} numberOfLines={1}>{prod.title}</Text>
                                             <Text style={styles.suggestionPrice}>{formatPrice(prod.price)}</Text>

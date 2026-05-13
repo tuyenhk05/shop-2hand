@@ -81,7 +81,7 @@ export default function Home() {
                         </div>
                         <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold text-slate-900 leading-tight tracking-tight">
                             Di sản được <br />
-                            <i className="font-semibold italic text-orange-800">tái tạo.</i>
+                            <i className="font-semibold italic text-orange-800">tái tạo</i>
                         </h1>
 
                         <p className="text-slate-600 text-lg md:text-xl max-w-md leading-relaxed font-medium">
@@ -103,7 +103,7 @@ export default function Home() {
                         direction="slideFromRight"
                         className="w-full md:w-1/2 relative flex items-center"
                     >
-                        <div 
+                        <div
                             className="w-full max-h-[70vh] md:max-h-[80vh] aspect-[3/4] rounded-[2rem] overflow-hidden shadow-2xl shadow-slate-900/10 relative group bg-slate-100 border border-outline-variant/10 cursor-pointer"
                             onClick={() => products[0] && navigate(`/products/${products[0].slug}`)}
                         >
@@ -181,19 +181,19 @@ export default function Home() {
                                             </span>
                                         </div>
                                     </div>
-                                    
+
                                     <span className="inline-block px-2 py-0.5 bg-tertiary-container/50 text-on-tertiary-container text-[9px] font-bold rounded mb-3 uppercase tracking-wider border border-tertiary-container">
                                         Verified
                                     </span>
-                                    
+
                                     <h4 className="font-manrope font-semibold text-lg text-on-background line-clamp-1 group-hover:text-primary transition-colors duration-300">
                                         {item.title}
                                     </h4>
-                                    
+
                                     <p className="text-on-surface-variant text-sm mb-2 line-clamp-1">
                                         {item.color} • {item.material}
                                     </p>
-                                    
+
                                     <span className="text-primary font-bold text-lg">
                                         {formatPrice(item.price)}
                                     </span>
@@ -270,7 +270,7 @@ export default function Home() {
                                         />
                                         {/* Overlay gradient */}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-70 group-hover:opacity-50 transition-opacity duration-500"></div>
-                                        
+
                                         {/* Text content */}
                                         <div className="absolute bottom-0 left-0 p-8 w-full z-10">
                                             <h3 className="font-serif text-3xl font-bold text-white mb-3 group-hover:-translate-y-2 transition-transform duration-500 drop-shadow-md">{cat.name}</h3>

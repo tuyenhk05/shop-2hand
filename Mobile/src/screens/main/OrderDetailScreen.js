@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Button, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -145,7 +146,7 @@ const OrderDetailScreen = () => {
 
                         return (
                             <View key={idx} style={styles.itemRow}>
-                                <Image source={{ uri: getImageUrl(mainImage) }} style={styles.itemImage} />
+                                <Image source={{ uri: getImageUrl(mainImage) }} style={styles.itemImage} contentFit="cover" transition={200} />
                                 <View style={styles.itemDetails}>
                                     <Text style={styles.itemTitle} numberOfLines={2}>{product.title}</Text>
                                     <Text style={styles.itemQty}>Số lượng: x{item.quantity}</Text>

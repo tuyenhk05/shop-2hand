@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { IconButton, Button } from 'react-native-paper';
@@ -191,7 +192,8 @@ const ProductDetailScreen = () => {
                                         key={idx} 
                                         source={{ uri: getImageUrl(imgUrl) }} 
                                         style={styles.galleryImage} 
-                                        resizeMode="cover"
+                                        contentFit="cover"
+                                        transition={300}
                                     />
                                 );
                             })
@@ -199,7 +201,8 @@ const ProductDetailScreen = () => {
                             <Image 
                                 source={{ uri: getImageUrl(product.image || product.images?.[0]?.imageUrl) }} 
                                 style={styles.galleryImage} 
-                                resizeMode="cover"
+                                contentFit="cover"
+                                transition={300}
                             />
                         )}
                     </ScrollView>

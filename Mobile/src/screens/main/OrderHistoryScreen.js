@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { Button, IconButton } from 'react-native-paper';
@@ -165,6 +166,8 @@ const OrderHistoryScreen = () => {
                                         <Image 
                                             source={{ uri: getImageUrl(item.productId?.image || item.productId?.images?.[0]?.imageUrl) }} 
                                             style={styles.orderItemImg} 
+                                            contentFit="cover"
+                                            transition={200}
                                         />
                                         <View style={styles.orderItemInfo}>
                                             <Text style={styles.orderItemTitle} numberOfLines={1}>{item.productId?.title || 'Sản phẩm'}</Text>

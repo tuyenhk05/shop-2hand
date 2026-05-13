@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useNavigation } from '@react-navigation/native';
 import { IconButton } from 'react-native-paper';
 import { getAllProducts } from '../../services/client/products';
@@ -70,7 +71,7 @@ const HomeScreen = () => {
                 
                 {/* LOGO & SEARCH HEADER */}
                 <View style={styles.header}>
-                    <Image source={require('../../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
+                    <Image source={require('../../../assets/images/logo.png')} style={styles.logo} contentFit="contain" />
                     <TouchableOpacity style={styles.searchBar} onPress={() => navigation.navigate('StoreTab')}>
                         <IconButton icon="magnify" size={18} iconColor="#64748b" style={{ margin: 0 }} />
                         <Text style={styles.searchPlaceholder}>Tìm kiếm sản phẩm...</Text>
@@ -99,7 +100,7 @@ const HomeScreen = () => {
                                     style={styles.categoryBox}
                                     onPress={() => navigation.navigate('StoreTab', { category: cat._id })}
                                 >
-                                    <Image source={imageSource} style={styles.categoryBoxImage} />
+                                    <Image source={imageSource} style={styles.categoryBoxImage} transition={200} />
                                     <Text style={styles.categoryBoxText} numberOfLines={1}>{cat.name}</Text>
                                 </TouchableOpacity>
                             );
