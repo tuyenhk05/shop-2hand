@@ -37,6 +37,7 @@ const Consignment = () => {
     const [material, setMaterial] = useState('');
 
     const [brands, setBrands] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
 

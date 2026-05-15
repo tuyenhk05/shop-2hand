@@ -1,5 +1,5 @@
-import { adminGet } from '../../untils/adminRequest.jsx';
+import { adminGet } from "../../untils/adminRequest";
 
-export const getDashboardStats = async () => {
-    return await adminGet('/dashboard/stats');
+export const getDashboardStats = async (revenueRange = 30) => {
+    return await adminGet("/dashboard/stats", { revenueRange });
 };

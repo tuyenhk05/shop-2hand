@@ -258,7 +258,7 @@ const Login = () => {
                     <AnimateWhenVisible direction="fadeInUp" transition={{ duration: 1, delay: 0.2, ease: "easeInOut" }}>
                       <div className="relative z-10 max-w-md">
                         <h2 className="font-headline text-4xl text-primary-fixed-variant leading-tight italic font-semibold">
-                          Di sản được tái tạo.
+                          Di sản được tái tạo
                         </h2>
                         <p className="mt-4 text-on-surface-variant font-body leading-relaxed max-w-xs">
                           Nơi những món đồ cũ tìm thấy câu chuyện mới qua lăng kính của sự tinh tế và bền vững.

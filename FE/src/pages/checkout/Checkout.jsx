@@ -188,7 +188,7 @@ const Checkout = () => {
             } else {
                 // Xử lý lỗi từ Backend (Đặc biệt là lỗi mua trùng / hết hàng)
                 message.error(orderRes.message || 'Lỗi đặt hàng. Vui lòng thử lại.');
-                
+
                 // Load lại giỏ hàng vì có thể sản phẩm đã bị xóa/đổi trạng thái
                 fetchCart();
             }
@@ -374,11 +374,11 @@ const Checkout = () => {
                                 ) : (
                                     <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2">
                                         {cartItems.map((item, idx) => (
-                                            <CartItem 
-                                                key={idx} 
-                                                item={item} 
-                                                formatPrice={formatPrice} 
-                                                onRemove={handleRemove} 
+                                            <CartItem
+                                                key={idx}
+                                                item={item}
+                                                formatPrice={formatPrice}
+                                                onRemove={handleRemove}
                                                 isChecked={selectedItemIds.includes(String(item.productId?._id || item.productId || ''))}
                                                 onToggle={handleToggleItem}
                                             />
@@ -409,7 +409,7 @@ const Checkout = () => {
                                         : 'bg-primary text-on-primary hover:bg-primary-container active:scale-95'
                                         }`}
                                 >
-                                    Xác nhận thanh toán & Pay
+                                    Xác nhận đặt hàng
                                 </button>
                             </div>
 

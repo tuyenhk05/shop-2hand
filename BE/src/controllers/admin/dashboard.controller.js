@@ -2,142 +2,186 @@ const User = require('../../models/users.model');
 const Product = require('../../models/products.model');
 const Order = require('../../models/orders.model');
 const Consignment = require('../../models/consignments.model');
+const Review = require('../../models/reviews.model');
+const Category = require('../../models/category.model');
 
-// ✅ GET Dashboard Stats
 exports.getStats = async (req, res) => {
     try {
-        const totalUsers = await User.countDocuments();
-        const totalProducts = await Product.countDocuments();
-        
-        // Tính toán khoảng thời gian tháng hiện tại
         const now = new Date();
-        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        
+        // --- 1. Orders Stat (7 days) & Mini Chart ---
+        const last7DaysStart = new Date(startOfToday);
+        last7DaysStart.setDate(last7DaysStart.getDate() - 6);
+        
+        const previous7DaysStart = new Date(last7DaysStart);
+        previous7DaysStart.setDate(previous7DaysStart.getDate() - 7);
 
-        // Số đơn hàng trong tháng này
-        const currentMonthOrders = await Order.countDocuments({
-            createdAt: { $gte: currentMonthStart, $lte: currentMonthEnd }
+        const ordersLast7DaysData = await Order.find({ createdAt: { $gte: last7DaysStart } });
+        const ordersPrevious7Days = await Order.countDocuments({ createdAt: { $gte: previous7DaysStart, $lt: last7DaysStart } });
+        
+        const ordersLast7Days = ordersLast7DaysData.length;
+        let ordersGrowth = 0;
+        if (ordersPrevious7Days > 0) {
+            ordersGrowth = ((ordersLast7Days - ordersPrevious7Days) / ordersPrevious7Days) * 100;
+        } else if (ordersLast7Days > 0) {
+            ordersGrowth = 100;
+        }
+
+        const miniOrdersChart = [];
+        for (let i = 0; i < 7; i++) {
+            const currDate = new Date(last7DaysStart);
+            currDate.setDate(currDate.getDate() + i);
+            const count = ordersLast7DaysData.filter(o => new Date(o.createdAt).toDateString() === currDate.toDateString()).length;
+            miniOrdersChart.push({ name: currDate.toLocaleDateString('vi-VN', { weekday: 'short' }), val: count });
+        }
+
+        const completedOrdersCount = ordersLast7DaysData.filter(o => o.status === 'delivered').length;
+        const pendingPaymentCount = ordersLast7DaysData.filter(o => o.status === 'pending_payment').length;
+        const orderCompletionRate = ordersLast7Days > 0 ? Math.round((completedOrdersCount / ordersLast7Days) * 100) : 0;
+        const orderPendingRate = ordersLast7Days > 0 ? Math.round((pendingPaymentCount / ordersLast7Days) * 100) : 0;
+
+        // --- 2. Customers Stat (7 days) & Mini Chart ---
+        const usersLast7DaysData = await User.find({ createdAt: { $gte: last7DaysStart } });
+        const customersPrevious7Days = await User.countDocuments({ createdAt: { $gte: previous7DaysStart, $lt: last7DaysStart } });
+        
+        const customersLast7Days = usersLast7DaysData.length;
+        let customersGrowth = 0;
+        if (customersPrevious7Days > 0) {
+            customersGrowth = ((customersLast7Days - customersPrevious7Days) / customersPrevious7Days) * 100;
+        } else if (customersLast7Days > 0) {
+            customersGrowth = 100;
+        }
+
+        const miniUsersChart = [];
+        for (let i = 0; i < 7; i++) {
+            const currDate = new Date(last7DaysStart);
+            currDate.setDate(currDate.getDate() + i);
+            const count = usersLast7DaysData.filter(u => new Date(u.createdAt).toDateString() === currDate.toDateString()).length;
+            miniUsersChart.push({ name: currDate.toLocaleDateString('vi-VN', { weekday: 'short' }), val: count });
+        }
+
+        // --- 3. Status Block ---
+        const awaitingProcessing = await Order.countDocuments({ status: { $in: ['pending_payment', 'processing'] } });
+        const pendingConsignments = await Consignment.countDocuments({ status: 'pending' });
+        const activeProducts = await Product.countDocuments({ status: 'active' });
+
+        // --- 4. Revenue Chart (with filter) ---
+        const revenueRange = req.query.revenueRange || '30';
+        const daysToFetch = parseInt(revenueRange) === 7 ? 7 : 30;
+
+        const lastXDaysStart = new Date(startOfToday);
+        lastXDaysStart.setDate(lastXDaysStart.getDate() - (daysToFetch - 1));
+        
+        const prevXDaysStart = new Date(lastXDaysStart);
+        prevXDaysStart.setDate(prevXDaysStart.getDate() - daysToFetch);
+
+        const currentXDaysOrders = await Order.find({
+            paymentStatus: 'paid',
+            createdAt: { $gte: lastXDaysStart }
+        });
+        const prevXDaysOrders = await Order.find({
+            paymentStatus: 'paid',
+            createdAt: { $gte: prevXDaysStart, $lt: lastXDaysStart }
         });
 
-        // Doanh thu trong tháng này (từ các đơn đã thanh toán)
-        const revenueResult = await Order.aggregate([
-            { 
-                $match: { 
-                    paymentStatus: 'paid',
-                    createdAt: { $gte: currentMonthStart, $lte: currentMonthEnd }
-                } 
-            },
-            { $group: { _id: null, totalRevenue: { $sum: '$totalAmount' } } }
-        ]);
-        const currentMonthRevenue = revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
+        const revenueChart = [];
+        for (let i = 0; i < daysToFetch; i++) {
+            const currDate = new Date(lastXDaysStart);
+            currDate.setDate(currDate.getDate() + i);
+            const currDateStr = currDate.toLocaleDateString('vi-VN', { day: '2-digit', month: 'short' });
+            
+            const prevDate = new Date(prevXDaysStart);
+            prevDate.setDate(prevDate.getDate() + i);
 
-        const currentYear = new Date().getFullYear();
+            const currTotal = currentXDaysOrders
+                .filter(o => new Date(o.createdAt).toDateString() === currDate.toDateString())
+                .reduce((sum, o) => sum + o.totalAmount, 0);
 
-        // 1. Doanh thu theo tháng (12 tháng của năm hiện tại)
-        const monthlyRevenueRaw = await Order.aggregate([
-            {
-                $match: {
-                    paymentStatus: 'paid',
-                    createdAt: {
-                        $gte: new Date(`${currentYear}-01-01`),
-                        $lte: new Date(`${currentYear}-12-31T23:59:59.999Z`)
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: { $month: "$createdAt" },
-                    total: { $sum: "$totalAmount" }
-                }
-            }
-        ]);
+            const prevTotal = prevXDaysOrders
+                .filter(o => new Date(o.createdAt).toDateString() === prevDate.toDateString())
+                .reduce((sum, o) => sum + o.totalAmount, 0);
 
-        const monthlyRevenue = Array.from({ length: 12 }, (_, i) => ({
-            name: `T${i + 1}`,
-            revenue: 0
-        }));
+            revenueChart.push({
+                name: currDateStr,
+                current: currTotal,
+                previous: prevTotal
+            });
+        }
 
-        monthlyRevenueRaw.forEach(item => {
-            monthlyRevenue[item._id - 1].revenue = item.total;
-        });
-
-        // 2. Thống kê số lượng đơn hàng theo trạng thái
+        // --- 5. Order Status Ratio ---
         const orderStatusRaw = await Order.aggregate([
-            {
-                $group: {
-                    _id: "$status",
-                    count: { $sum: 1 }
-                }
-            }
+            { $match: { createdAt: { $gte: lastXDaysStart } } },
+            { $group: { _id: "$status", count: { $sum: 1 } } }
         ]);
+        
+        const orderStatusMap = {
+            pending_payment: 'Chờ thanh toán',
+            paid: 'Đã thanh toán',
+            processing: 'Đang xử lý',
+            shipped: 'Đang giao',
+            delivered: 'Đã giao',
+            cancelled: 'Đã hủy',
+            returned: 'Hoàn trả'
+        };
 
-        const orderStatusCounts = orderStatusRaw.reduce((acc, curr) => {
-            acc[curr._id] = curr.count;
-            return acc;
-        }, {});
+        const orderStatusRatio = orderStatusRaw.map(item => ({
+            name: orderStatusMap[item._id] || item._id,
+            value: item.count
+        })).sort((a, b) => b.value - a.value);
+        
+        // --- 6. Paying vs Non-paying ---
+        const paymentStatsRaw = await Order.aggregate([
+            { $match: { createdAt: { $gte: lastXDaysStart } } },
+            { $group: { _id: "$paymentStatus", count: { $sum: 1 } } }
+        ]);
+        
+        let payingCount = 0;
+        let nonPayingCount = 0;
+        paymentStatsRaw.forEach(item => {
+            if (item._id === 'paid') payingCount += item.count;
+            else nonPayingCount += item.count;
+        });
 
-        // 3. Đơn hàng gần đây
+        const paymentStats = [
+            { name: 'Đã thanh toán', value: payingCount },
+            { name: 'Chưa thanh toán', value: nonPayingCount }
+        ];
+
+        // --- 7. Recent Orders ---
         const recentOrders = await Order.find()
             .sort({ createdAt: -1 })
             .limit(5)
-            .select('orderCode buyerName totalAmount status paymentMethod createdAt')
             .lean();
-
-        const pendingOrders = await Order.countDocuments({ status: { $in: ['paid', 'processing'] } });
-        const totalActiveProducts = await Product.countDocuments({ status: 'active' });
-        const totalDeliveredOrders = await Order.countDocuments({ status: 'delivered' });
-        const totalPendingConsignments = await Consignment.countDocuments({ status: { $in: ['pending', 'received'] } });
-
-        // Tính toán doanh thu tuần hiện tại (Thứ 2 -> Chủ nhật)
-        const currentWeekStart = new Date();
-        const day = currentWeekStart.getDay();
-        const diffToMonday = currentWeekStart.getDate() - (day === 0 ? 6 : day - 1);
-        currentWeekStart.setDate(diffToMonday);
-        currentWeekStart.setHours(0, 0, 0, 0);
-
-        const currentWeekEnd = new Date(currentWeekStart);
-        currentWeekEnd.setDate(currentWeekStart.getDate() + 6);
-        currentWeekEnd.setHours(23, 59, 59, 999);
-
-        const weeklyOrders = await Order.find({
-            paymentStatus: 'paid',
-            createdAt: { $gte: currentWeekStart, $lte: currentWeekEnd }
-        });
-
-        const dayNames = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-        const weeklyRevenue = dayNames.map((name, index) => {
-            const startOfDay = new Date(currentWeekStart);
-            startOfDay.setDate(currentWeekStart.getDate() + index);
-            startOfDay.setHours(0, 0, 0, 0);
-
-            const endOfDay = new Date(startOfDay);
-            endOfDay.setHours(23, 59, 59, 999);
-
-            const total = weeklyOrders
-                .filter(o => o.createdAt >= startOfDay && o.createdAt <= endOfDay)
-                .reduce((acc, o) => acc + o.totalAmount, 0);
-
-            return { name, revenue: total };
-        });
 
         res.status(200).json({
             success: true,
             data: {
-                totalUsers,
-                totalProducts,
-                totalActiveProducts,
-                pendingOrders,
-                totalDeliveredOrders,
-                totalPendingConsignments,
-                totalOrders: currentMonthOrders,
-                totalRevenue: currentMonthRevenue,
-                monthlyRevenue,
-                weeklyRevenue,
-                orderStatusCounts,
+                ordersStat: {
+                    total: ordersLast7Days,
+                    growth: ordersGrowth.toFixed(1),
+                    completionRate: orderCompletionRate,
+                    pendingRate: orderPendingRate,
+                    miniChart: miniOrdersChart
+                },
+                customersStat: {
+                    total: customersLast7Days,
+                    growth: customersGrowth.toFixed(1),
+                    miniChart: miniUsersChart
+                },
+                inventoryStats: {
+                    awaitingProcessing,
+                    pendingConsignments,
+                    activeProducts
+                },
+                revenueChart,
+                orderStatusRatio: orderStatusRatio.length > 0 ? orderStatusRatio : [{ name: 'Chưa có', value: 1 }],
+                paymentStats,
                 recentOrders
             }
         });
     } catch (error) {
+        console.error('Dashboard Stats Error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
