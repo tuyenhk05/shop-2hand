@@ -36,33 +36,40 @@ exports.cleanupExpiredOrders = cleanupExpiredOrders;
 
 exports.getOrders = async (req, res) => {
     try {
-        await cleanupExpiredOrders();
         const { buyerId } = req.params;
-        let orders = await Order.find({ buyerId }).populate('items.productId').sort({ createdAt: -1 }).lean();
+        const currentUserId = req.user?.id;
+
+        // Chống IDOR: Chỉ cho phép người dùng xem đơn hàng của chính mình hoặc admin
+        if (currentUserId && buyerId !== currentUserId && !req.user?.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền xem đơn hàng này' });
+        }
+
+        const targetBuyerId = currentUserId || buyerId;
+        let orders = await Order.find({ buyerId: targetBuyerId }).populate('items.productId').sort({ createdAt: -1 }).lean();
         
         for (let order of orders) {
             for (let item of order.items) {
                 if (item.productId && item.productId._id) {
-                     const image = await ProductImage.findOne({ productId: item.productId._id, isPrimary: true });
+                     const image = await ProductImage.findOne({ productId: item.productId._id, isPrimary: true }).lean();
                      if (image) {
                          item.productId.image = image.imageUrl;
                      } else {
-                         const firstImage = await ProductImage.findOne({ productId: item.productId._id });
+                         const firstImage = await ProductImage.findOne({ productId: item.productId._id }).lean();
                          item.productId.image = firstImage ? firstImage.imageUrl : null;
                      }
                 }
             }
         }
 
-        res.status(200).json({ success: true, orders });
+        res.status(200).json({ success: true, orders, data: orders });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('getOrders error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy danh sách đơn hàng' });
     }
 };
 
 exports.getOrderById = async (req, res) => {
     try {
-        await cleanupExpiredOrders();
         const { orderId } = req.params;
         const order = await Order.findById(orderId).populate('items.productId').lean();
         
@@ -70,28 +77,35 @@ exports.getOrderById = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
         }
 
+        // Chống IDOR: Chỉ người mua hoặc quản trị viên mới được xem chi tiết đơn hàng
+        const currentUserId = req.user?.id;
+        if (currentUserId && order.buyerId?.toString() !== currentUserId && !req.user?.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền truy cập đơn hàng này' });
+        }
+
         for (let item of order.items) {
             if (item.productId && item.productId._id) {
-                 const image = await ProductImage.findOne({ productId: item.productId._id, isPrimary: true });
+                 const image = await ProductImage.findOne({ productId: item.productId._id, isPrimary: true }).lean();
                  if (image) {
                      item.productId.image = image.imageUrl;
                  } else {
-                     const firstImage = await ProductImage.findOne({ productId: item.productId._id });
+                     const firstImage = await ProductImage.findOne({ productId: item.productId._id }).lean();
                      item.productId.image = firstImage ? firstImage.imageUrl : null;
                  }
             }
         }
 
-        res.status(200).json({ success: true, order });
+        res.status(200).json({ success: true, order, data: order });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('getOrderById error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy chi tiết đơn hàng' });
     }
 };
 
 exports.createOrder = async (req, res) => {
     try {
-        await cleanupExpiredOrders();
-        const { buyerId, items, totalAmount, shippingAddress, buyerName, buyerPhone, paymentMethod } = req.body;
+        const buyerId = req.user?.id || req.body.buyerId;
+        const { items, shippingAddress, buyerName, buyerPhone, paymentMethod } = req.body;
 
         // --- Kiểm tra đơn hàng đang chờ thanh toán ---
         if (buyerId) {
@@ -152,11 +166,31 @@ exports.createOrder = async (req, res) => {
             }
         }
 
-        // --- 3. Tạo đơn hàng ---
+        // --- 3. Tính toán lại tổng tiền từ Database để chống giả mạo giá ---
+        let verifiedTotal = 0;
+        const productIds = items.map(it => it.productId);
+        const dbProducts = await Product.find({ _id: { $in: productIds } }).lean();
+        const priceMap = new Map(dbProducts.map(p => [p._id.toString(), p.price || 0]));
+
+        const verifiedItems = items.map(item => {
+            const unitPrice = priceMap.get(item.productId.toString()) !== undefined 
+                ? priceMap.get(item.productId.toString()) 
+                : (item.price || 0);
+            const quantity = item.quantity || 1;
+            verifiedTotal += unitPrice * quantity;
+            return {
+                productId: item.productId,
+                quantity,
+                price: unitPrice
+            };
+        });
+
+        const finalTotalAmount = verifiedTotal > 0 ? verifiedTotal : (Number(totalAmount) || 0);
+
         const newOrder = new Order({
             buyerId, 
-            items, 
-            totalAmount, 
+            items: verifiedItems, 
+            totalAmount: finalTotalAmount, 
             shippingAddress, 
             buyerName, 
             buyerPhone, 
@@ -170,7 +204,7 @@ exports.createOrder = async (req, res) => {
         await createNotification(req.app, {
             role: 'admin',
             title: 'Đơn hàng mới',
-            content: `Bạn có một đơn hàng mới từ ${buyerName || 'Khách hàng'}. Tổng tiền: ${totalAmount.toLocaleString()}đ`,
+            content: `Bạn có một đơn hàng mới từ ${buyerName || 'Khách hàng'}. Tổng tiền: ${finalTotalAmount.toLocaleString()}đ`,
             type: 'new_order',
             link: `${systemConfig.prefixAdmin}/orders`
         });

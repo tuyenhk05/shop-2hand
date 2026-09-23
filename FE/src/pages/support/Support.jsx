@@ -28,7 +28,7 @@ const Support = () => {
             return;
         }
 
-        const adminEmail = 'huynhkimtuyenphuyen@gmail.com';
+        const adminEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'support@atelier-archive.com';
         const mailtoLink = `mailto:${adminEmail}?subject=${encodeURIComponent(formData.subject || 'Yêu cầu hỗ trợ từ Atelier')}&body=${encodeURIComponent(`Họ tên: ${formData.name}\nEmail: ${formData.email}\n\nNội dung:\n${formData.message}`)}`;
         
         window.location.href = mailtoLink;

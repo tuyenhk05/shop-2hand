@@ -2,6 +2,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const Chat = require("../../models/chats.model");
 const Product = require("../../models/products.model");
 const ProductImage = require("../../models/productImages.model");
+const { escapeRegex } = require("../../utils/string.utils");
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -80,15 +81,18 @@ module.exports.chatWithAI = async (req, res) => {
         const keywords = words.filter(w => !stopWords.includes(w) && w.trim() !== '');
 
         if (keywords.length > 0) {
-            // 2. Tạo Regex khớp với bất kỳ từ khóa nào được nhắc đến
-            const keywordRegex = new RegExp(keywords.join('|'), 'i');
-            query.$or = [
-                { title: keywordRegex },
-                { size: keywordRegex },
-                { color: keywordRegex },
-                { condition: keywordRegex }
-            ];
-            console.log("Smart Search Triggered with keywords:", keywords);
+            // 2. Tạo Regex khớp với bất kỳ từ khóa nào được nhắc đến (đã làm sạch chống ReDoS)
+            const safeKeywords = keywords.map(w => escapeRegex(w)).filter(Boolean);
+            if (safeKeywords.length > 0) {
+                const keywordRegex = new RegExp(safeKeywords.join('|'), 'i');
+                query.$or = [
+                    { title: keywordRegex },
+                    { size: keywordRegex },
+                    { color: keywordRegex },
+                    { condition: keywordRegex }
+                ];
+                console.log("Smart Search Triggered with keywords:", safeKeywords);
+            }
         }
 
         // 3. Tìm sản phẩm theo từ khóa

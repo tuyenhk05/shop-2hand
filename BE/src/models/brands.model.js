@@ -38,4 +38,11 @@ const brandSchema = new mongoose.Schema({
     }
 }, { collection: 'brands' });
 
+// Tự động tạo brand_id nếu không được truyền vào khi tạo mới
+brandSchema.pre('validate', function () {
+    if (!this.brand_id && this.name) {
+        this.brand_id = this.name.toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, '') + '_' + Date.now().toString().slice(-4);
+    }
+});
+
 module.exports = mongoose.model('Brand', brandSchema, 'brands');

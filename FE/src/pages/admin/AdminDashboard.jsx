@@ -97,7 +97,21 @@ const AdminDashboard = () => {
         }
     ];
 
-    if (!stats) return <Loading fullScreen={true} text="Đang tải dữ liệu thống kê..." />;
+    if (!stats && isLoading) return <Loading fullScreen={true} text="Đang tải dữ liệu thống kê..." />;
+
+    if (!stats && !isLoading) {
+        return (
+            <div className="min-h-[400px] flex flex-col items-center justify-center p-8 bg-white rounded-3xl border border-gray-100 text-center">
+                <p className="text-gray-600 mb-4 font-medium">Không thể kết nối đến máy chủ hoặc dữ liệu thống kê tạm thời không khả dụng.</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-5 py-2.5 bg-[#4c6545] text-white font-semibold rounded-xl hover:opacity-90 transition-all text-sm shadow-sm"
+                >
+                    Tải lại bảng điều khiển
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="animate-in fade-in duration-500 max-w-7xl mx-auto space-y-6 bg-gray-50/50 p-6 rounded-3xl relative">

@@ -103,6 +103,7 @@ const Login = () => {
             email: data.data.email,
             phone: data.data.phone
           }));
+          localStorage.setItem('userId', data.data.id);
           localStorage.setItem('role', data.data.role);
 
           dispatch(checkLogin(data.data));
@@ -151,6 +152,7 @@ const Login = () => {
           email: data.data.email,
           phone: data.data.phone
         }));
+        localStorage.setItem('userId', data.data.id);
         localStorage.setItem('role', data.data.role);
         // Cập nhật Redux state ngay lập tức để đồng bộ dữ liệu phiên làm việc
         dispatch(checkLogin(data.data));

@@ -4,7 +4,9 @@ import {
     getAllConversationsAdminApi,
     getConversationDetailAdminApi,
     closeConversationApi,
-    markReadByAdminApi,
+    markReadByAdminApi
+} from '../../services/admin/support.service';
+import {
     connectSupportSocket,
     disconnectSupportSocket
 } from '../../services/client/support.service';

@@ -3,23 +3,24 @@ const ProductImage = require('../../models/productImages.model');
 
 exports.getWishlist = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền xem danh sách yêu thích này' });
+        }
 
-        // Populate product tr\u01b0\u1edbc, sau \u0111\u00f3 l\u1ea5y \u1ea3nh t\u1eeb collection product_images
-        const wishlists = await Wishlist.find({ userId }).populate('productId').lean();
+        const wishlists = await Wishlist.find({ userId: targetUserId }).populate('productId').lean();
 
-        // V\u1edbi m\u1ed7i wishlist item, lookup \u1ea3nh t\u01b0\u01a1ng \u1ee9ng
         const wishlistsWithImages = await Promise.all(
             wishlists.map(async (item) => {
                 if (item.productId && item.productId._id) {
                     const images = await ProductImage.find({ productId: item.productId._id })
-                        .sort({ isPrimary: -1, sortOrder: 1 }) // \u1ea3nh primary l\u00ean \u0111\u1ea7u
+                        .sort({ isPrimary: -1, sortOrder: 1 })
                         .lean();
                     return {
                         ...item,
                         productId: {
                             ...item.productId,
-                            images // g\u1eafn m\u1ea3ng \u1ea3nh v\u00e0o product
+                            images
                         }
                     };
                 }
@@ -29,34 +30,45 @@ exports.getWishlist = async (req, res) => {
 
         res.status(200).json({ success: true, data: wishlistsWithImages });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('getWishlist error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy danh sách yêu thích' });
     }
 };
 
 exports.addToWishlist = async (req, res) => {
     try {
-        const { userId } = req.params;
-        const { productId } = req.body;
-
-        const existing = await Wishlist.findOne({ userId, productId });
-        if (existing) {
-            return res.status(200).json({ success: true, message: 'Already in wishlist' });
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền sửa danh sách yêu thích này' });
         }
 
-        await Wishlist.create({ userId, productId });
-        res.status(201).json({ success: true, message: 'Added to wishlist' });
+        const { productId } = req.body;
+
+        const existing = await Wishlist.findOne({ userId: targetUserId, productId });
+        if (existing) {
+            return res.status(200).json({ success: true, message: 'Sản phẩm đã có trong danh sách yêu thích' });
+        }
+
+        await Wishlist.create({ userId: targetUserId, productId });
+        res.status(201).json({ success: true, message: 'Đã thêm vào danh sách yêu thích' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('addToWishlist error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi thêm vào yêu thích' });
     }
 };
 
 exports.removeFromWishlist = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền sửa danh sách yêu thích này' });
+        }
+
         const { productId } = req.body;
-        await Wishlist.findOneAndDelete({ userId, productId });
-        res.status(200).json({ success: true, message: 'Removed from wishlist' });
+        await Wishlist.findOneAndDelete({ userId: targetUserId, productId });
+        res.status(200).json({ success: true, message: 'Đã xóa khỏi danh sách yêu thích' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('removeFromWishlist error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xóa khỏi yêu thích' });
     }
 };

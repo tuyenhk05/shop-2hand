@@ -3,23 +3,54 @@ const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 const database = require('./src/configs/database.js');
 const systemconfig = require('./src/configs/system');
 const methodOverride = require('method-override');
 const { cleanupExpiredOrders } = require('./src/controllers/client/order.controller');
 const SupportConversation = require('./src/models/support_conversations.model');
+const User = require('./src/models/users.model');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3001';
 
-// ✅ Security & CORS
-app.use(helmet());
-app.use(cors({
-  origin: true, // Allow any origin to connect (fixes CORS for Expo Web)
+// Danh sách origin được phép truy cập
+const allowedOrigins = [
+  CLIENT_URL,
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'http://127.0.0.1:5173'
+].filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Cho phép requests không có origin (native mobile apps, server-to-server) hoặc nằm trong whitelist
+    if (
+      !origin || 
+      allowedOrigins.includes(origin) || 
+      origin.endsWith('.vercel.app') || 
+      origin.endsWith('.onrender.com') || 
+      origin.startsWith('http://localhost:') || 
+      origin.startsWith('http://127.0.0.1:')
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS Policy: Origin not allowed'));
+    }
+  },
   credentials: true
+};
+
+// ✅ Security & CORS
+app.use(helmet({
+  crossOriginResourcePolicy: false
 }));
+app.use(cors(corsOptions));
 
 // ✅ Middleware
 app.use(methodOverride('_method'));
@@ -42,11 +73,12 @@ adminRoutes(app);
 
 // ✅ Global Error Handler (phải đặt sau tất cả routes)
 app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
+  console.error('Server Error:', err.message);
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Đã xảy ra lỗi hệ thống, vui lòng thử lại sau.' 
+      : (err.message || 'Internal Server Error')
   });
 });
 
@@ -61,45 +93,67 @@ app.use((req, res) => {
 // ✅ Tạo HTTP server và Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: true,
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
+  cors: corsOptions
 });
 
 // ✅ Đính io vào app để dùng trong controllers
 app.set('io', io);
 
+// Helper xác thực token cho Socket.IO
+const authenticateSocket = async (socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token || socket.handshake.query?.token;
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      const user = await User.findById(decoded.id).populate('role').lean();
+      if (user && user.isActive) {
+        socket.user = {
+          id: user._id.toString(),
+          role: user.role?.title || 'Khách hàng',
+          isAdmin: user.role?.title === 'Quản trị viên' || (user.role?.permissions && (user.role.permissions.includes('all') || user.role.permissions.length > 0))
+        };
+      }
+    }
+    next();
+  } catch (err) {
+    // Không block handshake nếu chưa đăng nhập nhưng không gán socket.user
+    next();
+  }
+};
+
 // ✅ Socket.IO namespace /support — real-time chat hỗ trợ khách hàng
 const supportNS = io.of('/support');
+supportNS.use(authenticateSocket);
 
 supportNS.on('connection', (socket) => {
-  console.log(`🔌 Socket connected: ${socket.id}`);
-
   // Khách hàng / Admin join vào room của conversation
   socket.on('join_conversation', (conversationId) => {
-    socket.join(conversationId);
-    console.log(`Socket ${socket.id} joined room: ${conversationId}`);
+    if (conversationId) {
+      socket.join(conversationId);
+    }
   });
 
-  // Admin join tất cả để nhận notification
+  // Chỉ Admin được phép join admin_room để nghe thông báo
   socket.on('admin_join', () => {
-    socket.join('admin_room');
-    console.log(`Admin socket ${socket.id} joined admin_room`);
+    if (socket.user?.isAdmin) {
+      socket.join('admin_room');
+    }
   });
 
-  // Gửi tin nhắn
+  // Gửi tin nhắn an toàn (ngăn chặn mạo danh sender)
   socket.on('send_message', async (data) => {
     try {
-      const { conversationId, sender, content } = data;
-      if (!conversationId || !sender || !content?.trim()) return;
+      const { conversationId, content } = data;
+      if (!conversationId || !content?.trim()) return;
 
       const conversation = await SupportConversation.findById(conversationId);
       if (!conversation || conversation.status === 'closed') return;
 
+      // Xác định danh tính thật của người gửi dựa trên token đã xác thực
+      const actualSender = socket.user?.isAdmin ? 'admin' : 'customer';
+
       const newMsg = {
-        sender,
+        sender: actualSender,
         content: content.trim(),
         createdAt: new Date()
       };
@@ -108,7 +162,7 @@ supportNS.on('connection', (socket) => {
       conversation.lastMessageAt = new Date();
 
       // Cập nhật unread counter
-      if (sender === 'customer') {
+      if (actualSender === 'customer') {
         conversation.unreadByAdmin += 1;
         if (conversation.status === 'open') conversation.status = 'in_progress';
       } else {
@@ -136,32 +190,31 @@ supportNS.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {
-    console.log(`🔌 Socket disconnected: ${socket.id}`);
-  });
+  socket.on('disconnect', () => {});
 });
 
 // ✅ Socket.IO namespace /notifications
 const notificationNS = io.of('/notifications');
+notificationNS.use(authenticateSocket);
 
 notificationNS.on('connection', (socket) => {
-  console.log(`🔔 Notification socket connected: ${socket.id}`);
-
-  // Join user room
+  // Join user room có kiểm tra quyền hoặc khớp userId
   socket.on('join', (userId) => {
-    socket.join(userId);
-    console.log(`User ${userId} joined notification room`);
+    if (userId) {
+      if (!socket.user || socket.user.id === userId || socket.user.isAdmin) {
+        socket.join(userId);
+      }
+    }
   });
 
-  // Admin join
+  // Admin join room
   socket.on('admin_join', () => {
-    socket.join('admin_room');
-    console.log(`Admin joined notification room`);
+    if (socket.user?.isAdmin) {
+      socket.join('admin_room');
+    }
   });
 
-  socket.on('disconnect', () => {
-    console.log(`🔔 Notification socket disconnected: ${socket.id}`);
-  });
+  socket.on('disconnect', () => {});
 });
 
 app.set('notificationNS', notificationNS);
@@ -171,7 +224,7 @@ server.listen(port, () => {
   console.log(`🚀 Backend API running at http://localhost:${port}`);
   console.log(`🔌 Socket.IO /support namespace ready`);
 
-  // ✅ Chạy task kiểm tra đơn hàng hết hạn mỗi phút
+  // ✅ Chạy task kiểm tra đơn hàng hết hạn định kỳ mỗi 60 giây
   setInterval(() => {
     cleanupExpiredOrders();
   }, 60000);

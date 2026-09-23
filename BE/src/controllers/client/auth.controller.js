@@ -4,6 +4,7 @@ const { OAuth2Client } = require('google-auth-library');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt'); // Dùng để mã hóa mật khẩu
+const crypto = require('crypto');
 const Role = require('../../models/roles.model.js');
 
 
@@ -383,12 +384,14 @@ exports.forgotPassword = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Email chưa được đăng ký trong hệ thống' });
         }
 
-        // Tạo mã OTP ngẫu nhiên 6 số
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // Tạo mã OTP ngẫu nhiên 6 số bằng hàm an toàn mật mã
+        const otp = crypto.randomInt(100000, 1000000).toString();
+        const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
 
-        // Lưu OTP vào DB, hạn sử dụng 5 phút
-        user.resetPasswordOtp = otp;
+        // Lưu OTP đã băm vào DB, hạn sử dụng 5 phút
+        user.resetPasswordOtp = hashedOtp;
         user.resetPasswordExpires = Date.now() + 5 * 60 * 1000;
+        user.resetPasswordAttempts = 0;
         await user.save();
 
         // Gửi email
@@ -399,7 +402,7 @@ exports.forgotPassword = async (req, res) => {
             html: `
                 <h3>Chào ${user.fullName},</h3>
                 <p>Bạn đã yêu cầu đặt lại mật khẩu. Mã xác nhận (OTP) của bạn là:</p>
-                <h1 style="color: #ff6b6b; font-size: 32px; letter-spacing: 5px;">${otp}</h1>
+                <h1 style="color: #4c6545; font-size: 32px; letter-spacing: 5px;">${otp}</h1>
                 <p>Mã này sẽ hết hạn sau 5 phút. Vui lòng không chia sẻ mã này với bất kỳ ai.</p>
             `
         };
@@ -419,23 +422,45 @@ exports.resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
 
-        const user = await User.findOne({
-            email,
-            resetPasswordOtp: otp,
-            resetPasswordExpires: { $gt: Date.now() } // Kiểm tra xem OTP còn hạn không
-        });
-
-        if (!user) {
-            return res.status(400).json({ success: false, message: 'Mã xác nhận không hợp lệ hoặc đã hết hạn' });
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Vui lòng cung cấp đầy đủ thông tin' });
         }
 
-        // Mã hóa mật khẩu mới (Nếu bạn đang dùng pre-save hook trong Mongoose thì không cần dùng bcrypt ở đây, chỉ cần gán user.password = newPassword)
-        // user.password = await bcrypt.hash(newPassword, 10); // Bật dòng này nếu bạn tự mã hoá thủ công
-        user.password = newPassword;
+        const user = await User.findOne({ email });
+        if (!user || !user.resetPasswordOtp || !user.resetPasswordExpires) {
+            return res.status(400).json({ success: false, message: 'Yêu cầu đặt lại mật khẩu không hợp lệ' });
+        }
 
-        // Xóa OTP đi sau khi dùng xong
+        // Kiểm tra số lần thử (Tối đa 5 lần)
+        if (user.resetPasswordAttempts >= 5) {
+            user.resetPasswordOtp = undefined;
+            user.resetPasswordExpires = undefined;
+            await user.save();
+            return res.status(400).json({ success: false, message: 'Bạn đã nhập sai quá 5 lần. Vui lòng yêu cầu mã OTP mới.' });
+        }
+
+        // Kiểm tra thời hạn
+        if (user.resetPasswordExpires.getTime() < Date.now()) {
+            return res.status(400).json({ success: false, message: 'Mã xác nhận đã hết hạn. Vui lòng yêu cầu mã mới.' });
+        }
+
+        // Băm OTP người dùng nhập vào để đối chiếu với hash lưu trong DB
+        const inputHashedOtp = crypto.createHash('sha256').update(otp.trim()).digest('hex');
+        if (inputHashedOtp !== user.resetPasswordOtp) {
+            user.resetPasswordAttempts = (user.resetPasswordAttempts || 0) + 1;
+            await user.save();
+            const remaining = 5 - user.resetPasswordAttempts;
+            return res.status(400).json({ 
+                success: false, 
+                message: `Mã xác nhận không chính xác. Bạn còn ${remaining} lần thử.` 
+            });
+        }
+
+        // Cập nhật mật khẩu mới (pre-save hook trong users.model.js sẽ tự động băm bcrypt)
+        user.password = newPassword;
         user.resetPasswordOtp = undefined;
         user.resetPasswordExpires = undefined;
+        user.resetPasswordAttempts = 0;
 
         await user.save();
 

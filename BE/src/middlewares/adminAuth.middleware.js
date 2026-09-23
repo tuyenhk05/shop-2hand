@@ -26,12 +26,22 @@ exports.requireAdmin = async (req, res, next) => {
             return res.status(403).json({ success: false, message: 'Lỗi phân quyền. Truy cập bị từ chối.' });
         }
 
+        // Kiểm tra vai trò: Nếu là vai trò 'Khách hàng' và không có bất kỳ quyền quản trị nào, từ chối ngay lập tức
+        const permissions = user.role.permissions || [];
+        const isCustomer = user.role.title === 'Khách hàng';
+        const hasAdminAccess = permissions.includes('all') || permissions.some(p => p !== 'client_access') || user.role.title === 'Quản trị viên';
+
+        if (isCustomer && !hasAdminAccess) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Truy cập bị từ chối. Bạn không có quyền quản trị.' 
+            });
+        }
+
         // Lưu thông tin user và quyền vào req để các controller/middleware tiếp theo sử dụng
         req.user = user;
-        req.permissions = user.role.permissions || [];
-        
-        // Neu khong phai danh sach quyen quan tri thi tu choi
-        // (Optional: require a specific base permission like "access_admin")
+        req.user.isAdmin = hasAdminAccess;
+        req.permissions = permissions;
         
         next();
     } catch (error) {

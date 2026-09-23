@@ -46,8 +46,18 @@ const ChatWithShop = () => {
     const messagesContainerRef = useRef(null);
     const socketRef = useRef(null);
 
-    // Lấy userId từ localStorage
-    const userId = localStorage.getItem('userId') || '';
+    // Lấy userId an toàn từ localStorage (hỗ trợ cả key userId riêng lẻ và JSON user)
+    const getStoredUserId = () => {
+        const directId = localStorage.getItem('userId');
+        if (directId) return directId;
+        try {
+            const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+            return userObj?.id || userObj?._id || '';
+        } catch {
+            return '';
+        }
+    };
+    const userId = getStoredUserId();
 
     // Fetch danh sách conversations
     const fetchConversations = useCallback(async () => {

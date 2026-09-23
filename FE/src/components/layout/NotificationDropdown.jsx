@@ -21,7 +21,17 @@ const NotificationDropdown = ({ isAdmin = false }) => {
     const socketRef = useRef(null);
     const navigate = useNavigate();
 
-    const userId = localStorage.getItem('userId');
+    const getStoredUserId = () => {
+        const directId = localStorage.getItem('userId');
+        if (directId) return directId;
+        try {
+            const userObj = JSON.parse(localStorage.getItem('user') || '{}');
+            return userObj?.id || userObj?._id || '';
+        } catch {
+            return '';
+        }
+    };
+    const userId = getStoredUserId();
     const token = getCookie('token') || localStorage.getItem('token');
 
     const fetchNotifications = async () => {

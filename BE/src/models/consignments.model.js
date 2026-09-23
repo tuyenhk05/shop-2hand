@@ -56,7 +56,7 @@ const consignmentSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'valued', 'approved', 'rejected', 'completed'],
+        enum: ['pending', 'valued', 'approved', 'rejected', 'received', 'completed'],
         default: 'pending'
     },
     adminNotes: {

@@ -4,11 +4,15 @@ const ProductImage = require('../../models/productImages.model');
 
 exports.getCart = async (req, res) => {
     try {
-        const { userId } = req.params;
-        let cart = await Cart.findOne({ userId }).populate('items.productId').lean();
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền truy cập giỏ hàng này' });
+        }
+
+        let cart = await Cart.findOne({ userId: targetUserId }).populate('items.productId').lean();
         if (!cart) {
-            cart = await Cart.create({ userId, items: [] });
-            return res.status(200).json({ success: true, cart: [] });
+            cart = await Cart.create({ userId: targetUserId, items: [] });
+            return res.status(200).json({ success: true, cart: [], data: [] });
         }
 
         // Loại bỏ các sản phẩm đã bán khỏi giỏ hàng hiển thị (tuỳ chọn nhưng nên làm)
@@ -33,19 +37,24 @@ exports.getCart = async (req, res) => {
             })
         );
 
-        res.status(200).json({ success: true, cart: itemsWithImages });
+        res.status(200).json({ success: true, cart: itemsWithImages, data: itemsWithImages });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('getCart error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy giỏ hàng' });
     }
 };
 
 exports.addToCart = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền sửa giỏ hàng này' });
+        }
+
         const { productId, quantity = 1 } = req.body;
         
         // Kiểm tra trạng thái sản phẩm trước khi thêm
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productId).lean();
         if (!product || product.status !== 'active') {
             return res.status(400).json({ 
                 success: false, 
@@ -53,8 +62,8 @@ exports.addToCart = async (req, res) => {
             });
         }
 
-        let cart = await Cart.findOne({ userId });
-        if (!cart) cart = new Cart({ userId, items: [] });
+        let cart = await Cart.findOne({ userId: targetUserId });
+        if (!cart) cart = new Cart({ userId: targetUserId, items: [] });
 
         const itemIndex = cart.items.findIndex(p => p.productId && p.productId.toString() === productId);
         if (itemIndex > -1) {
@@ -69,34 +78,45 @@ exports.addToCart = async (req, res) => {
         cart.items.push({ productId, quantity: finalQuantity });
 
         await cart.save();
-        res.status(200).json({ success: true, message: 'Added to cart' });
+        res.status(200).json({ success: true, message: 'Đã thêm sản phẩm vào giỏ hàng' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('addToCart error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi thêm vào giỏ hàng' });
     }
 };
 
 exports.removeFromCart = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền sửa giỏ hàng này' });
+        }
+
         const { productId } = req.body;
 
-        const cart = await Cart.findOne({ userId });
+        const cart = await Cart.findOne({ userId: targetUserId });
         if (cart) {
             cart.items = cart.items.filter(p => p.productId && p.productId.toString() !== productId);
             await cart.save();
         }
-        res.status(200).json({ success: true, message: 'Removed from cart' });
+        res.status(200).json({ success: true, message: 'Đã xóa sản phẩm khỏi giỏ hàng' });
     } catch (error) {
-         res.status(500).json({ success: false, message: error.message });
+        console.error('removeFromCart error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xóa khỏi giỏ hàng' });
     }
 };
 
 exports.clearCart = async (req, res) => {
     try {
-        const { userId } = req.params;
-        await Cart.findOneAndUpdate({ userId }, { items: [] });
-        res.status(200).json({ success: true, message: 'Cart cleared' });
+        const targetUserId = req.user?.id || req.params.userId;
+        if (req.user && req.params.userId && req.params.userId !== req.user.id && !req.user.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền xóa giỏ hàng này' });
+        }
+
+        await Cart.findOneAndUpdate({ userId: targetUserId }, { items: [] });
+        res.status(200).json({ success: true, message: 'Đã dọn sạch giỏ hàng' });
     } catch (error) {
-         res.status(500).json({ success: false, message: error.message });
+        console.error('clearCart error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xóa giỏ hàng' });
     }
 };

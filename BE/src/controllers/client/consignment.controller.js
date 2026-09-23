@@ -6,25 +6,36 @@ const { uploadToCloudinary } = require('../../configs/cloudinary');
 exports.getConsignments = async (req, res) => {
     try {
         const { userId } = req.params;
-        const items = await Consignment.find({ userId })
+        const currentUserId = req.user?.id;
+
+        // Chống IDOR: Chỉ cho phép xem đơn ký gửi của chính mình hoặc quyền admin
+        if (currentUserId && userId !== currentUserId && !req.user?.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền xem danh sách ký gửi này' });
+        }
+
+        const targetUserId = currentUserId || userId;
+        const items = await Consignment.find({ userId: targetUserId })
             .populate('categoryId', 'name')
             .populate('brandId', 'name')
-            .sort({ createdAt: -1 });
-        res.status(200).json({ success: true, consignments: items });
+            .sort({ createdAt: -1 })
+            .lean();
+        res.status(200).json({ success: true, consignments: items, data: items });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('getConsignments error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi lấy danh sách ký gửi' });
     }
 };
 
 // POST create consignment
 exports.createConsignment = async (req, res) => {
     try {
+        const currentUserId = req.user?.id || req.body.userId;
         const { 
-            userId, title, description, expectedPrice, condition,
+            title, description, expectedPrice, condition,
             categoryId, brandId, gender, size, color, material 
         } = req.body;
 
-        if (!userId || !title || !description) {
+        if (!currentUserId || !title || !description) {
             return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ thông tin.' });
         }
 
@@ -36,20 +47,21 @@ exports.createConsignment = async (req, res) => {
         }
 
         const newCon = new Consignment({
-            userId,
+            userId: currentUserId,
             title,
             description,
-            expectedPrice: Number(expectedPrice) || 0,
-            photos: photoUrls,
-            condition: condition || 'excellent',
+            expectedPrice,
+            condition,
             categoryId: categoryId || null,
             brandId: brandId || null,
-            gender: gender || 'unisex',
-            size: size || '',
-            color: color || '',
-            material: material || '',
+            gender,
+            size,
+            color,
+            material,
+            photos: photoUrls,
             status: 'pending'
         });
+
         await newCon.save();
 
         // --- Tạo thông báo cho Admin ---
@@ -63,9 +75,10 @@ exports.createConsignment = async (req, res) => {
             link: `${systemConfig.prefixAdmin}/consignments`
         });
 
-        res.status(201).json({ success: true, consignment: newCon, message: 'Yêu cầu ký gửi đã được gửi thành công!' });
+        res.status(201).json({ success: true, consignment: newCon, data: newCon, message: 'Yêu cầu ký gửi đã được gửi thành công!' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('createConsignment error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi tạo yêu cầu ký gửi' });
     }
 };
 
@@ -79,19 +92,25 @@ exports.updateConsignmentStatus = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ.' });
         }
 
-        const consignment = await Consignment.findByIdAndUpdate(
-            id,
-            { status, processedAt: Date.now() },
-            { new: true }
-        );
-
+        const consignment = await Consignment.findById(id);
         if (!consignment) {
             return res.status(404).json({ success: false, message: 'Không tìm thấy yêu cầu ký gửi.' });
         }
 
-        res.status(200).json({ success: true, consignment, message: 'Đã cập nhật trạng thái thành công.' });
+        // Kiểm tra quyền: Chỉ chủ sở hữu hoặc Admin mới có quyền cập nhật trạng thái
+        const currentUserId = req.user?.id;
+        if (currentUserId && consignment.userId?.toString() !== currentUserId && !req.user?.isAdmin) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền thao tác trên yêu cầu ký gửi này.' });
+        }
+
+        consignment.status = status;
+        consignment.processedAt = Date.now();
+        await consignment.save();
+
+        res.status(200).json({ success: true, consignment, data: consignment, message: 'Đã cập nhật trạng thái thành công.' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('updateConsignmentStatus error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi cập nhật trạng thái ký gửi' });
     }
 };
 

@@ -65,11 +65,19 @@ const Consignment = () => {
         fetchData();
     }, []);
 
+    const previewUrlsRef = useRef([]);
+    useEffect(() => {
+        previewUrlsRef.current = previewUrls;
+    }, [previewUrls]);
+
     // Dọn dẹp URL tạm thời khi component unmount để tránh rò rỉ bộ nhớ
     useEffect(() => {
         return () => {
-            // Không revoke ở đây mỗi khi previewUrls thay đổi vì sẽ làm mất ảnh cũ.
-            // Component unmount sẽ bị xóa khỏi bộ nhớ bởi trình duyệt sau đó.
+            previewUrlsRef.current.forEach(url => {
+                if (url && typeof url === 'string' && url.startsWith('blob:')) {
+                    URL.revokeObjectURL(url);
+                }
+            });
         };
     }, []);
 

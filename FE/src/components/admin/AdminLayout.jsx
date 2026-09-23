@@ -3,7 +3,8 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../action/auth';
 import { message } from 'antd';
-import { getUnreadCountApi, connectSupportSocket } from '../../services/client/support.service';
+import { getUnreadCountApi } from '../../services/admin/support.service';
+import { connectSupportSocket } from '../../services/client/support.service';
 import NotificationDropdown from '../layout/NotificationDropdown';
 
 const AdminLayout = () => {
@@ -47,6 +48,11 @@ const AdminLayout = () => {
 
     const handleLogout = () => {
         dispatch(logout());
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        localStorage.removeItem('userId');
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         message.success('Đăng xuất thành công');
         navigate('/login');
     };

@@ -11,10 +11,11 @@
     "start": "vite"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.6.1",
     "@react-oauth/google": "^0.13.4",
-    "ant-design": "^1.0.0",
     "antd": "^6.3.5",
     "axios": "^1.15.0",
+    "framer-motion": "^12.4.7",
     "motion": "^12.23.24",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -22,12 +23,10 @@
     "react-redux": "^9.2.0",
     "react-router": "^7.6.3",
     "react-router-dom": "^7.6.3",
-    "react-scripts": "5.0.1",
     "recharts": "^3.8.1",
     "redux": "^5.0.1",
     "remark-gfm": "^4.0.1",
     "sass": "^1.89.2",
-    "scss": "^0.2.4",
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {

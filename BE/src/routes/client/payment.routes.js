@@ -4,5 +4,6 @@ const controller = require('../../controllers/client/payment.controller');
 
 router.post('/create_payment_url', controller.createPaymentUrl);
 router.post('/verify', controller.verifyPayment);
+router.get('/vnpay_ipn', controller.vnpayIpn);
 
 module.exports = router;

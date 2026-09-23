@@ -6,8 +6,8 @@ import {
 import { UploadOutlined, PlusOutlined, EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
 import { getAllProducts, getProductById, createProduct, updateProduct, updateProductStatus, deleteProduct, deleteProductImage } from '../../services/admin/products.service.jsx';
 import { getAllCategories } from '../../services/admin/categories.service.jsx';
-import { adminGet } from '../../untils/adminRequest.jsx';
-import { exportToCSV } from '../../untils/exportCSV';
+import { getAllBrandsAdminApi } from '../../services/admin/brands.service.jsx';
+import { exportToCSV } from '../../utils/exportCSV';
 import Loading from '../../components/loading/loading';
 
 const { TextArea, Search } = Input;
@@ -60,7 +60,7 @@ const ProductsManagement = () => {
             const [prodRes, catRes, brandRes] = await Promise.all([
                 getAllProducts({}),
                 getAllCategories(),
-                adminGet('/brands')
+                getAllBrandsAdminApi()
             ]);
             if (prodRes.success) setProducts(prodRes.data);
             if (catRes.success) setCategories(catRes.data);

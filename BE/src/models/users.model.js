@@ -33,9 +33,22 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    // Thêm vào trong Schema
+    status: {
+        type: String,
+        default: 'active'
+    },
+    avatar: {
+        type: String,
+        default: ''
+    },
+    provider: {
+        type: String,
+        default: 'local'
+    },
+    // Thêm vào trong Schema phục vụ quên mật khẩu an toàn
     resetPasswordOtp: { type: String },
     resetPasswordExpires: { type: Date },
+    resetPasswordAttempts: { type: Number, default: 0 },
     createdAt: {
         type: Date,
         default: Date.now

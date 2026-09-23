@@ -3,6 +3,7 @@ const ProductImage = require('../../models/productImages.model');
 const Brand = require('../../models/brands.model');
 const mongoose = require('mongoose');
 const { uploadToCloudinary, deleteFromCloudinary } = require('../../configs/cloudinary');
+const { escapeRegex } = require('../../utils/string.utils');
 
 // ✅ Lấy tất cả sản phẩm kèm ảnh đại diện từ bảng product_images
 exports.getAllProducts = async (req, res) => {
@@ -12,11 +13,12 @@ exports.getAllProducts = async (req, res) => {
         // Xây dựng query cơ bản (không lấy sản phẩm đã xóa)
         const query = { status: { $ne: 'delete' } };
 
-        // 1. Tìm kiếm theo từ khóa (title hoặc description)
+        // 1. Tìm kiếm theo từ khóa (title hoặc description) đã được làm sạch chống ReDoS
         if (q) {
+            const safeQ = escapeRegex(q.trim());
             query.$or = [
-                { title: { $regex: q, $options: 'i' } },
-                { description: { $regex: q, $options: 'i' } }
+                { title: { $regex: safeQ, $options: 'i' } },
+                { description: { $regex: safeQ, $options: 'i' } }
             ];
         }
 
@@ -93,8 +95,9 @@ exports.createProduct = async (req, res) => {
         // ✅ Xử lý Brand mới nếu brandId không phải ObjectId hợp lệ
         if (productData.brandId && !mongoose.Types.ObjectId.isValid(productData.brandId)) {
             const brandName = productData.brandId;
+            const safeBrandName = escapeRegex(brandName.trim());
             // Tìm brand theo tên (không phân biệt hoa thường)
-            let brand = await Brand.findOne({ name: { $regex: new RegExp(`^${brandName}$`, 'i') } });
+            let brand = await Brand.findOne({ name: { $regex: new RegExp(`^${safeBrandName}$`, 'i') } });
             
             if (!brand) {
                 // Tạo mới nếu chưa có
@@ -194,7 +197,8 @@ exports.updateProduct = async (req, res) => {
         // ✅ Xử lý Brand mới nếu brandId không phải ObjectId hợp lệ
         if (updateData.brandId && !mongoose.Types.ObjectId.isValid(updateData.brandId)) {
             const brandName = updateData.brandId;
-            let brand = await Brand.findOne({ name: { $regex: new RegExp(`^${brandName}$`, 'i') } });
+            const safeBrandName = escapeRegex(brandName.trim());
+            let brand = await Brand.findOne({ name: { $regex: new RegExp(`^${safeBrandName}$`, 'i') } });
             
             if (!brand) {
                 const brand_id = brandName.toLowerCase().replace(/ /g, '_').replace(/[^\w-]+/g, '') + '_' + Date.now().toString().slice(-4);
