@@ -2,8 +2,8 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 
 const API_CLIENT = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const API_ADMIN  = import.meta.env.VITE_API_URL_ADMIN || 'http://localhost:3001/admin';
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+const API_ADMIN = import.meta.env.VITE_API_URL_ADMIN || 'http://localhost:3001/admin';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token') ||

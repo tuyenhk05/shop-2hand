@@ -38,7 +38,7 @@ export default function Home() {
                 ]);
 
                 if (productRes.success) {
-                    setProducts(productRes.data);
+                    setProducts(productRes.data || []);
                 }
                 if (categoryRes.success) {
                     setCategories(categoryRes.data || []);

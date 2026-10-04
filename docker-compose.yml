@@ -1,0 +1,28 @@
+services:
+  # ==========================================
+  # 1. DỊCH VỤ BACKEND
+  # ==========================================
+  backend:
+    build:
+      context: ./BE
+      dockerfile: Dockerfile
+    container_name: shop-2hand-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./BE/.env
+    restart: unless-stopped
+
+  # ==========================================
+  # 2. DỊCH VỤ FRONTEND
+  # ==========================================
+  frontend:
+    build:
+      context: ./FE
+      dockerfile: Dockerfile
+    container_name: shop-2hand-frontend
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+    depends_on:
+      - backend
