@@ -11,31 +11,25 @@ const { cleanupExpiredOrders } = require('./src/controllers/client/order.control
 const SupportConversation = require('./src/models/support_conversations.model');
 const User = require('./src/models/users.model');
 require('dotenv').config();
-
 const app = express();
 const port = process.env.PORT || 3000;
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3001';
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 
 // Danh sách origin được phép truy cập
 const allowedOrigins = [
   CLIENT_URL,
   'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:5173',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3001',
-  'http://127.0.0.1:5173'
 ].filter(Boolean);
 
 const corsOptions = {
   origin: (origin, callback) => {
     // Cho phép requests không có origin (native mobile apps, server-to-server) hoặc nằm trong whitelist
     if (
-      !origin || 
-      allowedOrigins.includes(origin) || 
-      origin.endsWith('.vercel.app') || 
-      origin.endsWith('.onrender.com') || 
-      origin.startsWith('http://localhost:') || 
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.onrender.com') ||
+      origin.startsWith('http://localhost:') ||
       origin.startsWith('http://127.0.0.1:')
     ) {
       callback(null, true);
@@ -76,8 +70,8 @@ app.use((err, req, res, next) => {
   console.error('Server Error:', err.message);
   res.status(err.status || 500).json({
     success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Đã xảy ra lỗi hệ thống, vui lòng thử lại sau.' 
+    message: process.env.NODE_ENV === 'production'
+      ? 'Đã xảy ra lỗi hệ thống, vui lòng thử lại sau.'
       : (err.message || 'Internal Server Error')
   });
 });
@@ -190,7 +184,7 @@ supportNS.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {});
+  socket.on('disconnect', () => { });
 });
 
 // ✅ Socket.IO namespace /notifications
@@ -214,7 +208,7 @@ notificationNS.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {});
+  socket.on('disconnect', () => { });
 });
 
 app.set('notificationNS', notificationNS);

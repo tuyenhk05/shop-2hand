@@ -1,0 +1,47 @@
+name: Build and Push Docker Images to Docker Hub
+
+# 1. ĐIỀU KIỆN KÍCH HOẠT (TRIGGER):
+# Chạy kịch bản này mỗi khi có ai gõ git push lên nhánh master hoặc main
+on:
+  push:
+    branches: [ "master", "main" ]
+
+# 2. CÁC CÔNG VIỆC CẦN THỰC HIỆN (JOBS):
+jobs:
+  build-and-push:
+    # Mượn một máy ảo Ubuntu mới nhất của GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # Bước 1: Kéo toàn bộ mã nguồn của bạn về máy ảo Ubuntu
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Bước 2: Chuẩn bị công cụ Docker Buildx hiện đại trên máy ảo
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Bước 3: Tự động đăng nhập vào Docker Hub bằng Secret đã lưu
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Bước 4: Đóng gói và đẩy (Build & Push) Image của BACKEND lên Docker Hub
+      - name: Build and push Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./BE
+          file: ./BE/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-backend:latest
+
+      # Bước 5: Đóng gói và đẩy (Build & Push) Image của FRONTEND lên Docker Hub
+      - name: Build and push Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./FE
+          file: ./FE/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-frontend:latest

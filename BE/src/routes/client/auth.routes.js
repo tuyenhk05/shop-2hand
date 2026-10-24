@@ -1,6 +1,6 @@
 const express = require('express');
 const authController = require('../../controllers/client/auth.controller');
-const authMiddleware = require('../../middleware/auth.middleware');
+const authMiddleware = require('../../middlewares/auth.middleware');
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ router.post('/login', authController.login);
 router.post('/social-login', authController.socialLogin);
 router.post('/logout', authController.logout);
 
-router.put('/complete-profile', authMiddleware, authController.completeProfile); 
+router.put('/complete-profile', authMiddleware, authController.completeProfile);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
 

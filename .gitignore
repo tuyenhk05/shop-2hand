@@ -1,6 +1,19 @@
-.aider*
+# Môi trường & Thư viện
 .env
 node_modules/
-.vs
-.gitignore
-.md
+dist/
+
+# File hệ thống & IDE
+.vs/
+.vscode/
+.aider*
+.cursor/
+
+# Các thư mục cấu hình Agent & Rules nội bộ
+.agents/
+rules/
+skills/
+REUSABLE_PROJECT_RULES/
+ORIGINAL_REQUEST.md
+PROJECT_AUDIT_REPORT.md
+PROJECT_RULES.md
