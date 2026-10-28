@@ -1,62 +1,82 @@
-name: Build and Push Docker Images to Docker Hub
+name: Production CI/CD Pipeline
 
-# 1. ĐIỀU KIỆN KÍCH HOẠT (TRIGGER):
-# Chạy kịch bản này mỗi khi có ai gõ git push lên nhánh master hoặc main
 on:
   push:
     branches: [ "master", "main" ]
 
-# 2. CÁC CÔNG VIỆC CẦN THỰC HIỆN (JOBS):
 jobs:
-  build-and-push:
-    # Mượn một máy ảo Ubuntu mới nhất của GitHub
+  # ========================================================
+  # GIAI ĐOẠN 1: KIỂM ĐỊNH MÃ NGUỒN (CI)
+  # ========================================================
+  test-code:
+    name: 🧪 Run Automated Unit Tests
     runs-on: ubuntu-latest
 
     steps:
-      # Bước 1: Kéo toàn bộ mã nguồn của bạn về máy ảo Ubuntu
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 
+      - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: ./BE/package-lock.json
 
-      - name: Install dependencies
+      - name: Install Backend dependencies
         run: |
           cd BE
           npm install
 
-      - name: Run Backend Unit Test
+      - name: Run Backend Unit Tests
         run: |
           cd BE
-          npm run test
+          npm test
 
-      # Bước 2: Chuẩn bị công cụ Docker Buildx hiện đại trên máy ảo
+  # ========================================================
+  # GIAI ĐOẠN 2: ĐÓNG GÓI & PHÂN PHỐI DOCKER (CD)
+  # ========================================================
+  build-and-push-docker:
+    name: 🐳 Build & Push Docker Images
+    runs-on: ubuntu-latest
+    # CHỈ CHẠY KHI JOB TEST Ở TRÊN ĐÃ PASS 100%!
+    needs: test-code
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Bước 3: Tự động đăng nhập vào Docker Hub bằng Secret đã lưu
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Bước 4: Đóng gói và đẩy (Build & Push) Image của BACKEND lên Docker Hub
-      - name: Build and push Backend Docker Image
+      # Build & Push BACKEND với Cache + Đánh số phiên bản SHA
+      - name: Build and push Backend Image
         uses: docker/build-push-action@v5
         with:
           context: ./BE
           file: ./BE/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-backend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      # Bước 5: Đóng gói và đẩy (Build & Push) Image của FRONTEND lên Docker Hub
-      - name: Build and push Frontend Docker Image
+      # Build & Push FRONTEND với Cache + Đánh số phiên bản SHA
+      - name: Build and push Frontend Image
         uses: docker/build-push-action@v5
         with:
           context: ./FE
           file: ./FE/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-frontend:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/shop-2hand-frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
