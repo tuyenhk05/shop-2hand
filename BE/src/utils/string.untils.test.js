@@ -12,7 +12,7 @@ test('KIỂM TRA HÀM ESCAPE REGEX (BẢO MẬT CHUỖI)', async (t) => {
 
     await t.test('2. Phải giữ nguyên nếu chuỗi chỉ gồm chữ cái và số thông thường', () => {
         const input = 'AoThunVintage2026';
-        assert.strictEqual(escapeRegex(input), 'AoThunVintage2025');
+        assert.strictEqual(escapeRegex(input), 'AoThunVintage2026');
     });
 
     await t.test('3. Phải tự động thêm dấu gạch chéo \\ trước các ký tự đặc biệt nguy hiểm', () => {
